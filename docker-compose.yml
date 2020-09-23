@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  distributed-town-api:
+    container_name: distributed-town-api
+    image: node
+    volumes:
+      - .:/app
+    working_dir: /app
+    ports:
+      - "3005:3005"
+    command: /bin/bash -c 'yarn; yarn start;'
+    networks:
+      - distributed-town
+
+  distributed-town-db:
+    container_name: distributed-town-db
+    image: mongo
+    volumes:
+      - db_data:/data/db
+    ports:
+      - 27018:27017
+    networks:
+      - distributed-town
+
+
+networks:
+  distributed-town:
+volumes:
+  db_data:
