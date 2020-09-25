@@ -1,10 +1,10 @@
 import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
-import { User } from "../models";
+import { Organization } from "../models";
 
 @injectable()
-export class UsersController {
+export class OrganizationController {
   constructor(
     private loggerService: LoggerService,
   ) { }
@@ -13,9 +13,9 @@ export class UsersController {
    * @swagger
    * /:
    *  get:
-   *      description: Gets all users from the database
+   *      description: Gets all organizations from the database
    *      tags:
-   *          - Users
+   *          - Organization
    *      produces:
    *          - application/json
    *      responses:
@@ -26,12 +26,18 @@ export class UsersController {
    */
   public get = async (req: Request, res: Response) => {
     try {
-      const response: User[] = [{
+      const response = [
+        {
         id: "ba60a22e-2178-4d58-bf47-c9d337c093ba", 
-        name: "Milena",
-        organization: "8319543e-f6e3-4af1-9595-4b91d87b0bae",
-        skills: []
-      }]
+        name: "Org1",
+        scarcityScore: 60
+      },
+      {
+        id: "ba60a22e-2178-4d58-bf47-c9d337c093as", 
+        name: "Org2",
+        scarcityScore: 70
+      },
+    ]
       res.status(200).send(response);
     } catch (err) {
       this.loggerService.error(err);
