@@ -6,15 +6,15 @@ The idea is to build a DAO-Project using a credit system and geo-location to bui
 
 ## Functionalities: 
 
-User should be able to register and select their skills
-User should be able to login 
-User should be able to join a community
-User should be able to place an offer (Credtis calculation?)
-User should be able to list all offers inside this community 
-User should be able to pick and offer and complete it
-User should who has placed an offer should be able to rate the user who is completing it. The credits trasferred should depend on this rate.
-User should be able to switch between communities.
-User should be able to create a community? How? 
+- User should be able to register and select their skills
+- User should be able to login 
+- User should be able to join a community
+- User should be able to place an offer (Credtis calculation?)
+- User should be able to list all offers inside this community 
+- User should be able to pick and offer and complete it
+- User should who has placed an offer should be able to rate the user who is completing it. The credits trasferred should depend on this rate.
+- User should be able to switch between communities.
+- User should be able to create a community? How? 
 
 ## Technical stack
 
