@@ -1,19 +1,18 @@
 import { injectable } from "inversify";
 import { Router } from "express";
-import { UsersController } from "../controllers";
+import { OrganizationController } from "../controllers";
 
 @injectable()
-export class UserRouter {
+export class OrganizationRouter {
   private readonly _router: Router;
 
-  constructor(private userController: UsersController) {
+  constructor(private organizationController: OrganizationController) {
     this._router = Router({ strict: true });
     this.init();
   }
 
   private init(): void {
-    this._router.get("/", this.userController.get);
-    this._router.post("/", this.userController.post);
+    this._router.get("/", this.organizationController.get);
   }
 
   public get router(): Router {

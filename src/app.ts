@@ -5,6 +5,8 @@ import { injectable } from "inversify";
 import * as promBundle from "express-prom-bundle";
 import {
   UserRouter,
+  SkillsRouter,
+  OrganizationRouter,
   SwaggerRouter,
 } from "./routers";
 
@@ -14,6 +16,8 @@ export class App {
 
   constructor(
     private userRouter: UserRouter,
+    private skillsRouter: SkillsRouter,
+    private organizationRouter: OrganizationRouter,
     private swaggerRouter: SwaggerRouter
   ) {
     this._app = express();
@@ -44,5 +48,7 @@ export class App {
   private _initRoutes() {
     this._app.use("/api/docs", this.swaggerRouter.router);
     this._app.use("/api/user", this.userRouter.router);
+    this._app.use("/api/skill", this.skillsRouter.router);
+    this._app.use("/api/organization", this.organizationRouter.router);
   }
 }

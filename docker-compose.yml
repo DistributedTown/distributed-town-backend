@@ -13,18 +13,5 @@ services:
     networks:
       - distributed-town
 
-  distributed-town-db:
-    container_name: distributed-town-db
-    image: mongo
-    volumes:
-      - db_data:/data/db
-    ports:
-      - 27018:27017
-    networks:
-      - distributed-town
-
-
 networks:
   distributed-town:
-volumes:
-  db_data:

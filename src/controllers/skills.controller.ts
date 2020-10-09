@@ -4,18 +4,20 @@ import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 
 @injectable()
-export class OrganizationController {
+export class SkillsController {
+
   constructor(
     private loggerService: LoggerService,
-  ) { }
+  ) {
+  }
 
   /**
    * @swagger
-   * /organization:
+   * /skill:
    *  get:
-   *      description: Gets all organizations from the database
+   *      description: Gets all predefined skills from the database
    *      tags:
-   *          - Organization
+   *          - Skills
    *      produces:
    *          - application/json
    *      responses:
@@ -24,10 +26,10 @@ export class OrganizationController {
    *          500:
    *              description: Server error
    */
-  public get = async (req: Request, res: Response) => {
+  public get = async (_req: Request, res: Response) => {
     try {
-      var response = await threadDBClient.getAll('Organizations');
-      res.status(200).send(response);
+      const skills = await threadDBClient.getAll('Skills');
+      res.status(200).send(skills);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
