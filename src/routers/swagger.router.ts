@@ -20,8 +20,8 @@ export class SwaggerRouter {
     const options = {
       swaggerDefinition: {
         info: {
-          title: "Accountable Test API",
-          description: "Accountable Test API definition"
+          title: "Distributed Town API",
+          description: "Distributed Town API definition"
         },
         host: `${process.env.ENVIRONMENT_IP}:${process.env.SERVER_PORT}`,
         basePath: "/api",
