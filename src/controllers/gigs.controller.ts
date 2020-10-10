@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
-import { acceptGig } from "../services/gig.service";
+import { acceptGig, validateAcceptingGig, validateGig } from "../services/gig.service";
 import { GigsCollection } from "../constants/constants";
 
 @injectable()
@@ -61,8 +61,14 @@ export class GigsController {
    */
   public post = async (req: Request, res: Response) => {
     try {
-      const gigID = await threadDBClient.insert(GigsCollection, req.body);
-      res.status(201).send({ gigID: gigID });
+      const validationResult = await validateGig(req.body);
+      if (validationResult.isValid) {
+        const gigID = await threadDBClient.insert(GigsCollection, req.body);
+        res.status(201).send({ gigID: gigID });
+
+      } else {
+        res.status(400).send({ message: validationResult.message });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -95,8 +101,13 @@ export class GigsController {
    */
   public accept = async (req: Request, res: Response) => {
     try {
-      await acceptGig(req.params.gigID, req.body.userID);
-      res.status(200).send();
+      const validationResult = await validateAcceptingGig(req.params.gigID);
+      if (validationResult.isValid) {
+        await acceptGig(req.params.gigID, req.body.userID);
+        res.status(200).send();
+      } else {
+        res.status(400).send({ message: validationResult.message });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

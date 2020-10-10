@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 import { calculateInitialCreditsAmount } from "../services";
 import { UsersCollection } from "../constants/constants";
+import { validateUser } from "../services/user.service";
 
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
@@ -44,20 +45,6 @@ export class UsersController {
     }
   }
 
-
-  validateRegisterBody = (model: any) => {
-    if (!model.username) {
-      throw Error('Username is required.');
-    }
-    if (model.skillCategories.length == 0) {
-      throw Error('User should enter some skills is required.');
-    }
-    if (!model.organizationID) {
-      throw Error('Organization is required.');
-    }
-    // validate organization -> if it exists, if it has free slot (members < 24);
-  };
-
   /**
    * @swagger
    * /user:
@@ -83,13 +70,16 @@ export class UsersController {
    */
   public post = async (req: any, res: Response) => {
     try {
-
-      this.validateRegisterBody(req.body);
-      const userID = await threadDBClient.insert(UsersCollection, req.body);
-      const credits = await calculateInitialCreditsAmount(req.body);
-      console.log(credits);
-      // store the credits on the blockchain
-      res.status(201).send({ userID: userID });
+      const validationResult = await validateUser(req.body);
+      if(validationResult.isValid) {
+        const userID = await threadDBClient.insert(UsersCollection, req.body);
+        const credits = await calculateInitialCreditsAmount(req.body);
+        console.log(credits);
+        // store the credits on the blockchain
+        res.status(201).send({ userID: userID });
+      } else {
+        res.status(400).send({ message: validationResult.message });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -114,10 +104,6 @@ export class UsersController {
      */
   public login = async (req: any, res: Response) => {
     try {
-
-      // console.log('aaaaaaaaaaaaaaaaaaa');
-      // const didToken = await magic.auth.loginWithMagicLink({ email: 'mimonova13@gmail.com' });
-      // console.log(didToken);
       if (req.user) {
         res.status(200).end('User is logged in.');
       } else {

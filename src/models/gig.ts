@@ -33,4 +33,5 @@ export interface Gig {
     }
     creditsOffered: number;
     isOpen: boolean;
+    organizationID: string;
 }

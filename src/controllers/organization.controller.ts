@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 import { OrganizationsCollection } from "../constants/constants";
+import { Where } from "@textile/hub";
 
 @injectable()
 export class OrganizationController {
@@ -28,7 +29,8 @@ export class OrganizationController {
   public get = async (req: any, res: Response) => {
     try {
       // if (req.isAuthenticated()) {
-        var response = await threadDBClient.getAll(OrganizationsCollection);
+        const query = new Where('isOpen').eq(true);
+        var response = await threadDBClient.filter(OrganizationsCollection, query);
         res.status(200).send(response);
       // } else {
       //   res.status(401).send( { error: 'User not logged in.'} );
