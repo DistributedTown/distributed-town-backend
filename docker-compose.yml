@@ -12,6 +12,7 @@ services:
       - ENVIRONMENT_IP=localhost
       - SERVER_PORT=3005
       - NODE_ENV=development
+      - MAGIC_SECRET_KEY=sk_test_A040E804B3F17845
     ports:
       - "3005:3005"
     command: /bin/bash -c 'yarn; yarn start;'

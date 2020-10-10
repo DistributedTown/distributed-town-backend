@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import { Router } from "express";
 import { OrganizationController } from "../controllers";
 
+const passport = require("passport");
 @injectable()
 export class OrganizationRouter {
   private readonly _router: Router;
