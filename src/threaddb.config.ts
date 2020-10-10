@@ -108,7 +108,7 @@ class ThreadDBInit {
       { name: 'Tech', category: 'DLT & Blockchain', credits: 6 },
       { name: 'Protocol', category: 'DLT & Blockchain', credits: 24 },
 
-      { name: 'Creative Art', category: 'Art & Lifestyle', credits: 12 },
+      { name: 'Creative Arts', category: 'Art & Lifestyle', credits: 12 },
       { name: 'Lifestyle', category: 'Art & Lifestyle', credits: 6 },
       { name: 'Activities', category: 'Art & Lifestyle', credits: 24 },
     ]);

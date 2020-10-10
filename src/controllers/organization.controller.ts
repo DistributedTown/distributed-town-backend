@@ -1,8 +1,7 @@
 import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
-import threadDBClient from "../threaddb.config";
-import { OrganizationsCollection } from "../constants/constants";
+import { getOrganizationsBySkill } from "../services/organization.service";
 
 @injectable()
 export class OrganizationController {
@@ -28,7 +27,8 @@ export class OrganizationController {
   public get = async (req: any, res: Response) => {
     try {
       // if (req.isAuthenticated()) {
-        var response = await threadDBClient.getAll(OrganizationsCollection);
+        const skillName = req.query.skill;
+        var response = await getOrganizationsBySkill(skillName);
         res.status(200).send(response);
       // } else {
       //   res.status(401).send( { error: 'User not logged in.'} );
