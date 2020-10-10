@@ -7,6 +7,7 @@ import {
   UserRouter,
   SkillsRouter,
   OrganizationRouter,
+  GigRouter,
   SwaggerRouter,
 } from "./routers";
 
@@ -18,6 +19,7 @@ export class App {
     private userRouter: UserRouter,
     private skillsRouter: SkillsRouter,
     private organizationRouter: OrganizationRouter,
+    private gigRouter: GigRouter,
     private swaggerRouter: SwaggerRouter
   ) {
     this._app = express();
@@ -49,6 +51,7 @@ export class App {
     this._app.use("/api/docs", this.swaggerRouter.router);
     this._app.use("/api/user", this.userRouter.router);
     this._app.use("/api/skill", this.skillsRouter.router);
+    this._app.use("/api/gig", this.gigRouter.router);
     this._app.use("/api/organization", this.organizationRouter.router);
   }
 }
