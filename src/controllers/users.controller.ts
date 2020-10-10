@@ -1,9 +1,13 @@
 import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
-import { CreateUser } from "../models";
 import threadDBClient from "../threaddb.config";
 import { calculateInitialCreditsAmount } from "../services";
+import { UsersCollection } from "../constants/constants";
+
+const { Magic } = require("@magic-sdk/admin");
+const magic = new Magic(process.env.MAGIC_SECRET_KEY);
+
 @injectable()
 export class UsersController {
   constructor(
@@ -25,10 +29,15 @@ export class UsersController {
    *          500:
    *              description: Server error
    */
-  public get = async (req: Request, res: Response) => {
+  public get = async (req: any, res: Response) => {
     try {
-      const response = {};
-      res.status(200).send(response);
+      if (req.isAuthenticated())
+        return res
+          .status(200)
+          .json(req.user)
+          .end();
+      else
+        return res.status(401).end(`User is not logged in.`);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -43,7 +52,7 @@ export class UsersController {
     if (model.skillCategories.length == 0) {
       throw Error('User should enter some skills is required.');
     }
-    if(!model.organizationID) {
+    if (!model.organizationID) {
       throw Error('Organization is required.');
     }
     // validate organization -> if it exists, if it has free slot (members < 24);
@@ -72,37 +81,62 @@ export class UsersController {
    *          500:
    *              description: Server error
    */
-  public post = async (req: Request, res: Response) => {
+  public post = async (req: any, res: Response) => {
     try {
-    //   {
-    //     "organizationId": "01em7cpcfatd4th7afk5t930pd",
-    //     "username": "migrenaaa", 
-    //     "skillCategories": [
-    //         {
-    //         "category": "At home",
-    //         "skills": [
-    //             {
-    //                 "skill": "Gardening",
-    //                 "level": 8
-    //             }
-    //         ]
-    //     },
-    //      {
-    //         "category": "Community life",
-    //         "skills": [
-    //             {
-    //                 "skill": "Legal & Proposals",
-    //                 "level": 10
-    //             }
-    //         ]
-    //     }]
-    // }
+
       this.validateRegisterBody(req.body);
-      const userID = await threadDBClient.insert('Users', req.body);
+      const userID = await threadDBClient.insert(UsersCollection, req.body);
       const credits = await calculateInitialCreditsAmount(req.body);
       console.log(credits);
       // store the credits on the blockchain
       res.status(201).send({ userID: userID });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+  /**
+     * @swagger
+     * /user/login:
+     *  post:
+     *      description: Login with magic link
+     *      tags:
+     *          - Users
+     *      produces:
+     *          - application/json
+     *      responses:
+     *          200:
+     *              description: Created
+     *          401:
+     *              description: Unauthorized
+     *          500:
+     *              description: Server error
+     */
+  public login = async (req: any, res: Response) => {
+    try {
+
+      // console.log('aaaaaaaaaaaaaaaaaaa');
+      // const didToken = await magic.auth.loginWithMagicLink({ email: 'mimonova13@gmail.com' });
+      // console.log(didToken);
+      if (req.user) {
+        res.status(200).end('User is logged in.');
+      } else {
+        return res.status(401).end('Could not log user in.');
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+  public logout = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        await magic.users.logoutByIssuer(req.user.issuer);
+        req.logout();
+        return res.status(200).end();
+      } else {
+        return res.status(401).end(`User is not logged in.`);
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

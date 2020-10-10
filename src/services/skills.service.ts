@@ -1,8 +1,9 @@
+import { SkillsCollection } from "../constants/constants";
 import { CreateUser } from "../models";
 import threadDBClient from "../threaddb.config";
 
 export async function calculateInitialCreditsAmount(user: CreateUser) {
-    const categories: any[] = await threadDBClient.getAll('Skills');
+    const categories: any[] = await threadDBClient.getAll(SkillsCollection);
     let totalCredits = 2000; // joined community
 
     console.log(categories);

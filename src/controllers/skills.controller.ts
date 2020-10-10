@@ -2,6 +2,7 @@ import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
+import { SkillsCollection } from "../constants/constants";
 
 @injectable()
 export class SkillsController {
@@ -26,10 +27,14 @@ export class SkillsController {
    *          500:
    *              description: Server error
    */
-  public get = async (_req: Request, res: Response) => {
+  public get = async (req: any, res: Response) => {
     try {
-      const skills = await threadDBClient.getAll('Skills');
-      res.status(200).send(skills);
+      if (req.isAuthenticated()) {
+        const skills = await threadDBClient.getAll(SkillsCollection);
+        res.status(200).send(skills);
+      } else {
+        res.status(401).send({ error: 'User not logged in.' });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

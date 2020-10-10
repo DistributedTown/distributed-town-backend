@@ -1,4 +1,10 @@
-import { Client, KeyInfo, ThreadID } from '@textile/hub'
+import { Client, KeyInfo, QueryJSON, ThreadID } from '@textile/hub'
+import {
+  UsersCollection,
+  OrganizationsCollection,
+  SkillsCollection,
+  UsersCollectionTestMagic
+} from './constants/constants';
 import { injectable } from 'inversify';
 
 @injectable()
@@ -31,13 +37,13 @@ class ThreadDBInit {
     await this.client.newDB(this.threadID)
 
     // Define the collections 
-    const allCollections = await this.client.listCollections(this.threadID);
-    await this.client.newCollection(this.threadID, { name: 'Skills' });
-    await this.client.newCollection(this.threadID, { name: 'Organizations' });
-    await this.client.newCollection(this.threadID, { name: 'Users' });
+    await this.client.newCollection(this.threadID, { name: SkillsCollection });
+    await this.client.newCollection(this.threadID, { name: OrganizationsCollection });
+    await this.client.newCollection(this.threadID, { name: UsersCollection });
+    await this.client.newCollection(this.threadID, { name: UsersCollectionTestMagic });
 
     // Insert the predefined data
-    await this.client.create(this.threadID, 'Skills', [
+    await this.client.create(this.threadID, SkillsCollection, [
       {
         category: 'Local communities',
         credits: 6,
@@ -93,7 +99,7 @@ class ThreadDBInit {
         ]
       }
     ]);
-    await this.client.create(this.threadID, 'Organizations', [
+    await this.client.create(this.threadID, OrganizationsCollection, [
       {
         scarcityScore: 60,
         category: 'Art & Lifestyle',
@@ -111,6 +117,10 @@ class ThreadDBInit {
 
   public async getAll(collectionName: string) {
     return await this.client.find(this.threadID, collectionName, {});
+  }
+
+  public async filter(collectionName: string, filter: QueryJSON) {
+    return await this.client.find(this.threadID, collectionName, filter);
   }
 
   public async insert(collectionName: string, model: any) {
