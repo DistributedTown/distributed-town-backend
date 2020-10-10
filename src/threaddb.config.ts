@@ -3,7 +3,8 @@ import {
   UsersCollection,
   OrganizationsCollection,
   SkillsCollection,
-  UsersCollectionTestMagic
+  UsersCollectionTestMagic,
+  GigsCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
 
@@ -35,20 +36,13 @@ class ThreadDBInit {
      * Each new ThreadID requires a `newDB` call.
      */
     await this.client.newDB(this.threadID)
-
+    
     // Define the collections 
-<<<<<<< HEAD
     await this.client.newCollection(this.threadID, { name: SkillsCollection });
     await this.client.newCollection(this.threadID, { name: OrganizationsCollection });
     await this.client.newCollection(this.threadID, { name: UsersCollection });
     await this.client.newCollection(this.threadID, { name: UsersCollectionTestMagic });
-=======
-    const allCollections = await this.client.listCollections(this.threadID);
-    await this.client.newCollection(this.threadID, { name: 'Skills' });
-    await this.client.newCollection(this.threadID, { name: 'Organizations' });
-    await this.client.newCollection(this.threadID, { name: 'Users' });
-    await this.client.newCollection(this.threadID, { name: 'Gigs' });
->>>>>>> master
+    await this.client.newCollection(this.threadID, { name: GigsCollection });
 
     // Insert the predefined data
     await this.client.create(this.threadID, SkillsCollection, [
