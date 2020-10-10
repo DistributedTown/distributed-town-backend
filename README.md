@@ -17,4 +17,5 @@ You will know that the application is up and running when you see this message:
 Go to `http://localhost:3005/api/docs`
 You will see a swagger page with all available endpoints.
 
-## 4. Known issues
+Production URL: 
+`http://3.250.29.111:3005/api/docs`

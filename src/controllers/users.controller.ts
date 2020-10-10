@@ -71,7 +71,7 @@ export class UsersController {
   public post = async (req: any, res: Response) => {
     try {
       const validationResult = await validateUser(req.body);
-      if(validationResult.isValid) {
+      if (validationResult.isValid) {
         const userID = await threadDBClient.insert(UsersCollection, req.body);
         const credits = await calculateInitialCreditsAmount(req.body);
         console.log(credits);
