@@ -6,7 +6,6 @@ export async function acceptGig(gigID: string, acceptedUser: string) {
     let gig: any = await threadDBClient.getByID(GigsCollection, gigID);
     gig.isOpen = false;
     gig.acceptedUser = acceptedUser;
-    // call smart contract
     await threadDBClient.save(GigsCollection, [gig]);
 }
 export async function validateAcceptingGig(gigID: string): Promise<ValidationResponseModel> {
@@ -33,11 +32,11 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
         response.isValid = false;
         response.message = 'Credits offered should be greater than 0.';
     }
-    else if (!gig.skillCategories) {
+    else if (!gig.skills) {
         response.isValid = false;
         response.message = 'Skills should be selected.';
     }
-    else if (gig.skillCategories.skills.length === 0) {
+    else if (gig.skills.length === 0) {
         response.isValid = false;
         response.message = 'Skills should be selected.';
     } else if (!gig.organizationID) {

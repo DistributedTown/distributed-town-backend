@@ -1,6 +1,6 @@
 import threadDBClient from "../threaddb.config";
 import { CreateUser, ValidationResponseModel } from "../models";
-import { OrganizationsCollection } from "../constants/constants";
+import { OrganizationsCollection, UsersCollection } from "../constants/constants";
 import { Where } from "@textile/hub";
 
 export async function validateUser(user: CreateUser): Promise<ValidationResponseModel> {
@@ -23,7 +23,7 @@ export async function validateUser(user: CreateUser): Promise<ValidationResponse
     }
 
     const query = new Where('organizationId').eq(user.organizationId);
-    const organizationMembers = await threadDBClient.filter(OrganizationsCollection, query);
+    const organizationMembers = await threadDBClient.filter(UsersCollection, query);
     if(organizationMembers.length >= 24) {
         response.isValid = false;
         response.message = 'Organization cannot exceed 24 members';

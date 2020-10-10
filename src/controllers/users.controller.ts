@@ -1,5 +1,5 @@
 import { LoggerService } from "../services";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 import { calculateInitialCreditsAmount } from "../services";
@@ -72,11 +72,9 @@ export class UsersController {
     try {
       const validationResult = await validateUser(req.body);
       if (validationResult.isValid) {
-        const userID = await threadDBClient.insert(UsersCollection, req.body);
+        const inserted = await threadDBClient.insert(UsersCollection, req.body);
         const credits = await calculateInitialCreditsAmount(req.body);
-        console.log(credits);
-        // store the credits on the blockchain
-        res.status(201).send({ userID: userID });
+        res.status(201).send({ userID: inserted[0], credits: credits });
       } else {
         res.status(400).send({ message: validationResult.message });
       }

@@ -24,14 +24,30 @@
 export interface Gig {
     _id: string;
     userID: string;
-    acceptedUser: string;
+    acceptedUserID: string;
     title: string;
     description: string;
-    skillCategories: {
-        category: string; 
-        skills: string[];
-    }
     creditsOffered: number;
     isOpen: boolean;
     organizationID: string;
+    skills: string[];
 }
+
+
+export const gigSchema = {
+    title: 'Gig',
+    type: 'object',
+    properties: {
+      _id: { type: 'string' },
+      userID: { type: 'string' },
+      acceptedUserID: { type: 'string' },
+      title: { type: 'string' },
+      description: { type: 'string' },
+      creditsOffered: { type: 'number' },
+      isOpen: { type: 'boolean' },
+      organizationID: { type: 'string' },
+      skills: { type: 'array', items: {
+        type: 'string'
+      } },
+    },
+  }

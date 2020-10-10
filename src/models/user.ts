@@ -15,29 +15,32 @@
 export interface CreateUser {
     username: string;
     organizationId: string;
-    skillCategories: SkillCategories[];
+    skills: UserSkill[];
 }
 
-/**
- * @swagger
- * definitions:
- *  SkillCategories:
- *      type: object
- *      required:
- *          - category
- *          - skills
- *      properties:
- *            name:
- *              type: string
- *            balance:
- *              type: array
- *              items:
- *                type: object
- */
-export interface SkillCategories {
-    category: string;
-    skills: UserSkill[];
-};
+
+export const userSchema = {
+    title: 'User',
+    type: 'object',
+    properties: {
+        _id: { type: 'string' },
+        username: { type: 'string' },
+        organizationId: { type: 'string' },
+        skills: {
+            type: 'array',
+            items: { "$ref": "#/definitions/userSkill" }
+        },
+    },
+    definitions: {
+        "userSkill": {
+            type: "object",
+            properties: {
+                skill: { type: 'string' }, 
+                level: { type: 'number' }
+            }
+        }
+    }
+}
 
 /**
  * @swagger

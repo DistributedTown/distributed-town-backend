@@ -3,9 +3,18 @@ import {
   UsersCollection,
   OrganizationsCollection,
   SkillsCollection,
-  GigsCollection
+  GigsCollection,
+  SubcategoriesCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
+import {
+  subcategorySchema,
+  skillSchema,
+  organizationSchema,
+  userSchema,
+  gigSchema
+} from './models'
+
 
 @injectable()
 class ThreadDBInit {
@@ -34,83 +43,80 @@ class ThreadDBInit {
      * Each new ThreadID requires a `newDB` call.
      */
     await this.client.newDB(this.threadID)
-    
+
     // Define the collections 
-    await this.client.newCollection(this.threadID, { name: SkillsCollection });
-    await this.client.newCollection(this.threadID, { name: OrganizationsCollection });
-    await this.client.newCollection(this.threadID, { name: UsersCollection });
-    await this.client.newCollection(this.threadID, { name: GigsCollection });
+    await this.client.newCollection(this.threadID, { name: SkillsCollection, schema: skillSchema });
+    await this.client.newCollection(this.threadID, { name: SubcategoriesCollection, schema: subcategorySchema });
+    await this.client.newCollection(this.threadID, { name: OrganizationsCollection, schema: organizationSchema });
+    await this.client.newCollection(this.threadID, { name: UsersCollection, schema: userSchema });
+    await this.client.newCollection(this.threadID, { name: GigsCollection, schema: gigSchema });
 
     // Insert the predefined data
     await this.client.create(this.threadID, SkillsCollection, [
-      {
-        category: 'Local communities',
-        credits: 6,
-        skills: [
-          { name: 'Administration' },
-          { name: 'Householding' },
-          { name: 'Gardening' },
-          { name: 'Legal' },
-          { name: 'Accounting' },
-          { name: 'Fun & Entertainment' },
-          { name: 'Company' },
-          { name: 'Community Life' },
-          { name: 'Art & Creativity' },
-          { name: 'Teaching' },
-          { name: 'Leadership' },
-          { name: 'Cooking' },
-        ]
-      },
-      {
-        category: 'DLT & Blockchain',
-        credits: 24,
-        skills: [
-          { name: 'Governance' },
-          { name: 'Blockchain' },
-          { name: 'Architecture' },
-          { name: 'Frontend Dev' },
-          { name: 'Backend Dev' },
-          { name: 'DeFi' },
-          { name: 'Tokenomics' },
-          { name: 'Game Theory' },
-          { name: 'Network Design' },
-          { name: 'Smart Contracts' },
-          { name: 'Mobile Dev' },
-          { name: 'Web Dev' },
-        ]
-      },
-      {
-        category: 'Art & Lifestyle',
-        credits: 12,
-        skills: [
-          { name: 'Music' },
-          { name: 'Painting' },
-          { name: 'Photography' },
-          { name: 'Video-making' },
-          { name: 'Training & Sport' },
-          { name: 'Hiking' },
-          { name: 'Biking' },
-          { name: 'Performance' },
-          { name: 'Theather' },
-          { name: 'Project Management' },
-          { name: 'Writing' },
-          { name: 'Gaming' },
-        ]
-      }
+      { name: 'Company', subcategory: 'At Home' },
+      { name: 'Householding', subcategory: 'At Home' },
+      { name: 'Gardening', subcategory: 'At Home' },
+      { name: 'Cooking', subcategory: 'At Home' },
+
+      { name: 'Legal', subcategory: 'Professional' },
+      { name: 'Accounting', subcategory: 'Professional' },
+      { name: 'Art, Music & Creativity', subcategory: 'Professional' },
+      { name: 'Teaching', subcategory: 'Professional' },
+
+      { name: 'Fun & Entertainment', subcategory: 'Community Life' },
+      { name: 'Administration & Management', subcategory: 'Community Life' },
+      { name: 'Community Life', subcategory: 'Community Life' },
+      { name: 'Leadership & Public Speaking', subcategory: 'Community Life' },
+
+      { name: 'DeFi', subcategory: 'Blockchain & DLT' },
+      { name: 'Blockchain infrastructure', subcategory: 'Blockchain & DLT' },
+      { name: 'Architecture', subcategory: 'Blockchain & DLT' },
+      { name: 'Smart Contracts', subcategory: 'Blockchain & DLT' },
+
+      { name: 'Backend', subcategory: 'Tech' },
+      { name: 'Frontend', subcategory: 'Tech' },
+      { name: 'Web Dev', subcategory: 'Tech' },
+      { name: 'Mobile Dev', subcategory: 'Tech' },
+
+      { name: 'Network Design', subcategory: 'Protocol' },
+      { name: 'Tokenomics', subcategory: 'Protocol' },
+      { name: 'Game Theory', subcategory: 'Protocol' },
+      { name: 'Governance & Consensus', subcategory: 'Protocol' },
+
+      { name: 'Music', subcategory: 'Creative Arts' },
+      { name: 'Painting', subcategory: 'Creative Arts' },
+      { name: 'Photography', subcategory: 'Creative Arts' },
+      { name: 'Video-making', subcategory: 'Creative Arts' },
+
+      { name: 'Training & Sport', subcategory: 'Lifestyle' },
+      { name: 'Hiking', subcategory: 'Lifestyle' },
+      { name: 'Biking', subcategory: 'Lifestyle' },
+      { name: 'Writing', subcategory: 'Lifestyle' },
+
+      { name: 'Performance & Theather', subcategory: 'Activities' },
+      { name: 'Project Management', subcategory: 'Activities' },
+      { name: 'Production', subcategory: 'Activities' },
+      { name: 'Gaming', subcategory: 'Activities' },
     ]);
+
+    await this.client.create(this.threadID, SubcategoriesCollection, [
+      { name: 'At Home', category: 'Local communities', credits: 6 },
+      { name: 'Community Life', category: 'Local communities', credits: 12 },
+      { name: 'Professional', category: 'Local communities', credits: 24 },
+
+      { name: 'Blockchain & DLT', category: 'DLT & Blockchain', credits: 12 },
+      { name: 'Tech', category: 'DLT & Blockchain', credits: 6 },
+      { name: 'Protocol', category: 'DLT & Blockchain', credits: 24 },
+
+      { name: 'Creative Art', category: 'Art & Lifestyle', credits: 12 },
+      { name: 'Lifestyle', category: 'Art & Lifestyle', credits: 6 },
+      { name: 'Activities', category: 'Art & Lifestyle', credits: 24 },
+    ]);
+
     await this.client.create(this.threadID, OrganizationsCollection, [
-      {
-        scarcityScore: 60,
-        category: 'Art & Lifestyle',
-      },
-      {
-        scarcityScore: 50,
-        category: 'DLT & Blockchain',
-      },
-      {
-        scarcityScore: 70,
-        category: 'Local communities',
-      }
+      { scarcityScore: 60, category: 'Art & Lifestyle', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c'},
+      { scarcityScore: 70, category: 'DLT & Blockchain', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2'},
+      { scarcityScore: 40, category: 'Local communities', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
     ]);
   }
 
@@ -121,17 +127,18 @@ class ThreadDBInit {
   public async getByID(collectionName: string, id: string) {
     return await this.client.findByID(this.threadID, collectionName, id);
   }
-  
-  public async save(collectionName: string, values: any[]) {
-    return await this.client.save(this.threadID, collectionName, values);
-  }
 
   public async filter(collectionName: string, filter: QueryJSON) {
     return await this.client.find(this.threadID, collectionName, filter);
   }
 
+
   public async insert(collectionName: string, model: any) {
     return await this.client.create(this.threadID, collectionName, [model]);
+  }
+
+  public async save(collectionName: string, values: any[]) {
+    return await this.client.save(this.threadID, collectionName, values);
   }
 
   public async update(collectionName: string, id: string, model: any) {

@@ -1,18 +1,19 @@
-import { SkillsCollection } from "../constants/constants";
-import { CreateUser } from "../models";
+import { SkillsCollection, SubcategoriesCollection } from "../constants/constants";
+import { CreateUser, Skill, Subcategory } from "../models";
 import threadDBClient from "../threaddb.config";
 
-export async function calculateInitialCreditsAmount(user: CreateUser) {
-    const categories: any[] = await threadDBClient.getAll(SkillsCollection);
-    let totalCredits = 2000; // joined community
+export async function calculateInitialCreditsAmount(user: CreateUser): Promise<number> {
+    const subcategories: any[] = await threadDBClient.getAll(SubcategoriesCollection);
+    const skills: any[] = await threadDBClient.getAll(SkillsCollection);
+    const subcategoriesTyped = subcategories as Subcategory[];
+    const skillsTyped = skills as Skill[];
 
-    console.log(categories);
-    user.skillCategories.forEach(category => {
-        console.log('category: ', category);
-        const credits = categories.find(e => e.category === category.category).credits;
-        category.skills.forEach(skill => {
-            totalCredits +=  credits * skill.level;
-        })
+    let totalCredits = 2000;
+
+    user.skills.forEach(userSkill => {
+        const skill = skillsTyped.find(s => s.name === userSkill.skill);
+        const subCat = subcategoriesTyped.find(e => e.name === skill.subcategory);
+        totalCredits +=  subCat.credits * userSkill.level;
     });
 
     return totalCredits;

@@ -4,6 +4,7 @@ import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 import { acceptGig, validateAcceptingGig, validateGig } from "../services/gig.service";
 import { GigsCollection } from "../constants/constants";
+import { Where } from "@textile/hub";
 
 @injectable()
 export class GigsController {
@@ -28,7 +29,8 @@ export class GigsController {
    */
   public get = async (req: Request, res: Response) => {
     try {
-      const gigs = await threadDBClient.getAll(GigsCollection);
+      const query = new Where('isOpen').eq(true);
+      const gigs = await threadDBClient.filter(GigsCollection, query);
       res.status(200).send(gigs);
     } catch (err) {
       this.loggerService.error(err);
@@ -61,11 +63,11 @@ export class GigsController {
    */
   public post = async (req: Request, res: Response) => {
     try {
+      req.body.isOpen = true;
       const validationResult = await validateGig(req.body);
       if (validationResult.isValid) {
-        const gigID = await threadDBClient.insert(GigsCollection, req.body);
-        res.status(201).send({ gigID: gigID });
-
+        const inserted = await threadDBClient.insert(GigsCollection, req.body);
+        res.status(201).send({ gigID: inserted[0] });
       } else {
         res.status(400).send({ message: validationResult.message });
       }
