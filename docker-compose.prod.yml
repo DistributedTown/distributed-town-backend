@@ -4,14 +4,17 @@ services:
   distributed-town-api:
     container_name: distributed-town-api
     image: node
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/app
     working_dir: /app
     environment:
-      - SWAGGER_URL=http://localhost:3005/api/docs  
-      - ENVIRONMENT_IP=localhost
+      - SWAGGER_URL=http://3.250.29.111:3005/api/docs  
+      - ENVIRONMENT_IP=3.250.29.111
       - SERVER_PORT=3005
-      - NODE_ENV=development
+      - NODE_ENV=production
     ports:
       - "3005:3005"
     command: /bin/bash -c 'yarn; yarn start;'

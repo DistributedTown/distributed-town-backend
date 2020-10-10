@@ -1,7 +1,7 @@
 {
   "name": "distributed-town-api",
   "version": "1.0.0",
-  "description": "A project for the PostCovid Hackaton aiming to build self-sustainable community hubs.",
+  "description": "A project for the Babylon Hackaton aiming to build self-sustainable community hubs.",
   "main": "index.js",
   "scripts": {
     "build": "tsc",

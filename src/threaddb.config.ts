@@ -39,75 +39,74 @@ class ThreadDBInit {
     // Insert the predefined data
     await this.client.create(this.threadID, 'Skills', [
       {
-        category: 'Community life',
-        credits: 12,
-        skills: [
-          { name: 'Administration & Management' },
-          { name: 'Leadership & Public Speaking' },
-          { name: 'Art, Music & Creativity' },
-          { name: 'Legal & Proposals' },
-        ]
-      },
-      {
-        category: 'At Home',
+        category: 'Local communities',
         credits: 6,
         skills: [
+          { name: 'Administration' },
+          { name: 'Householding' },
           { name: 'Gardening' },
-          { name: 'Cooking' },
-          { name: 'Repairing & Household' },
+          { name: 'Legal' },
+          { name: 'Accounting' },
+          { name: 'Fun & Entertainment' },
           { name: 'Company' },
+          { name: 'Community Life' },
+          { name: 'Art & Creativity' },
+          { name: 'Teaching' },
+          { name: 'Leadership' },
+          { name: 'Cooking' },
         ]
       },
       {
-        category: 'Professional',
+        category: 'DLT & Blockchain',
         credits: 24,
         skills: [
-          { name: 'Tech & Computer' },
-          { name: 'Accounting' },
-          { name: 'Design' },
-          { name: 'Teaching' },
+          { name: 'Governance' },
+          { name: 'Blockchain' },
+          { name: 'Architecture' },
+          { name: 'Frontend Dev' },
+          { name: 'Backend Dev' },
+          { name: 'DeFi' },
+          { name: 'Tokenomics' },
+          { name: 'Game Theory' },
+          { name: 'Network Design' },
+          { name: 'Smart Contracts' },
+          { name: 'Mobile Dev' },
+          { name: 'Web Dev' },
+        ]
+      },
+      {
+        category: 'Art & Lifestyle',
+        credits: 12,
+        skills: [
+          { name: 'Music' },
+          { name: 'Painting' },
+          { name: 'Photography' },
+          { name: 'Video-making' },
+          { name: 'Training & Sport' },
+          { name: 'Hiking' },
+          { name: 'Biking' },
+          { name: 'Performance' },
+          { name: 'Theather' },
+          { name: 'Project Management' },
+          { name: 'Writing' },
+          { name: 'Gaming' },
         ]
       }
     ]);
     await this.client.create(this.threadID, 'Organizations', [
       {
         scarcityScore: 60,
-        category: 'Art',
+        category: 'Art & Lifestyle',
       },
       {
         scarcityScore: 50,
-        category: 'IT',
+        category: 'DLT & Blockchain',
       },
       {
         scarcityScore: 70,
-        category: 'Household',
+        category: 'Local communities',
       }
     ]);
-    await this.client.create(this.threadID, 'Users', [
-      {
-        username: 'migrenaa',
-        skillCategories: [{
-          category: 'Community life',
-          skills: [
-            { skill: 'Administration & Management', rate: 9 },
-          ]
-        },
-        {
-          category: 'Professional',
-          skills: [
-            { skill: 'Teaching', rate: 10 },
-            { skill: 'Design', rate: 6 },
-          ]
-        },
-        {
-          category: 'At Home',
-          skills: [
-            { skill: 'Cooking', rate: 8 },
-            { skill: 'Gardening', rate: 9 },
-          ]
-        }]
-      }
-    ])
   }
 
   public async getAll(collectionName: string) {
