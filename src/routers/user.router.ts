@@ -13,8 +13,7 @@ const magic = new Magic('sk_test_A040E804B3F17845');
 const passport = require("passport");
 const MagicStrategy = require("passport-magic").Strategy;
 
-const strategy = new MagicStrategy(async function(user, done) {
-  console.log('strategyyyyyyyyyyyyyy');
+const strategy = new MagicStrategy(async function (user, done) {
   const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
   // const existingUser = await users.findOne({ issuer: user.issuer });
   const query = new Where('issuer').eq(user.issuer);
@@ -82,8 +81,8 @@ export class UserRouter {
   private init(): void {
     this._router.post('/', this.userController.post);
     this._router.post('/login', this.userController.login);
-    this._router.post('/logout', passport.authenticate('magic'), this.userController.logout);
-    this._router.get('/', passport.authenticate('magic'), this.userController.get);
+    this._router.post('/logout', this.userController.logout);
+    this._router.get('/', this.userController.get);
   }
 
   public get router(): Router {
