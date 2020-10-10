@@ -1,0 +1,10 @@
+{
+    "userID": "12312313", 
+    "title": "asdasdasdasd", 
+    "description": "desc desc desc desc", 
+    "skillCategories": {
+        "category": "At Home",
+        "skills": [ "Gardening", "Cooking" ]
+    },
+    "creditsOffered": 12
+}
