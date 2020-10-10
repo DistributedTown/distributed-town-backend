@@ -14,7 +14,7 @@
 
 // create a user
 {
-    "organizationID": "01em99r7bq7a23736jrv8dhxdh",
+    "communityID": "01em99r7bq7a23736jrv8dhxdh",
     "username": "migrenaaa", 
     "skillCategories": [
         {
@@ -39,7 +39,7 @@
 
 // create a gig
 {
-"organizationID": "01em99r7bq7a23736jrv8dhxdh",
+"communityID": "01em99r7bq7a23736jrv8dhxdh",
 "userID": "01em99wx03x3b59s0nesr57r1g", 
 "title": "my first gig", 
 "description": "desc desc desc desc", 

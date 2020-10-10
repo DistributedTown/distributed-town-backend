@@ -1,21 +1,21 @@
 import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
-import { getOrganizationsBySkill } from "../services/organization.service";
+import { getCommunitiesBySkill } from "../services/community.service";
 
 @injectable()
-export class OrganizationController {
+export class CommunityController {
   constructor(
     private loggerService: LoggerService,
   ) { }
 
   /**
    * @swagger
-   * /organization:
+   * /community:
    *  get:
-   *      description: Gets all organizations from the database
+   *      description: Gets all communities from the database
    *      tags:
-   *          - Organization
+   *          - Community
    *      produces:
    *          - application/json
    *      responses:
@@ -28,7 +28,7 @@ export class OrganizationController {
     try {
       // if (req.isAuthenticated()) {
         const skillName = req.query.skill;
-        var response = await getOrganizationsBySkill(skillName);
+        var response = await getCommunitiesBySkill(skillName);
         res.status(200).send(response);
       // } else {
       //   res.status(401).send( { error: 'User not logged in.'} );

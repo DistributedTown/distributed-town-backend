@@ -6,7 +6,7 @@ import * as promBundle from "express-prom-bundle";
 import {
   UserRouter,
   SkillsRouter,
-  OrganizationRouter,
+  CommunityRouter,
   GigRouter,
   SwaggerRouter,
 } from "./routers";
@@ -21,7 +21,7 @@ export class App {
   constructor(
     private userRouter: UserRouter,
     private skillsRouter: SkillsRouter,
-    private organizationRouter: OrganizationRouter,
+    private communityRouter:   CommunityRouter,
     private gigRouter: GigRouter,
     private swaggerRouter: SwaggerRouter
   ) {
@@ -73,7 +73,7 @@ export class App {
     this._app.use("/api/docs", this.swaggerRouter.router);
     this._app.use("/api/user", this.userRouter.router);
     this._app.use("/api/skill", this.skillsRouter.router);
-    this._app.use("/api/organization", this.organizationRouter.router);
+    this._app.use("/api/community", this.communityRouter.router);
     this._app.use("/api/gig", this.gigRouter.router);
   }
 }

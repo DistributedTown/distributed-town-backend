@@ -1,12 +1,12 @@
-export interface Organization {
+export interface Community {
     _id: string;
     scarcityScore: number;
     category: string;
     address: string;
 }
 
-export const organizationSchema = {
-    title: 'Organization',
+export const communitySchema = {
+    title: 'Community',
     type: 'object',
     properties: {
       _id: { type: 'string' },

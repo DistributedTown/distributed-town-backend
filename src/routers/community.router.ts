@@ -1,19 +1,19 @@
 import { injectable } from "inversify";
 import { Router } from "express";
-import { OrganizationController } from "../controllers";
+import { CommunityController } from "../controllers";
 
 const passport = require("passport");
 @injectable()
-export class OrganizationRouter {
+export class CommunityRouter {
   private readonly _router: Router;
 
-  constructor(private organizationController: OrganizationController) {
+  constructor(private communityController: CommunityController) {
     this._router = Router({ strict: true });
     this.init();
   }
 
   private init(): void {
-    this._router.get("/", this.organizationController.get);
+    this._router.get("/", this.communityController.get);
   }
 
   public get router(): Router {

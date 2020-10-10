@@ -14,7 +14,7 @@
  */
 export interface CreateUser {
     username: string;
-    organizationId: string;
+    communityId: string;
     skills: UserSkill[];
 }
 
@@ -25,7 +25,7 @@ export const userSchema = {
     properties: {
         _id: { type: 'string' },
         username: { type: 'string' },
-        organizationId: { type: 'string' },
+        communityId: { type: 'string' },
         skills: {
             type: 'array',
             items: { "$ref": "#/definitions/userSkill" }

@@ -25,7 +25,7 @@ Distributed town will be implemented with a NodeJS server dealing with all the o
 When deciding which data should be stored offchain and onchain we should keep in mind the feature cost, feature capability, and privacy. We should store on the blockchain the least amount of data possible because of the cost. All types of entity descriptions will be stored off chain and only the crucial for the logic and payments data will be stored on chain. 
 
 Off chain: 
-- Organizations
+- Communities
 - Gig details
 - User details 
 - User skills

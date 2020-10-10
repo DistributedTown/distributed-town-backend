@@ -1,5 +1,5 @@
 import { Gig, ValidationResponseModel } from '../models';
-import { GigsCollection, OrganizationsCollection } from '../constants/constants';
+import { GigsCollection, CommunitiesCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 
 export async function acceptGig(gigID: string, acceptedUser: string) {
@@ -39,14 +39,14 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
     else if (gig.skills.length === 0) {
         response.isValid = false;
         response.message = 'Skills should be selected.';
-    } else if (!gig.organizationID) {
+    } else if (!gig.communityID) {
         response.isValid = false;
-        response.message = 'OrganizationID is required.';
+        response.message = 'CommunityID is required.';
     } else {
-        const organization = await threadDBClient.getByID(OrganizationsCollection, gig.organizationID);
-        if (!organization) {
+        const community = await threadDBClient.getByID(CommunitiesCollection, gig.communityID);
+        if (!community) {
             response.isValid = false;
-            response.message = 'Organization not found.';
+            response.message = 'Community not found.';
         }
     }
     return response;

@@ -1,7 +1,7 @@
 import { Client, KeyInfo, QueryJSON, ThreadID } from '@textile/hub'
 import {
   UsersCollection,
-  OrganizationsCollection,
+  CommunitiesCollection,
   SkillsCollection,
   GigsCollection,
   SubcategoriesCollection
@@ -10,7 +10,7 @@ import { injectable } from 'inversify';
 import {
   subcategorySchema,
   skillSchema,
-  organizationSchema,
+  communitySchema,
   userSchema,
   gigSchema
 } from './models'
@@ -47,7 +47,7 @@ class ThreadDBInit {
     // Define the collections 
     await this.client.newCollection(this.threadID, { name: SkillsCollection, schema: skillSchema });
     await this.client.newCollection(this.threadID, { name: SubcategoriesCollection, schema: subcategorySchema });
-    await this.client.newCollection(this.threadID, { name: OrganizationsCollection, schema: organizationSchema });
+    await this.client.newCollection(this.threadID, { name: CommunitiesCollection, schema: communitySchema });
     await this.client.newCollection(this.threadID, { name: UsersCollection, schema: userSchema });
     await this.client.newCollection(this.threadID, { name: GigsCollection, schema: gigSchema });
 
@@ -113,7 +113,7 @@ class ThreadDBInit {
       { name: 'Activities', category: 'Art & Lifestyle', credits: 24 },
     ]);
 
-    await this.client.create(this.threadID, OrganizationsCollection, [
+    await this.client.create(this.threadID, CommunitiesCollection, [
       { scarcityScore: 60, category: 'Art & Lifestyle', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c'},
       { scarcityScore: 70, category: 'DLT & Blockchain', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2'},
       { scarcityScore: 40, category: 'Local communities', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },

@@ -1,6 +1,6 @@
 import threadDBClient from "../threaddb.config";
 import { CreateUser, ValidationResponseModel } from "../models";
-import { OrganizationsCollection, UsersCollection } from "../constants/constants";
+import { CommunitiesCollection, UsersCollection } from "../constants/constants";
 import { Where } from "@textile/hub";
 
 export async function validateUser(user: CreateUser): Promise<ValidationResponseModel> {
@@ -10,23 +10,23 @@ export async function validateUser(user: CreateUser): Promise<ValidationResponse
         response.message = 'Username is required field';
         return response;
     } 
-    if(!user.organizationId) {
+    if(!user.communityId) {
         response.isValid = false;
-        response.message = 'Organization is required field';
+        response.message = 'Community is required field';
         return response;
     }
-    const organization = await threadDBClient.getByID(OrganizationsCollection, user.organizationId)
-    if(!organization) {
+    const community = await threadDBClient.getByID(CommunitiesCollection, user.communityId)
+    if(!community) {
         response.isValid = false;
-        response.message = 'Organization not found';
+        response.message = 'Community not found';
         return response;
     }
 
-    const query = new Where('organizationId').eq(user.organizationId);
-    const organizationMembers = await threadDBClient.filter(UsersCollection, query);
-    if(organizationMembers.length >= 24) {
+    const query = new Where('communityId').eq(user.communityId);
+    const communityMembers = await threadDBClient.filter(UsersCollection, query);
+    if(communityMembers.length >= 24) {
         response.isValid = false;
-        response.message = 'Organization cannot exceed 24 members';
+        response.message = 'Community cannot exceed 24 members';
         return response;
     }
 
