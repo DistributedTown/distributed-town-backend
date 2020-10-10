@@ -72,8 +72,8 @@ export class App {
   private _initRoutes() {
     this._app.use("/api/docs", this.swaggerRouter.router);
     this._app.use("/api/user", this.userRouter.router);
-    this._app.use("/api/skill",passport.authenticate('magic'), this.skillsRouter.router);
-    this._app.use("/api/organization",passport.authenticate('magic'), this.organizationRouter.router);
+    this._app.use("/api/skill", this.skillsRouter.router);
+    this._app.use("/api/organization", this.organizationRouter.router);
     this._app.use("/api/gig", this.gigRouter.router);
   }
 }

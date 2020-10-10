@@ -27,12 +27,12 @@ export class OrganizationController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
+      // if (req.isAuthenticated()) {
         var response = await threadDBClient.getAll(OrganizationsCollection);
         res.status(200).send(response);
-      } else {
-        res.status(401).send( { error: 'User not logged in.'} );
-      }
+      // } else {
+      //   res.status(401).send( { error: 'User not logged in.'} );
+      // }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

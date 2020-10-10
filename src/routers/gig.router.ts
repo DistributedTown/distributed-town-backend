@@ -14,6 +14,7 @@ export class GigRouter {
   private init(): void {
     this._router.get("/", this.gigsController.get);
     this._router.post("/", this.gigsController.post);
+    this._router.post("/:gigID/accept", this.gigsController.accept);
   }
 
   public get router(): Router {

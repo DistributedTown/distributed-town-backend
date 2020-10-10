@@ -3,7 +3,7 @@ import { Router } from "express";
 import { UsersController } from "../controllers";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
-import { UsersCollection, UsersCollectionTestMagic } from "../constants/constants";
+import { UsersCollection } from "../constants/constants";
 
 /* 1️⃣ Setup Magic Admin SDK */
 const { Magic } = require("@magic-sdk/admin");
@@ -40,7 +40,7 @@ const signup = async (user, userMetadata, done) => {
     email: userMetadata.email,
     lastLoginAt: user.claim.iat
   };
-  await threadDBClient.insert(UsersCollectionTestMagic, newUser);
+  await threadDBClient.insert(UsersCollection, newUser);
   return done(null, newUser);
 };
 

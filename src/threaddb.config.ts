@@ -3,7 +3,6 @@ import {
   UsersCollection,
   OrganizationsCollection,
   SkillsCollection,
-  UsersCollectionTestMagic,
   GigsCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
@@ -31,7 +30,6 @@ class ThreadDBInit {
     * Setup a new ThreadID and Database
     */
     this.threadID = ThreadID.fromRandom();
-
     /**
      * Each new ThreadID requires a `newDB` call.
      */
@@ -41,7 +39,6 @@ class ThreadDBInit {
     await this.client.newCollection(this.threadID, { name: SkillsCollection });
     await this.client.newCollection(this.threadID, { name: OrganizationsCollection });
     await this.client.newCollection(this.threadID, { name: UsersCollection });
-    await this.client.newCollection(this.threadID, { name: UsersCollectionTestMagic });
     await this.client.newCollection(this.threadID, { name: GigsCollection });
 
     // Insert the predefined data
@@ -121,12 +118,26 @@ class ThreadDBInit {
     return await this.client.find(this.threadID, collectionName, {});
   }
 
+  public async getByID(collectionName: string, id: string) {
+    return await this.client.findByID(this.threadID, collectionName, id);
+  }
+  
+  public async save(collectionName: string, values: any[]) {
+    return await this.client.save(this.threadID, collectionName, values);
+  }
+
   public async filter(collectionName: string, filter: QueryJSON) {
     return await this.client.find(this.threadID, collectionName, filter);
   }
 
   public async insert(collectionName: string, model: any) {
     return await this.client.create(this.threadID, collectionName, [model]);
+  }
+
+  public async update(collectionName: string, id: string, model: any) {
+    let toUpdate = await this.client.findByID(this.threadID, collectionName, id);
+    toUpdate = model;
+    this.client.save(this.threadID, collectionName, [toUpdate]);
   }
 }
 

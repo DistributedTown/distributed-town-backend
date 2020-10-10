@@ -22,7 +22,9 @@
  *              type: number
  */
 export interface Gig {
+    _id: string;
     userID: string;
+    acceptedUser: string;
     title: string;
     description: string;
     skillCategories: {
@@ -30,4 +32,5 @@ export interface Gig {
         skills: string[];
     }
     creditsOffered: number;
+    isOpen: boolean;
 }

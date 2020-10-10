@@ -1,3 +1,6 @@
+
+// create a gig
+
 {
     "userID": "12312313", 
     "title": "asdasdasdasd", 
@@ -7,4 +10,49 @@
         "skills": [ "Gardening", "Cooking" ]
     },
     "creditsOffered": 12
+}
+
+// create a user
+{
+    "organizationID": "01em99r7bq7a23736jrv8dhxdh",
+    "username": "migrenaaa", 
+    "skillCategories": [
+        {
+        "category": "Art & Lifestyle",
+        "skills": [
+            {
+                "skill": "Painting",
+                "level": 8
+            }
+        ]
+    },
+     {
+        "category": "Art & Lifestyle",
+        "skills": [
+            {
+                "skill": "Music",
+                "level": 10
+            }
+        ]
+    }]
+}
+
+// create a gig
+{
+"organizationID": "01em99r7bq7a23736jrv8dhxdh",
+"userID": "01em99wx03x3b59s0nesr57r1g", 
+"title": "my first gig", 
+"description": "desc desc desc desc", 
+"skillCategories": {
+    "category": "Art & Lifestyle",
+    "skills": [ "Music" ]
+},
+"creditsOffered": 12
+}
+
+// accept gig
+// url param :     "gigID": "01em99y7k6cz1qay1p13cgmvv9"
+
+{
+    "userId": "01em99y7k6cz1qay1p13cgmvv9"
 }
