@@ -35,6 +35,7 @@ class ThreadDBInit {
     await this.client.newCollection(this.threadID, { name: 'Skills' });
     await this.client.newCollection(this.threadID, { name: 'Organizations' });
     await this.client.newCollection(this.threadID, { name: 'Users' });
+    await this.client.newCollection(this.threadID, { name: 'Gigs' });
 
     // Insert the predefined data
     await this.client.create(this.threadID, 'Skills', [
