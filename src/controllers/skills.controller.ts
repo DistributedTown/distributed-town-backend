@@ -29,12 +29,8 @@ export class SkillsController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      // if (req.isAuthenticated()) {
-        const skills = await threadDBClient.getAll(SkillsCollection);
-        res.status(200).send(skills);
-      // } else {
-      //   res.status(401).send({ error: 'User not logged in.' });
-      // }
+      const skills = await threadDBClient.getAll(SkillsCollection);
+      res.status(200).send(skills);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

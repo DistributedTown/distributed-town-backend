@@ -1,10 +1,7 @@
 import { LoggerService } from "../services";
-import { Request, Response } from "express";
+import {  Response } from "express";
 import { injectable } from "inversify";
-import threadDBClient from "../threaddb.config";
 import { acceptGig, createGig, getGigs, validateAcceptingGig, validateGig } from "../services/gig.service";
-import { GigsCollection } from "../constants/constants";
-import { Where } from "@textile/hub";
 
 @injectable()
 export class GigsController {
@@ -27,12 +24,16 @@ export class GigsController {
    *          500:
    *              description: Server error
    */
-  public get = async (req: Request, res: Response) => {
+  public get = async (req: any, res: Response) => {
     try {
-      const isOpen: boolean = req.query.isOpen === 'true';
-      const userID: string = req.query.userID as string;
-      const gigs = await getGigs(userID, isOpen);
-      res.status(200).send(gigs);
+      if (req.isAuthenticated()) {
+        const isOpen: boolean = req.query.isOpen === 'true';
+        const userID: string = req.query.userID as string;
+        const gigs = await getGigs(userID, isOpen);
+        res.status(200).send(gigs);
+      } else {
+        return res.status(401).end({ message: `User is not logged in.` });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -62,16 +63,21 @@ export class GigsController {
    *          500:
    *              description: Server error
    */
-  public post = async (req: Request, res: Response) => {
+  public post = async (req: any, res: Response) => {
     try {
-      req.body.isOpen = true;
-      const validationResult = await validateGig(req.body);
-      if (validationResult.isValid) {
-        const gigID = await createGig(req.body);
-        res.status(201).send({ gigID: gigID });
+      if (req.isAuthenticated()) {
+        req.body.isOpen = true;
+        const validationResult = await validateGig(req.body);
+        if (validationResult.isValid) {
+          const gigID = await createGig(req.body);
+          res.status(201).send({ gigID: gigID });
+        } else {
+          res.status(400).send({ message: validationResult.message });
+        }
       } else {
-        res.status(400).send({ message: validationResult.message });
+        return res.status(401).end({ message: `User is not logged in.` });
       }
+
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -102,14 +108,18 @@ export class GigsController {
    *          500:
    *              description: Server error
    */
-  public accept = async (req: Request, res: Response) => {
+  public accept = async (req: any, res: Response) => {
     try {
-      const validationResult = await validateAcceptingGig(req.params.gigID);
-      if (validationResult.isValid) {
-        await acceptGig(req.params.gigID, req.body.userID);
-        res.status(200).send();
+      if (req.isAuthenticated()) {
+        const validationResult = await validateAcceptingGig(req.params.gigID);
+        if (validationResult.isValid) {
+          await acceptGig(req.params.gigID, req.body.userID);
+          res.status(200).send();
+        } else {
+          res.status(400).send({ message: validationResult.message });
+        }
       } else {
-        res.status(400).send({ message: validationResult.message });
+        return res.status(401).end({ message: `User is not logged in.` });
       }
     } catch (err) {
       this.loggerService.error(err);

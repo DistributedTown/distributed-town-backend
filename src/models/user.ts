@@ -16,6 +16,8 @@ export interface User {
     _id: string;
     username: string;
     communityID: string;
+    issuer: string;
+    lastLoginAt: string;
     skills: UserSkill[];
 }
 
@@ -31,6 +33,9 @@ export const userSchema = {
             type: 'array',
             items: { "$ref": "#/definitions/userSkill" }
         },
+        issuer: 'string', 
+        // email: 'string',
+        lastLoginAt: 'string'
     },
     definitions: {
         "userSkill": {

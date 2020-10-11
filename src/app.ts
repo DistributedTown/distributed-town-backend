@@ -13,6 +13,7 @@ import {
 const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
+var cors = require('cors');
 
 @injectable()
 export class App {
@@ -21,7 +22,7 @@ export class App {
   constructor(
     private userRouter: UserRouter,
     private skillsRouter: SkillsRouter,
-    private communityRouter:   CommunityRouter,
+    private communityRouter: CommunityRouter,
     private gigRouter: GigRouter,
     private swaggerRouter: SwaggerRouter
   ) {
@@ -63,7 +64,7 @@ export class App {
     );
     this._app.use(passport.initialize());
     this._app.use(passport.session());
-
+    this._app.use(cors());
     //Initialize app routes
     this._initRoutes();
 
@@ -71,9 +72,9 @@ export class App {
 
   private _initRoutes() {
     this._app.use("/api/docs", this.swaggerRouter.router);
-    this._app.use("/api/user", this.userRouter.router);
-    this._app.use("/api/skill", this.skillsRouter.router);
-    this._app.use("/api/community", this.communityRouter.router);
-    this._app.use("/api/gig", this.gigRouter.router);
+    this._app.use("/api/user",passport.authenticate("magic"),  this.userRouter.router);
+    this._app.use("/api/skill",passport.authenticate("magic"),  this.skillsRouter.router);
+    this._app.use("/api/community",passport.authenticate("magic"), this.communityRouter.router);
+    this._app.use("/api/gig", passport.authenticate("magic"), this.gigRouter.router);
   }
 }

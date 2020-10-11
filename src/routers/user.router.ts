@@ -15,7 +15,6 @@ const MagicStrategy = require("passport-magic").Strategy;
 
 const strategy = new MagicStrategy(async function (user, done) {
   const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
-  // const existingUser = await users.findOne({ issuer: user.issuer });
   const query = new Where('issuer').eq(user.issuer);
   const existingUser = await threadDBClient.filter(UsersCollection, query);
   if (!existingUser) {
@@ -35,7 +34,7 @@ passport.use(strategy);
 /* Implement User Signup */
 const signup = async (user, userMetadata, done) => {
   // TODO change model
-  let newUser = {
+  const newUser = {
     issuer: user.issuer,
     email: userMetadata.email,
     lastLoginAt: user.claim.iat
@@ -79,10 +78,10 @@ export class UserRouter {
   }
 
   private init(): void {
-    this._router.post('/', this.userController.post);
-    this._router.post('/login', this.userController.login);
-    this._router.post('/logout', this.userController.logout);
-    this._router.get('/', this.userController.get);
+    this._router.post('/', passport.authenticate("magic"), this.userController.post);
+    this._router.post('/login', passport.authenticate("magic"), this.userController.login);
+    this._router.post('/logout',passport.authenticate("magic"), this.userController.logout);
+    this._router.get('/',passport.authenticate("magic"), this.userController.get);
   }
 
   public get router(): Router {

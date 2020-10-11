@@ -1,10 +1,7 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import threadDBClient from "../threaddb.config";
-import { calculateInitialCreditsAmount } from "../services";
-import { UsersCollection } from "../constants/constants";
-import { createUser, validateUser } from "../services/user.service";
+import { fillUserData, validateUser } from "../services/user.service";
 
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
@@ -70,12 +67,16 @@ export class UsersController {
    */
   public post = async (req: any, res: Response) => {
     try {
-      const validationResult = await validateUser(req.body);
-      if (validationResult.isValid) {
-        const response = await createUser(req.body);
-        res.status(201).send(response);
+      if (req.isAuthenticated()) {
+        const validationResult = await validateUser(req.body);
+        if (validationResult.isValid) {
+          const response = await fillUserData(req.user.issuer, req.body);
+          res.status(201).send(response);
+        } else {
+          res.status(400).send({ message: validationResult.message });
+        }
       } else {
-        res.status(400).send({ message: validationResult.message });
+        return res.status(401).end({ message: 'Could not log user in.' });
       }
     } catch (err) {
       this.loggerService.error(err);
@@ -104,7 +105,7 @@ export class UsersController {
       if (req.user) {
         res.status(200).end('User is logged in.');
       } else {
-        return res.status(401).end('Could not log user in.');
+        return res.status(401).end({ message: 'Could not log user in.' });
       }
     } catch (err) {
       this.loggerService.error(err);
@@ -118,7 +119,7 @@ export class UsersController {
         req.logout();
         return res.status(200).end();
       } else {
-        return res.status(401).end(`User is not logged in.`);
+        return res.status(401).end({ message: `User is not logged in.` });
       }
     } catch (err) {
       this.loggerService.error(err);
