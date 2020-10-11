@@ -1,8 +1,8 @@
 import { SkillsCollection, SubcategoriesCollection } from "../constants/constants";
-import { CreateUser, Skill, Subcategory } from "../models";
+import { User, Skill, Subcategory } from "../models";
 import threadDBClient from "../threaddb.config";
 
-export async function calculateInitialCreditsAmount(user: CreateUser): Promise<number> {
+export async function calculateInitialCreditsAmount(user: User): Promise<number> {
     const subcategories: any[] = await threadDBClient.getAll(SubcategoriesCollection);
     const skills: any[] = await threadDBClient.getAll(SkillsCollection);
     const subcategoriesTyped = subcategories as Subcategory[];

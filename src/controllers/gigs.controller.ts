@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
-import { acceptGig, validateAcceptingGig, validateGig } from "../services/gig.service";
+import { acceptGig, createGig, getGigs, validateAcceptingGig, validateGig } from "../services/gig.service";
 import { GigsCollection } from "../constants/constants";
 import { Where } from "@textile/hub";
 
@@ -29,8 +29,9 @@ export class GigsController {
    */
   public get = async (req: Request, res: Response) => {
     try {
-      const query = new Where('isOpen').eq(true);
-      const gigs = await threadDBClient.filter(GigsCollection, query);
+      const isOpen: boolean = req.query.isOpen === 'true';
+      const userID: string = req.query.userID as string;
+      const gigs = await getGigs(userID, isOpen);
       res.status(200).send(gigs);
     } catch (err) {
       this.loggerService.error(err);
@@ -66,8 +67,8 @@ export class GigsController {
       req.body.isOpen = true;
       const validationResult = await validateGig(req.body);
       if (validationResult.isValid) {
-        const inserted = await threadDBClient.insert(GigsCollection, req.body);
-        res.status(201).send({ gigID: inserted[0] });
+        const gigID = await createGig(req.body);
+        res.status(201).send({ gigID: gigID });
       } else {
         res.status(400).send({ message: validationResult.message });
       }

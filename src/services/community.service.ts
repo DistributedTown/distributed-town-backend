@@ -30,3 +30,18 @@ export async function getCommunitiesBySkill(skillName: string) {
     return Promise.all(result);
 
 }
+
+export async function calculateScarcityScore(communityID: string) {
+// - USk = Unique Skills --> check how many numbers (skills) in the skill-set [1, 12] appear at least once (max. is 12, cause they are counted only the first time)
+
+// - ToSk = Total Skills --> All the skills available in the community, repeated ones as well. 
+// Min. = 6 (6 members, 1 skill each)
+// Max. = 72 (24 members, 3 skills each)
+
+// - fMSl = Filled Member Slots --> how many members are in a community (min. 6, max. 24)
+
+// - 4 is taken by simplifying the formula in extended version, and it spares a few passages
+
+
+
+}

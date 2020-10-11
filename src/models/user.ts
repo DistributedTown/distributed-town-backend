@@ -12,7 +12,8 @@
  *            balance:
  *              type: string
  */
-export interface CreateUser {
+export interface User {
+    _id: string;
     username: string;
     communityId: string;
     skills: UserSkill[];

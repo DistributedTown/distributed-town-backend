@@ -1,9 +1,9 @@
 import threadDBClient from "../threaddb.config";
-import { CreateUser, ValidationResponseModel } from "../models";
+import { User, ValidationResponseModel } from "../models";
 import { CommunitiesCollection, UsersCollection } from "../constants/constants";
 import { Where } from "@textile/hub";
 
-export async function validateUser(user: CreateUser): Promise<ValidationResponseModel> {
+export async function validateUser(user: User): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     if(!user.username){
         response.isValid = false;

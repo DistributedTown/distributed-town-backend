@@ -1,7 +1,21 @@
-import { Gig, ValidationResponseModel } from '../models';
-import { GigsCollection, CommunitiesCollection } from '../constants/constants';
+import { Gig, ValidationResponseModel, User } from '../models';
+import { GigsCollection, CommunitiesCollection, UsersCollection, SkillsCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
+import { Where } from '@textile/hub';
 
+export async function getGigs(userID: string, isOpen: boolean) {
+    const user = (await threadDBClient.getByID(UsersCollection, userID)) as User;
+    if (isOpen) {
+        const skills = user.skills.map(us => us.skill);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityId);
+        const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery)) as Gig[];
+        return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
+    } else {
+        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityId).and('acceptedUserID').eq(userID);
+        const completedGigs = (await threadDBClient.filter(SkillsCollection, gigQuery)) as Gig[];
+        return completedGigs;
+    }
+}
 export async function acceptGig(gigID: string, acceptedUser: string) {
     let gig: any = await threadDBClient.getByID(GigsCollection, gigID);
     gig.isOpen = false;
@@ -15,7 +29,7 @@ export async function validateAcceptingGig(gigID: string): Promise<ValidationRes
     if (!gigTyped.isOpen) {
         response.isValid = false;
         response.message = 'The gig has already been accepted.'
-    } 
+    }
     return response;
 }
 export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
@@ -39,15 +53,14 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
     else if (gig.skills.length === 0) {
         response.isValid = false;
         response.message = 'Skills should be selected.';
-    } else if (!gig.communityID) {
-        response.isValid = false;
-        response.message = 'CommunityID is required.';
-    } else {
-        const community = await threadDBClient.getByID(CommunitiesCollection, gig.communityID);
-        if (!community) {
-            response.isValid = false;
-            response.message = 'Community not found.';
-        }
     }
     return response;
 };
+
+
+export async function createGig(gig: Gig): Promise<string> {
+    const user = (await threadDBClient.getByID(UsersCollection, gig.userID)) as User;
+    gig.communityID = user.communityId;
+    const inserted = await threadDBClient.insert(GigsCollection, gig);
+    return inserted[0];
+}
