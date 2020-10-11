@@ -81,7 +81,7 @@ export class GigsController {
 
   /**
    * @swagger
-   * /gig/:gigId/accept:
+   * /gig/:gigID/accept:
    *  post:
    *      description: Complete a gig
    *      parameters:

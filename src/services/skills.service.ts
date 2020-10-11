@@ -3,16 +3,14 @@ import { User, Skill, Subcategory } from "../models";
 import threadDBClient from "../threaddb.config";
 
 export async function calculateInitialCreditsAmount(user: User): Promise<number> {
-    const subcategories: any[] = await threadDBClient.getAll(SubcategoriesCollection);
-    const skills: any[] = await threadDBClient.getAll(SkillsCollection);
-    const subcategoriesTyped = subcategories as Subcategory[];
-    const skillsTyped = skills as Skill[];
+    const subcategories = (await threadDBClient.getAll(SubcategoriesCollection)) as Subcategory[];
+    const skills = (await threadDBClient.getAll(SkillsCollection)) as Skill[];
 
     let totalCredits = 2000;
 
     user.skills.forEach(userSkill => {
-        const skill = skillsTyped.find(s => s.name === userSkill.skill);
-        const subCat = subcategoriesTyped.find(e => e.name === skill.subcategory);
+        const skill = skills.find(s => s.name === userSkill.skill);
+        const subCat = subcategories.find(e => e.name === skill.subcategory);
         totalCredits +=  subCat.credits * userSkill.level;
     });
 

@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
 import { calculateInitialCreditsAmount } from "../services";
 import { UsersCollection } from "../constants/constants";
-import { validateUser } from "../services/user.service";
+import { createUser, validateUser } from "../services/user.service";
 
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic(process.env.MAGIC_SECRET_KEY);
@@ -72,9 +72,8 @@ export class UsersController {
     try {
       const validationResult = await validateUser(req.body);
       if (validationResult.isValid) {
-        const inserted = await threadDBClient.insert(UsersCollection, req.body);
-        const credits = await calculateInitialCreditsAmount(req.body);
-        res.status(201).send({ userID: inserted[0], credits: credits });
+        const response = await createUser(req.body);
+        res.status(201).send(response);
       } else {
         res.status(400).send({ message: validationResult.message });
       }

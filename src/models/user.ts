@@ -15,7 +15,7 @@
 export interface User {
     _id: string;
     username: string;
-    communityId: string;
+    communityID: string;
     skills: UserSkill[];
 }
 
@@ -26,7 +26,7 @@ export const userSchema = {
     properties: {
         _id: { type: 'string' },
         username: { type: 'string' },
-        communityId: { type: 'string' },
+        communityID: { type: 'string' },
         skills: {
             type: 'array',
             items: { "$ref": "#/definitions/userSkill" }

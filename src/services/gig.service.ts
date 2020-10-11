@@ -7,11 +7,11 @@ export async function getGigs(userID: string, isOpen: boolean) {
     const user = (await threadDBClient.getByID(UsersCollection, userID)) as User;
     if (isOpen) {
         const skills = user.skills.map(us => us.skill);
-        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityId);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID);
         const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery)) as Gig[];
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
-        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityId).and('acceptedUserID').eq(userID);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID).and('acceptedUserID').eq(userID);
         const completedGigs = (await threadDBClient.filter(SkillsCollection, gigQuery)) as Gig[];
         return completedGigs;
     }
@@ -60,7 +60,7 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
 
 export async function createGig(gig: Gig): Promise<string> {
     const user = (await threadDBClient.getByID(UsersCollection, gig.userID)) as User;
-    gig.communityID = user.communityId;
+    gig.communityID = user.communityID;
     const inserted = await threadDBClient.insert(GigsCollection, gig);
     return inserted[0];
 }
