@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 import { Router } from "express";
 import { GigsController } from "../controllers";
+const passport = require("passport");
 
 @injectable()
 export class GigRouter {
@@ -12,9 +13,9 @@ export class GigRouter {
   }
 
   private init(): void {
-    this._router.get("/", this.gigsController.get);
-    this._router.post("/", this.gigsController.post);
-    this._router.post("/:gigID/accept", this.gigsController.accept);
+    this._router.get("/", passport.authenticate("magic"), this.gigsController.get);
+    this._router.post("/", passport.authenticate("magic"), this.gigsController.post);
+    this._router.post("/:gigID/accept", passport.authenticate("magic"), this.gigsController.accept);
   }
 
   public get router(): Router {

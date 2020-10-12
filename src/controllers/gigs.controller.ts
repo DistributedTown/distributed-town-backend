@@ -3,6 +3,9 @@ import {  Response } from "express";
 import { injectable } from "inversify";
 import { acceptGig, createGig, getGigs, validateAcceptingGig, validateGig } from "../services/gig.service";
 
+const { Magic } = require("@magic-sdk/admin");
+const magic = new Magic('sk_test_A040E804B3F17845');
+
 @injectable()
 export class GigsController {
   constructor(
@@ -28,8 +31,8 @@ export class GigsController {
     try {
       if (req.isAuthenticated()) {
         const isOpen: boolean = req.query.isOpen === 'true';
-        const userID: string = req.query.userID as string;
-        const gigs = await getGigs(userID, isOpen);
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const gigs = await getGigs(userMetadata.email, isOpen);
         res.status(200).send(gigs);
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
@@ -69,7 +72,8 @@ export class GigsController {
         req.body.isOpen = true;
         const validationResult = await validateGig(req.body);
         if (validationResult.isValid) {
-          const gigID = await createGig(req.body);
+          const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+          const gigID = await createGig(userMetadata.email, req.body);
           res.status(201).send({ gigID: gigID });
         } else {
           res.status(400).send({ message: validationResult.message });

@@ -35,9 +35,13 @@ class ThreadDBInit {
 
 
     this.client = await Client.withKeyInfo(keyInfo)
-    const thread = await this.client.getThread('default');
-    this.threadID = ThreadID.fromString(thread.id);
+    // const thread = await this.client.getThread('DiTo');
+    // this.threadID = ThreadID.fromString(thread.id);
 
+    this.threadID = ThreadID.fromRandom();
+    this.client.newDB(this.threadID, 'DiTo');
+
+    
     try {
       await this.client.getCollectionInfo(this.threadID, SkillsCollection);
     } catch (err) {
@@ -46,7 +50,7 @@ class ThreadDBInit {
       await this.client.newCollection(this.threadID, { name: SkillsCollection, schema: skillSchema });
       await this.client.newCollection(this.threadID, { name: SubcategoriesCollection, schema: subcategorySchema });
       await this.client.newCollection(this.threadID, { name: CommunitiesCollection, schema: communitySchema });
-      await this.client.newCollection(this.threadID, { name: UsersCollection, schema: userSchema });
+      await this.client.newCollection(this.threadID, { name: UsersCollection });
       await this.client.newCollection(this.threadID, { name: GigsCollection, schema: gigSchema });
 
       // Insert the predefined data

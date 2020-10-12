@@ -37,16 +37,15 @@ export async function validateUser(user: User): Promise<ValidationResponseModel>
 // validate
 // insert 
 // update scarcity score
-export async function fillUserData(issuer: string, user: User) {
-
-    const query = new Where('issuer').eq(issuer);
-    const existingUser = (await threadDBClient.filter(UsersCollection, query)) as any;
-    user.issuer = existingUser.issuer;
-    user.lastLoginAt = existingUser.lastLoginAt;
-
-    // const inserted = await threadDBClient.insert(UsersCollection, user);
-    await threadDBClient.update(UsersCollection, existingUser._id, user);
+export async function fillUserData(email: string, user: User) {
+    const query = new Where('email').eq(email);
+    const existingUser = (await threadDBClient.filter(UsersCollection, query)) as any[];
+    user.issuer = existingUser[0].issuer;
+    user.email = existingUser[0].email;
+    user.lastLoginAt = existingUser[0].lastLoginAt;
+    user._id = existingUser[0]._id;
+    await threadDBClient.update(UsersCollection, existingUser[0]._id, user);
     const credits = await calculateInitialCreditsAmount(user);
-    await updateScarcityScore(user.communityID);
-    return { credits: credits, userID: existingUser._id };
+    // await updateScarcityScore(user.communityID);
+    return { credits: credits, userID: existingUser[0]._id };
 }
