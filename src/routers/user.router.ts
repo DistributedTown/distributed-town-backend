@@ -21,8 +21,10 @@ const strategy = new MagicStrategy(async function (user, done) {
   const userExists = existingUser.length > 0;
   if (userExists) {
     /* Login user if otherwise */
+    console.log('login');
     return login(user, done);
   } else {
+    console.log('signup');
       /* Create new user if doesn't exist */
       return signup(user, userMetadata, done);
   }

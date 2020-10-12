@@ -35,12 +35,13 @@ class ThreadDBInit {
 
 
     this.client = await Client.withKeyInfo(keyInfo)
-    const thread = await this.client.getThread('DiTo');
-    this.threadID = ThreadID.fromString(thread.id);
+    // const thread = await this.client.getThread('DiTo');
+    // this.threadID = ThreadID.fromString(thread.id);
 
-    // this.threadID = ThreadID.fromRandom();
-    // this.client.newDB(this.threadID, 'DiTo');
+    this.threadID = ThreadID.fromRandom();
+    this.client.newDB(this.threadID, 'DiTo');
 
+    
     try {
       await this.client.getCollectionInfo(this.threadID, SkillsCollection);
     } catch (err) {
