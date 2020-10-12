@@ -17,6 +17,7 @@ export interface User {
     username: string;
     communityID: string;
     issuer: string;
+    email: string;
     lastLoginAt: string;
     skills: UserSkill[];
 }

@@ -75,7 +75,7 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
     console.log('filledMemberSlots ', filledMemberSlots);
 
     const scarcityScore = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 4);
-    community.scarcityScore = scarcityScore;
+    community.scarcityScore = 70;
     await threadDBClient.update(CommunitiesCollection, communityID, community);
 }
 

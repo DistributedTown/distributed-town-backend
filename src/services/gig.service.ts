@@ -3,15 +3,16 @@ import { GigsCollection, CommunitiesCollection, UsersCollection, SkillsCollectio
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 
-export async function getGigs(userID: string, isOpen: boolean) {
-    const user = (await threadDBClient.getByID(UsersCollection, userID)) as User;
+export async function getGigs(email: string, isOpen: boolean) {
+    const query = new Where('email').eq(email);
+    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
     if (isOpen) {
         const skills = user.skills.map(us => us.skill);
         const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID);
         const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery)) as Gig[];
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
-        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID).and('acceptedUserID').eq(userID);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID).and('acceptedUserID').eq(user._id);
         const completedGigs = (await threadDBClient.filter(SkillsCollection, gigQuery)) as Gig[];
         return completedGigs;
     }
@@ -58,9 +59,11 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
 };
 
 
-export async function createGig(gig: Gig): Promise<string> {
-    const user = (await threadDBClient.getByID(UsersCollection, gig.userID)) as User;
-    gig.communityID = user.communityID;
+export async function createGig(email: string, gig: Gig): Promise<string> {
+    const query = new Where('email').eq(email);
+    const user = (await threadDBClient.filter(UsersCollection, query)) as User[];
+    gig.communityID = user[0].communityID;
+    gig.userID = user[0]._id;
     const inserted = await threadDBClient.insert(GigsCollection, gig);
     return inserted[0];
 }

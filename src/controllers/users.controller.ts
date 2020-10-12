@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import { fillUserData, validateUser } from "../services/user.service";
 
 const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic(process.env.MAGIC_SECRET_KEY);
+const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class UsersController {
@@ -68,9 +68,10 @@ export class UsersController {
   public post = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
         const validationResult = await validateUser(req.body);
         if (validationResult.isValid) {
-          const response = await fillUserData(req.user.issuer, req.body);
+          const response = await fillUserData(userMetadata.email, req.body);
           res.status(201).send(response);
         } else {
           res.status(400).send({ message: validationResult.message });

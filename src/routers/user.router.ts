@@ -4,6 +4,7 @@ import { UsersController } from "../controllers";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
+import { User } from "../models";
 
 /* 1️⃣ Setup Magic Admin SDK */
 const { Magic } = require("@magic-sdk/admin");
@@ -15,14 +16,15 @@ const MagicStrategy = require("passport-magic").Strategy;
 
 const strategy = new MagicStrategy(async function (user, done) {
   const userMetadata = await magic.users.getMetadataByIssuer(user.issuer);
-  const query = new Where('issuer').eq(user.issuer);
-  const existingUser = await threadDBClient.filter(UsersCollection, query);
-  if (!existingUser) {
-    /* Create new user if doesn't exist */
-    return signup(user, userMetadata, done);
-  } else {
+  const query = new Where('email').eq(userMetadata.email);
+  const existingUser = (await threadDBClient.filter(UsersCollection, query));
+  const userExists = existingUser.length > 0;
+  if (userExists) {
     /* Login user if otherwise */
     return login(user, done);
+  } else {
+      /* Create new user if doesn't exist */
+      return signup(user, userMetadata, done);
   }
 });
 
@@ -55,6 +57,7 @@ const login = async (user, done) => {
 };
 
 passport.serializeUser((user, done) => {
+  console.log('ser', user.issuer);
   done(null, user.issuer);
 });
 
@@ -62,7 +65,8 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     const query = new Where('issuer').eq(id);
-    const user = await threadDBClient.filter(UsersCollection, query);
+    const user = (await threadDBClient.filter(UsersCollection, query))[0];
+    console.log('deser', user);
     done(null, user);
   } catch (err) {
     done(err, null);
