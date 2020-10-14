@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import { acceptGig, createGig, getGigs, validateAcceptingGig, validateGig } from "../services/gig.service";
 
 const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_test_A040E804B3F17845');
+const magic = new Magic('sk_live_B4234DDF6AE0251D');
 
 @injectable()
 export class GigsController {

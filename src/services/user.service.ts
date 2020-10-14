@@ -1,7 +1,7 @@
 import threadDBClient from "../threaddb.config";
 import { User, ValidationResponseModel } from "../models";
 import { CommunitiesCollection, UsersCollection } from "../constants/constants";
-import { updateScarcityScore, getCommunityMembers } from "./community.service";
+import { getCommunityMembers } from "./community.service";
 import { calculateInitialCreditsAmount } from "./skills.service";
 import { Where } from "@textile/hub";
 

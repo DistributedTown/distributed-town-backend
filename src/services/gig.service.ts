@@ -1,5 +1,5 @@
 import { Gig, ValidationResponseModel, User } from '../models';
-import { GigsCollection, CommunitiesCollection, UsersCollection, SkillsCollection } from '../constants/constants';
+import { GigsCollection, UsersCollection, SkillsCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 
