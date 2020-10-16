@@ -2,7 +2,9 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { fillUserData, validateUser } from "../services/user.service";
-
+import threadDBClient from "../threaddb.config";
+import { Where } from "@textile/hub";
+import { UsersCollection } from "../constants/constants";
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic('sk_live_B4234DDF6AE0251D');
 
@@ -29,13 +31,14 @@ export class UsersController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated())
-        return res
-          .status(200)
-          .json(req.user)
-          .end();
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const query = new Where('email').eq(userMetadata.email);
+        const user = (await threadDBClient.filter(UsersCollection, query));
+        return res.status(200).send(user);
+      }
       else
-        return res.status(401).end(`User is not logged in.`);
+        return res.status(401).send({ message: `User is not logged in.` });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
