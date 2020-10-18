@@ -1,18 +1,36 @@
-import { SkillsCollection, SubcategoriesCollection } from "../constants/constants";
-import { User, Skill, Subcategory } from "../models";
+import { GeneralSkillsCollection } from "../constants/constants";
+import { User, SkillsCategory, UserSkill } from "../models";
 import threadDBClient from "../threaddb.config";
 
 export async function calculateInitialCreditsAmount(user: User): Promise<number> {
-    const subcategories = (await threadDBClient.getAll(SubcategoriesCollection)) as Subcategory[];
-    const skills = (await threadDBClient.getAll(SkillsCollection)) as Skill[];
+    const skillsCredits = await getCreditsBySkill(user.skills);
+    return 2000 + skillsCredits;
+}
 
-    let totalCredits = 2000;
-
-    user.skills.forEach(userSkill => {
-        const skill = skills.find(s => s.name === userSkill.skill);
-        const subCat = subcategories.find(e => e.name === skill.subcategory);
-        totalCredits +=  subCat.credits * userSkill.level;
+async function getCreditsBySkill(userSkills: UserSkill[]) : Promise<number>{
+    let credits = 0;
+    const skillsTree = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
+    userSkills.forEach(us => {
+        skillsTree.forEach(root => root.categories.forEach(cat => {
+            const sk = cat.skills.find(s => s == us.skill);
+            if (sk) {
+                credits += cat.credits * us.level;
+            }
+        }));
     });
+    return credits;
+}
 
-    return totalCredits;
+export async function findMainCat(skillName: string): Promise<SkillsCategory> {
+    let mainCat: SkillsCategory = undefined;
+    const generalSkills = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
+    generalSkills.forEach(gs => gs.categories.forEach(cat => {
+        if (mainCat) return;
+        const existing = cat.skills.find(s => s == skillName);
+        if (existing) {
+            mainCat = gs;
+            return;
+        }
+    }));
+    return mainCat;
 }

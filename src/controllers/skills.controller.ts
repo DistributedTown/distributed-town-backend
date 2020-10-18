@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
-import { SkillsCollection } from "../constants/constants";
+import { GeneralSkillsCollection } from "../constants/constants";
 
 @injectable()
 export class SkillsController {
@@ -29,7 +29,7 @@ export class SkillsController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      const skills = await threadDBClient.getAll(SkillsCollection);
+      const skills = await threadDBClient.getAll(GeneralSkillsCollection);
       res.status(200).send(skills);
     } catch (err) {
       this.loggerService.error(err);
