@@ -8,7 +8,7 @@ import { User } from "../models";
 
 /* 1️⃣ Setup Magic Admin SDK */
 const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_live_B4234DDF6AE0251D');
+const magic = new Magic('sk_test_A040E804B3F17845');
 
 /* 2️⃣ Implement Auth Strategy */
 const passport = require("passport");

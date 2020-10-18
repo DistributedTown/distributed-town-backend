@@ -6,7 +6,7 @@ import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
 const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_live_B4234DDF6AE0251D');
+const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class UsersController {
