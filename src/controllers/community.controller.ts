@@ -1,10 +1,10 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunityByID } from "../services/community.service";
+import { getCommunityByID, getCommunities } from "../services/community.service";
 import threadDBClient from "../threaddb.config";
 import { CommunitiesCollection } from "../constants/constants";
-import { Community } from '../models'
+
 @injectable()
 export class CommunityController {
   constructor(
@@ -28,9 +28,8 @@ export class CommunityController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      const communities = (await threadDBClient.getAll(CommunitiesCollection)) as Community[];
-      res.status(200).send(communities);
-
+      const com = await getCommunities();
+      res.status(200).send(com);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

@@ -7,19 +7,22 @@ export async function calculateInitialCreditsAmount(user: User): Promise<number>
     return 2000 + skillsCredits;
 }
 
-async function getCreditsBySkill(userSkills: UserSkill[]) : Promise<number>{
+async function getCreditsBySkill(userSkills: UserSkill[]): Promise<number> {
     let credits = 0;
     const skillsTree = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
     userSkills.forEach(us => {
-        skillsTree.forEach(root => root.categories.forEach(cat => {
-            const sk = cat.skills.find(s => s == us.skill);
-            if (sk) {
-                credits += cat.credits * us.level;
-            }
-        }));
+        skillsTree.forEach(root => {
+            root.categories.forEach(cat => {
+                const sk = cat.skills.find(s => s == us.skill);
+                if (sk) {
+                    credits += cat.credits * us.level;
+                }
+            })
+        });
     });
     return credits;
 }
+
 
 export async function findMainCat(skillName: string): Promise<SkillsCategory> {
     let mainCat: SkillsCategory = undefined;
