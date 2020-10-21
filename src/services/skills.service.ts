@@ -37,3 +37,9 @@ export async function findMainCat(skillName: string): Promise<SkillsCategory> {
     }));
     return mainCat;
 }
+
+export async function getAllSkills(): Promise<string[]> {
+    const generalSkills = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
+    const skills = generalSkills.flatMap(gs => gs.categories.flatMap(s => s.skills));
+    return skills;
+}

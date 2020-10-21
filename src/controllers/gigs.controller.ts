@@ -31,8 +31,9 @@ export class GigsController {
     try {
       if (req.isAuthenticated()) {
         const isOpen: boolean = req.query.isOpen === 'true';
+        const isProject: boolean = req.query.isProject === 'true';
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const gigs = await getGigs(userMetadata.email, isOpen);
+        const gigs = await getGigs(userMetadata.email, isOpen, isProject);
         res.status(200).send(gigs);
       } else {
         return res.status(401).end({ message: `User is not logged in.` });

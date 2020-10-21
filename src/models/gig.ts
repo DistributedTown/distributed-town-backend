@@ -30,6 +30,7 @@ export interface Gig {
     creditsOffered: number;
     isOpen: boolean;
     communityID: string;
+    isProject: boolean;
     skills: string[];
 }
 
@@ -45,6 +46,7 @@ export const gigSchema = {
       description: { type: 'string' },
       creditsOffered: { type: 'number' },
       isOpen: { type: 'boolean' },
+      isProject: { type: 'boolean' },
       communityID: { type: 'string' },
       skills: { type: 'array', items: {
         type: 'string'
