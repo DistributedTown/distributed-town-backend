@@ -1,5 +1,5 @@
 import { Gig, ValidationResponseModel, User } from '../models';
-import { GigsCollection, UsersCollection, SkillsCollection } from '../constants/constants';
+import { GigsCollection, UsersCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 
@@ -13,7 +13,7 @@ export async function getGigs(email: string, isOpen: boolean) {
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
         const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID).and('acceptedUserID').eq(user._id);
-        const completedGigs = (await threadDBClient.filter(SkillsCollection, gigQuery)) as Gig[];
+        const completedGigs = (await threadDBClient.filter(GigsCollection, gigQuery)) as Gig[];
         return completedGigs;
     }
 }

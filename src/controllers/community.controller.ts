@@ -1,7 +1,9 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunitiesBySkill, getCommunityByID } from "../services/community.service";
+import { getCommunityByID, getCommunities } from "../services/community.service";
+import threadDBClient from "../threaddb.config";
+import { CommunitiesCollection } from "../constants/constants";
 
 @injectable()
 export class CommunityController {
@@ -26,10 +28,8 @@ export class CommunityController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      const skillName = req.query.skill;
-      var response = await getCommunitiesBySkill(skillName);
-      res.status(200).send(response);
-
+      const com = await getCommunities();
+      res.status(200).send(com);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -55,11 +55,11 @@ export class CommunityController {
   public getByID = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-      const communityID = req.params.communityID;
-      var response = await getCommunityByID(communityID);
-      res.status(200).send(response);
+        const communityID = req.params.communityID;
+        var response = await getCommunityByID(communityID);
+        res.status(200).send(response);
       } else {
-        res.status(401).send( { error: 'User not logged in.'} );
+        res.status(401).send({ error: 'User not logged in.' });
       }
     } catch (err) {
       this.loggerService.error(err);
