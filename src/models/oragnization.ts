@@ -3,6 +3,8 @@ export interface Community {
     scarcityScore: number;
     category: string;
     address: string;
+    name: string;
+    pubKey: string;
 }
 
 export const communitySchema = {
@@ -10,7 +12,9 @@ export const communitySchema = {
     type: 'object',
     properties: {
       _id: { type: 'string' },
+      pubKey: { type: 'string' },
       category: { type: 'string' },
+      name: { type: 'string' },
       address: { type: 'string' },
       scarcityScore: { type: 'integer' },
     },
