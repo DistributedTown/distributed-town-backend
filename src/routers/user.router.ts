@@ -4,7 +4,6 @@ import { UsersController } from "../controllers";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
-import { User } from "../models";
 
 /* 1️⃣ Setup Magic Admin SDK */
 const { Magic } = require("@magic-sdk/admin");
@@ -21,10 +20,8 @@ const strategy = new MagicStrategy(async function (user, done) {
   const userExists = existingUser.length > 0;
   if (userExists) {
     /* Login user if otherwise */
-    console.log('login');
     return login(user, done);
   } else {
-    console.log('signup');
       /* Create new user if doesn't exist */
       return signup(user, userMetadata, done);
   }
@@ -37,7 +34,6 @@ passport.use(strategy);
 
 /* Implement User Signup */
 const signup = async (user, userMetadata, done) => {
-  // TODO change model
   const newUser = {
     issuer: user.issuer,
     email: userMetadata.email,
@@ -49,6 +45,7 @@ const signup = async (user, userMetadata, done) => {
 
 /* Implement User Login */
 const login = async (user, done) => {
+  console.log(user);
   /* Replay attack protection (https://go.magic.link/replay-attack) */
   if (user.claim.iat <= user.lastLoginAt) {
     return done(null, false, {
@@ -59,7 +56,6 @@ const login = async (user, done) => {
 };
 
 passport.serializeUser((user, done) => {
-  console.log('ser', user.issuer);
   done(null, user.issuer);
 });
 
@@ -68,7 +64,6 @@ passport.deserializeUser(async (id, done) => {
   try {
     const query = new Where('issuer').eq(id);
     const user = (await threadDBClient.filter(UsersCollection, query))[0];
-    console.log('deser', user);
     done(null, user);
   } catch (err) {
     done(err, null);

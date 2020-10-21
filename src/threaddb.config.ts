@@ -2,18 +2,15 @@ import { Client, createUserAuth, DBInfo, KeyInfo, PrivateKey, QueryJSON, ThreadI
 import {
   UsersCollection,
   CommunitiesCollection,
-  SkillsCollection,
   GigsCollection,
-  SubcategoriesCollection,
-  CommunityKeysCollection
+  CommunityKeysCollection,
+  GeneralSkillsCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  subcategorySchema,
-  skillSchema,
   communitySchema,
-  gigSchema,
-  Community
+  Community,
+  gigSchema
 } from './models'
 
 const keyInfo: KeyInfo = {
@@ -21,9 +18,6 @@ const keyInfo: KeyInfo = {
   secret: 'bzcdqwxlxuqfoc3adtcbyasff2ef6opt37s2ucwq'
 }
 
-const userKey: UserAuth {
-  k
-}
 
 @injectable()
 class ThreadDBInit {
@@ -39,11 +33,11 @@ class ThreadDBInit {
   }
   async initialize() {
 
-    
-    this.client = await Client.withKeyInfo(keyInfo);
 
-    const ditoThread = await this.client.getThread('distributed-town-new');
-    this.ditoThreadID = ThreadID.fromString(ditoThread.id);
+    // this.client = await Client.withKeyInfo(keyInfo);
+
+    // const ditoThread = await this.client.getThread('distributed-town-new');
+    // this.ditoThreadID = ThreadID.fromString(ditoThread.id);
 
     // const communtiyKeysThread = await this.client.getThread('community-keys');
     // this.communityKeysThreadID = ThreadID.fromString(communtiyKeysThread.id);
@@ -51,103 +45,98 @@ class ThreadDBInit {
     // this.ditoThreadID = ThreadID.fromRandom();
     // this.client.newDB(this.ditoThreadID, 'distributed-town-new');
 
-    const communityKeysThreadID = await this.client.getThread('community-keys');
-    this.communityKeysThreadID = ThreadID.fromString(communityKeysThreadID.id);
+    // const communityKeysThreadID = await this.client.getThread('community-keys');
+    // this.communityKeysThreadID = ThreadID.fromString(communityKeysThreadID.id);
 
+      await this.createCommunity({ scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' } as Community);
 
     // this.ditoThreadID = ThreadID.fromRandom();
     // this.client.newDB(this.ditoThreadID, 'DiTo');
 
 
-    try {
-      await this.client.getCollectionInfo(this.ditoThreadID, SkillsCollection);
-    } catch (err) {
+  //   try {
+  //     await this.client.getCollectionInfo(this.communityKeysThreadID, CommunitiesCollection);
+  //   } catch (err) {
 
-      // Define the collections 
-      await this.client.newCollection(this.ditoThreadID, { name: SkillsCollection, schema: skillSchema });
-      await this.client.newCollection(this.ditoThreadID, { name: SubcategoriesCollection, schema: subcategorySchema });
-      await this.client.newCollection(this.ditoThreadID, { name: CommunitiesCollection, schema: communitySchema });
-      await this.client.newCollection(this.ditoThreadID, { name: UsersCollection });
-      await this.client.newCollection(this.ditoThreadID, { name: GigsCollection, schema: gigSchema });
+  //     // Define the collections 
+  //     await this.client.newCollection(this.communityKeysThreadID, { name: CommunityKeysCollection })
 
-      await this.client.newCollection(this.communityKeysThreadID, { name: CommunityKeysCollection })
+  //     await this.createCommunity({ scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' } as Community);
+  //     // await this.createCommunity({ scarcityScore: 0, category: 'DLT & Blockchain', name: 'Dito #2', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' } as Community);
+  //     // await this.createCommunity({ scarcityScore: 0, category: 'Local communities', name: 'Dito #3', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' } as Community);
 
-      // Insert the predefined data
-      await this.client.create(this.ditoThreadID, SkillsCollection, [
-        { name: 'Company', subcategory: 'At Home' },
-        { name: 'Householding', subcategory: 'At Home' },
-        { name: 'Gardening', subcategory: 'At Home' },
-        { name: 'Cooking', subcategory: 'At Home' },
 
-        { name: 'Legal', subcategory: 'Professional' },
-        { name: 'Accounting', subcategory: 'Professional' },
-        { name: 'Art, Music & Creativity', subcategory: 'Professional' },
-        { name: 'Teaching', subcategory: 'Professional' },
+  //     await this.client.create(this.ditoThreadID, GeneralSkillsCollection, [
+  //       {
+  //         main: 'Local Community',
+  //         categories: [
+  //           {
+  //             credits: 12,
+  //             subCat: 'Community Life',
+  //             skills: ['Fun & Entertainment', 'Administration & Management', 'Community Life', 'Leadership & Public Speaking']
+  //           },
+  //           {
+  //             credits: 6,
+  //             subCat: 'At Home',
+  //             skills: ['Company', 'Householding', 'Gardening', 'Cooking']
+  //           },
+  //           {
+  //             subCat: 'Professional',
+  //             credits: 24,
+  //             skills: ['Legal', 'Accounting', 'Art, Music & Creativity', 'Teaching']
+  //           }],
+  //       },
+  //       {
+  //         main: 'DLT & Blockchain',
+  //         categories: [
+  //           {
+  //             credits: 12,
+  //             subCat: 'Blockchain & DLT',
+  //             skills: ['DeFi', 'Blockchain infrastructure', 'Architecture', 'Smart Contracts']
+  //           },
+  //           {
+  //             credits: 6,
+  //             subCat: 'Tech',
+  //             skills: ['Backend', 'Frontend', 'Web Dev', 'Mobile Dev']
+  //           },
+  //           {
+  //             credits: 24,
+  //             subCat: 'Protocol',
+  //             skills: ['Network Design', 'Tokenomics', 'Game Theory', 'Governance & Consensus']
+  //           }
+  //         ]
+  //       },
+  //       {
+  //         main: 'Art & Lifestyle',
+  //         categories: [
+  //           {
+  //             credits: 12,
+  //             subCat: 'Creative Arts',
+  //             skills: ['Music', 'Painting', 'Photography', 'Video-making']
+  //           },
+  //           {
+  //             credits: 6,
+  //             subCat: 'Lifestyle',
+  //             skills: ['Training & Sport', 'Hiking', 'Biking', 'Writing']
+  //           },
+  //           {
+  //             credits: 24,
+  //             subCat: 'Activities',
+  //             skills: ['Performance & Theather', 'Project Management', 'Production', 'Gaming']
+  //           }
+  //         ]
+  //       }
+  //     ])
+  //   }
+  //   // await this.client.create(this.ditoThreadID, CommunitiesCollection, [
+  //   //   { scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' },
+  //   //   { scarcityScore: 0, category: 'DLT & Blockchain', name: 'Dito #2', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' },
+  //   //   { scarcityScore: 0, category: 'Local communities', name: 'Dito #3', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
+  //   // ]);
 
-        { name: 'Fun & Entertainment', subcategory: 'Community Life' },
-        { name: 'Administration & Management', subcategory: 'Community Life' },
-        { name: 'Community Life', subcategory: 'Community Life' },
-        { name: 'Leadership & Public Speaking', subcategory: 'Community Life' },
-
-        { name: 'DeFi', subcategory: 'Blockchain & DLT' },
-        { name: 'Blockchain infrastructure', subcategory: 'Blockchain & DLT' },
-        { name: 'Architecture', subcategory: 'Blockchain & DLT' },
-        { name: 'Smart Contracts', subcategory: 'Blockchain & DLT' },
-
-        { name: 'Backend', subcategory: 'Tech' },
-        { name: 'Frontend', subcategory: 'Tech' },
-        { name: 'Web Dev', subcategory: 'Tech' },
-        { name: 'Mobile Dev', subcategory: 'Tech' },
-
-        { name: 'Network Design', subcategory: 'Protocol' },
-        { name: 'Tokenomics', subcategory: 'Protocol' },
-        { name: 'Game Theory', subcategory: 'Protocol' },
-        { name: 'Governance & Consensus', subcategory: 'Protocol' },
-
-        { name: 'Music', subcategory: 'Creative Arts' },
-        { name: 'Painting', subcategory: 'Creative Arts' },
-        { name: 'Photography', subcategory: 'Creative Arts' },
-        { name: 'Video-making', subcategory: 'Creative Arts' },
-
-        { name: 'Training & Sport', subcategory: 'Lifestyle' },
-        { name: 'Hiking', subcategory: 'Lifestyle' },
-        { name: 'Biking', subcategory: 'Lifestyle' },
-        { name: 'Writing', subcategory: 'Lifestyle' },
-
-        { name: 'Performance & Theather', subcategory: 'Activities' },
-        { name: 'Project Management', subcategory: 'Activities' },
-        { name: 'Production', subcategory: 'Activities' },
-        { name: 'Gaming', subcategory: 'Activities' },
-      ]);
-
-      await this.client.create(this.ditoThreadID, SubcategoriesCollection, [
-        { name: 'At Home', category: 'Local communities', credits: 6 },
-        { name: 'Community Life', category: 'Local communities', credits: 12 },
-        { name: 'Professional', category: 'Local communities', credits: 24 },
-
-        { name: 'Blockchain & DLT', category: 'DLT & Blockchain', credits: 12 },
-        { name: 'Tech', category: 'DLT & Blockchain', credits: 6 },
-        { name: 'Protocol', category: 'DLT & Blockchain', credits: 24 },
-
-        { name: 'Creative Arts', category: 'Art & Lifestyle', credits: 12 },
-        { name: 'Lifestyle', category: 'Art & Lifestyle', credits: 6 },
-        { name: 'Activities', category: 'Art & Lifestyle', credits: 24 },
-      ]);
-
-      await this.createCommunity({ scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' } as Community);
-      await this.createCommunity({ scarcityScore: 0, category: 'DLT & Blockchain', name: 'Dito #2', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' } as Community);
-      await this.createCommunity({ scarcityScore: 0, category: 'Local communities', name: 'Dito #3', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' } as Community);
-
-      // await this.client.create(this.ditoThreadID, CommunitiesCollection, [
-      //   { scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' },
-      //   { scarcityScore: 0, category: 'DLT & Blockchain', name: 'Dito #2', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' },
-      //   { scarcityScore: 0, category: 'Local communities', name: 'Dito #3', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
-      // ]);
-
-    }
   }
 
-  
+
   private async auth(keyInfo: KeyInfo) {
     // Create an expiration and create a signature. 60s or less is recommended.
     const expiration = new Date(Date.now() + 60 * 1000)
@@ -189,51 +178,47 @@ class ThreadDBInit {
     this.client.save(this.ditoThreadID, collectionName, [toUpdate]);
   }
 
+  public async createIdentity(auth) {
+    const api = Users.withUserAuth(auth)
+    const identity = await PrivateKey.fromRandom()
+    await api.getToken(identity)
+    return identity;
+  }
+
   private async createCommunity(community: Community) {
-    const identity = await this.createIdentity();
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    const identity = await PrivateKey.fromRandom()
+    await client.getToken(identity)
+
     community.pubKey = identity.public.toString();
-    const comID = await this.client.create(this.ditoThreadID, CommunitiesCollection, [
+    const comID = await client.create(this.ditoThreadID, CommunitiesCollection, [
       community
     ])
 
-    console.log(identity.privKey.toString());
-    await this.client.create(this.communityKeysThreadID, CommunityKeysCollection, [
+    await client.create(this.communityKeysThreadID, CommunityKeysCollection, [
       {
         communityID: comID,
         privKey: identity.privKey.toString()
       }
     ]);
+
+    const comThread = ThreadID.fromRandom();
+    client.newDB(comThread, `community-${comID}`);
+    
+    await this.client.newCollection(comThread, { name: CommunitiesCollection, schema: communitySchema });
+    await this.client.newCollection(comThread, { name: UsersCollection });
+    await this.client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
+    await this.client.newCollection(comThread, { name: GeneralSkillsCollection });
   }
 
-    
-  private async getInfo (client: Client, threadID: ThreadID): Promise<DBInfo> {
+
+  private async getInfo(client: Client, threadID: ThreadID): Promise<DBInfo> {
     return await client.getDBInfo(threadID)
   }
-  
-  private async joinFromInfo (client: Client, info: DBInfo) {
+
+  private async joinFromInfo(client: Client, info: DBInfo) {
     return await client.joinFromInfo(info)
-  }
-
-  public async createIdentity() {
-
-    const api = Users.withUserAuth(auth)
-    const list = api.listThreads()
-
-    
-    const identity = await PrivateKey.fromRandom()
-
-    console.log(identity);
-    console.log('Your public identity:', identity.public.toString())
-
-    // Connect to the API with hub keys.
-    // Authorize the user to access your Huh api
-    await this.client.getToken(identity)
-
-    // // Setup the user's mailbox
-    // const mailboxID = await this.client.setupMailbox()
-    await identity.setupMailbox()
-
-    return identity;
   }
 }
 

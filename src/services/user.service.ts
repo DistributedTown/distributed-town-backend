@@ -1,7 +1,7 @@
 import threadDBClient from "../threaddb.config";
 import { User, ValidationResponseModel } from "../models";
 import { CommunitiesCollection, UsersCollection } from "../constants/constants";
-import { getCommunityMembers } from "./community.service";
+import { getCommunityMembers, updateScarcityScore } from "./community.service";
 import { calculateInitialCreditsAmount } from "./skills.service";
 import { Where } from "@textile/hub";
 
@@ -46,6 +46,6 @@ export async function fillUserData(email: string, user: User) {
     user._id = existingUser[0]._id;
     await threadDBClient.update(UsersCollection, existingUser[0]._id, user);
     const credits = await calculateInitialCreditsAmount(user);
-    // await updateScarcityScore(user.communityID);
+    await updateScarcityScore(user.communityID);
     return { credits: credits, userID: existingUser[0]._id };
 }
