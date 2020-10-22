@@ -8,11 +8,14 @@ import {
 import { Community, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
 
+// fixed all
+
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
 
     const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and('isOpen').eq(true);
-    const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery));
+    const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
+    const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
     const members = await getCommunityMembers(communityID);
     return { ...community, members: members.length, openGigs: openGigs.length }
 
@@ -36,7 +39,7 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
             uniqueSkills++;
     });
 
-    const varietyCoefficient =  (uniqueSkills  / totalSkillsCount) * (filledMemberSlots / 4)
+    const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 4)
     community.scarcityScore = Math.floor(varietyCoefficient * 100);
 
     await threadDBClient.update(CommunitiesCollection, communityID, community);
@@ -52,4 +55,15 @@ export async function getCommunityMembers(communityID: string): Promise<User[]> 
 export async function getCommunities() {
     const communities = await threadDBClient.getAll(CommunitiesCollection)
     return communities;
+}
+
+export async function signal(communityID: string) {
+    const community = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
+    if (community.scarcityScore < 48) {
+        const query = new Where('category').eq(community.category);
+
+        const communities = (await threadDBClient.filter(CommunitiesCollection, query)) as Community[];
+        const comIDs = communities.map(c => c._id);
+        // this.threadDBClient.sendMessage();
+    }
 }

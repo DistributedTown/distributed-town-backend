@@ -45,7 +45,6 @@ const signup = async (user, userMetadata, done) => {
 
 /* Implement User Login */
 const login = async (user, done) => {
-  console.log(user);
   /* Replay attack protection (https://go.magic.link/replay-attack) */
   if (user.claim.iat <= user.lastLoginAt) {
     return done(null, false, {

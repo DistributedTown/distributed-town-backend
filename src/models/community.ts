@@ -7,6 +7,13 @@ export interface Community {
     pubKey: string;
 }
 
+export interface CommunityKey {
+  _id: string;
+  communityID: string;
+  threadID: string;
+  privKey: string;
+}
+
 export const communitySchema = {
     title: 'Community',
     type: 'object',
