@@ -82,6 +82,7 @@ export class UserRouter {
     this._router.post('/login', passport.authenticate("magic"), this.userController.login);
     this._router.post('/logout',passport.authenticate("magic"), this.userController.logout);
     this._router.get('/',passport.authenticate("magic"), this.userController.get);
+    this._router.get('/messages',passport.authenticate("magic"), this.userController.getMessages);
   }
 
   public get router(): Router {

@@ -1,4 +1,4 @@
-import { Where } from '@textile/hub';
+import { PublicKey, Where } from '@textile/hub';
 import {
     CommunitiesCollection,
     UsersCollection,
@@ -40,9 +40,12 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
     });
 
     const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 4)
-    community.scarcityScore = Math.floor(varietyCoefficient * 100);
-
+    community.scarcityScore = Math.floor(varietyCoefficient * 100) - 20;
     await threadDBClient.update(CommunitiesCollection, communityID, community);
+
+    if (community.scarcityScore < 48) {
+        signal(community);
+    }
 }
 
 export async function getCommunityMembers(communityID: string): Promise<User[]> {
@@ -57,13 +60,14 @@ export async function getCommunities() {
     return communities;
 }
 
-export async function signal(communityID: string) {
-    const community = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
-    if (community.scarcityScore < 48) {
-        const query = new Where('category').eq(community.category);
+export async function signal(community: Community) {
+    // const query = new Where('category').eq(community.category);
+    const communities = (await threadDBClient.filter(CommunitiesCollection, {})) as Community[];
+    const comKey = await threadDBClient.getCommunityPrivKey(community._id);
 
-        const communities = (await threadDBClient.filter(CommunitiesCollection, query)) as Community[];
-        const comIDs = communities.map(c => c._id);
-        // this.threadDBClient.sendMessage();
-    }
+    const message = `Community ${community.name} needs you help. If you want to join follow the link ..`
+    communities.forEach(async community => {
+        const pubKey = PublicKey.fromString(community.pubKey)
+        await threadDBClient.sendMessage(comKey.privKey, pubKey, message);
+    })
 }

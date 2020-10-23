@@ -1,7 +1,7 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { fillUserData, validateUser } from "../services/user.service";
+import { fillUserData, getMessages, validateUser } from "../services/user.service";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
@@ -87,6 +87,24 @@ export class UsersController {
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
   }
+
+  public getMessages = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const response = await getMessages(userMetadata.email);
+        res.status(200).send(response);
+      } else {
+        return res.status(401).end({ message: 'Could not log user in.' });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+
   /**
      * @swagger
      * /user/login:

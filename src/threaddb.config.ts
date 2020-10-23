@@ -1,10 +1,11 @@
-import { Client, createUserAuth, DBInfo, KeyInfo, MailboxEvent, Private, PrivateKey, Query, QueryJSON, ThreadID, UserAuth, UserMessage, Users, Where } from '@textile/hub'
+import { Client, createUserAuth, DBInfo, KeyInfo, MailboxEvent, Private, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, UserMessage, Users, Where } from '@textile/hub'
 import {
   UsersCollection,
   CommunitiesCollection,
   GigsCollection,
   CommunityKeysCollection,
-  GeneralSkillsCollection
+  GeneralSkillsCollection,
+  MessagesCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
@@ -44,11 +45,22 @@ class ThreadDBInit {
 
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
 
+    // this.cleanTheThreads();
     try {
       await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
     } catch (err) {
       await client.newCollection(this.ditoThreadID, { name: UsersCollection });
+    }
+
+    try {
+      await client.getCollectionInfo(this.ditoThreadID, CommunitiesCollection);
+    } catch (err) {
       await client.newCollection(this.ditoThreadID, { name: CommunitiesCollection });
+    }
+
+    try {
+      await client.getCollectionInfo(this.ditoThreadID, CommunityKeysCollection);
+    } catch (err) {
       await client.newCollection(this.ditoThreadID, { name: CommunityKeysCollection });
     }
 
@@ -212,81 +224,45 @@ class ThreadDBInit {
     return communityKeys;
   }
 
-  private async setupMailbox(identity: PrivateKey) {
-
-    // Connect to the API with hub keys.
-    // Use withUserAuth for production.
-    const client = await Users.withKeyInfo(keyInfo)
-
-    // Authorize the user to access your Huh api
-    await client.getToken(identity)
-
-    // Setup the user's mailbox
-    const mailboxID = await client.setupMailbox()
-
-    // Create a listener for all new messages in the inbox
-    client.watchInbox(mailboxID, this.handleNewMessage)
-
-    // await this.sendMessageToSelf();
-    // Grab all existing inbox messages and decrypt them locally
-    const messages = await client.listInboxMessages()
-    const inbox = []
-    for (const message of messages) {
-      inbox.push(await this.messageDecoder(message, identity))
-    }
-  }
-
   public async createCommunity(community: Community) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
+    console.log("Generate community identity (public/private key)");
     const identity = await PrivateKey.fromRandom()
     await client.getToken(identity)
+    console.log('setup mailbox for inter-community communication');
+    await this.setupMailbox(identity);
 
     community.pubKey = identity.public.toString();
+
+    console.log('store the community in the ThreadDB');
+
     const comID = await client.create(this.ditoThreadID, CommunitiesCollection, [
       community
     ])
 
     const comThread = ThreadID.fromRandom();
+    console.log('store the community keys in another thread in ThreadDB');
 
     await client.create(this.ditoThreadID, CommunityKeysCollection, [
       {
         communityID: comID[0],
         threadID: comThread.toString(),
-        privKey: identity.toString()
+        privKey: identity.toString(),
       }
     ]);
+
+    console.log('create a thread and the collections for the community');
 
     await client.newDB(comThread, `community-${comID[0]}`);
 
     await client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
     await client.newCollection(comThread, { name: GeneralSkillsCollection });
-
-
-    // Grab all existing inbox messages and decrypt them locally
-    this.setupMailbox(identity);
+    await client.newCollection(comThread, { name: MessagesCollection });
 
     return comID[0];
   }
 
-  private async messageDecoder(message: UserMessage, identity: PrivateKey): Promise<any> {
-    // const identity = PrivateKey.fromString(privKey)
-    const bytes = await identity.decrypt(message.body)
-    const body = new TextDecoder().decode(bytes)
-    const { from } = message
-    const { readAt } = message
-    const { createdAt } = message
-    const { id } = message
-    const res = { body, from, readAt, sent: createdAt, id }
-    console.log(res)
-    return res;
-  }
-
-  private async handleNewMessage(reply: MailboxEvent, err: Error) {
-    if (!reply || !reply.message) return console.log('no message')
-    console.log(reply.type)
-    console.log(reply.message)
-  }
 
   private async cleanTheThreads() {
 
@@ -294,50 +270,81 @@ class ThreadDBInit {
     const client = Client.withUserAuth(auth);
     const identity = await PrivateKey.fromString(ditoPrivKey);
     await client.getToken(identity)
-    
+
     const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
     await client.delete(this.ditoThreadID, CommunitiesCollection, ids);
 
     const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
     await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
+
+    const ids3 = ((await client.find(this.ditoThreadID, UsersCollection, {})) as any[]).map(s => s._id);
+    await client.delete(this.ditoThreadID, UsersCollection, ids3);
   }
 
-  /**
-   * This example will simply send a message to yourself, instead of
-   * creating two distinct users.
-   */
-  sendMessageToSelf = async () => {
+  public async setupMailbox(identity: PrivateKey) {
+    const user = await Users.withKeyInfo(keyInfo)
+    await user.getToken(identity);
 
-    const auth = await this.auth(keyInfo);
-    // const client = Client.withUserAuth(auth);
-    const identity = await PrivateKey.fromRandom()
-    // await client.getToken(identity)
+    const mailboxID = await user.setupMailbox()
+    const callback = async (reply?: MailboxEvent, err?: Error) => {
+      if (!reply || !reply.message) return console.log('no message')
+      console.log('message received');
+      const bodyBytes = await identity.decrypt(reply.message.body)
+      const decoder = new TextDecoder()
+      const body = decoder.decode(bodyBytes)
 
-    const user = await Users.withUserAuth(auth);
-    const newMessage = 'asdasdasdasds';
+      const auth = await this.auth(keyInfo);
+      const client = Client.withUserAuth(auth);
 
-    const encoded = new TextEncoder().encode(newMessage);
-    console.log('encoded');
+      const communityKeyQuery = new Where('privKey').eq(identity.toString());
+      const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
 
-    console.log('aaaaaaaaa');
-    await user.sendMessage(identity, identity.public, encoded)
-    console.log('message sent');
+      const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
 
+      const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
+
+      const thread = ThreadID.fromString(communityKey.threadID);
+
+      await client.create(thread, MessagesCollection, [{
+        from: community._id,
+        message: body
+      }]);
+      console.log(body)
+    }
+    user.watchInbox(mailboxID, callback)
   }
 
+  public async getAllMessages(privKey: string) {
+    const user = await Users.withKeyInfo(keyInfo)
+    const identity = PrivateKey.fromString(privKey)
+    await user.getToken(identity);
 
-  private async sendAndReadMessage() {
-    const comID1 = await this.createCommunity({ scarcityScore: 0, category: 'Art & Lifestyle', name: 'Dito #1', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' } as Community);
-    const comID2 = await this.createCommunity({ scarcityScore: 0, category: 'Bla bla bla', name: 'Dito #2', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' } as Community);
+    const messages = await user.listInboxMessages()
+    const inbox = []
 
-    const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
 
-    const com1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, comID1);
-    const com2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, comID1);
+    for (const message of messages) {
+
+      const bytes = await identity.decrypt(message.body)
+      const body = new TextDecoder().decode(bytes)
+      const { from } = message
+      const { readAt } = message
+      const { createdAt } = message
+      const { id } = message
+      inbox.push({ body, from, readAt, sent: createdAt, id });
+      console.log({ body, from, readAt, sent: createdAt, id })
+    }
+    return inbox;
   }
 
-
+  public async sendMessage(senderPrivKey: string, recipientPubKey: Public, message: string) {
+    console.log('sending message');
+    const identity = PrivateKey.fromString(senderPrivKey)
+    const user = await Users.withKeyInfo(keyInfo)
+    await user.getToken(identity);
+    const encoded = new TextEncoder().encode(message);
+    await user.sendMessage(identity, recipientPubKey, encoded)
+  }
 }
 
 

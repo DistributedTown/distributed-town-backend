@@ -1,0 +1,68 @@
+[
+    // Bearer WyIweGMzOGE1NzMxZjdjM2UwOTYyMWY5NTM0MGM0MDI1NzU2ZTM4NjZmNzNiNWQ4MzgyYWIwYjIzN2NkYjdjZGFmMjgwMzNmY2RiNzljMWIyMzYyNmE2ZDczYjIyYTlmOTRiZWM4NjRhYzU3MTFlNjBhMTk3MWFhNmYyZGU4MzRmZmI3MWIiLCJ7XCJpYXRcIjoxNjAzNDA2ODg2LFwiZXh0XCI6MTYwMzQwNzc4NixcImlzc1wiOlwiZGlkOmV0aHI6MHgwM0MwMTU1MTI5Q0FjNTAyYTM2YTRBYzUzZkZlNzU0OTllMEVkQ2FCXCIsXCJzdWJcIjpcInpYaEhtY05QUC14dkdOT3lVYVhSZnFiMThkOU5HYVh6QlAySDB0RV9YcG89XCIsXCJhdWRcIjpcImRpZDptYWdpYzo5YjhkYjgxMi1jMmNmLTRjNzgtYjY3Yi1jODY0NjI3MDIzZTRcIixcIm5iZlwiOjE2MDM0MDY4ODYsXCJ0aWRcIjpcImIwN2MzMmJmLTc3ZjEtNGE5ZC1iMjU1LWM5ZGQyZjFlOThkZlwiLFwiYWRkXCI6XCIweDg3MGMxNDMyOTUwMDhmZTkwYWU5MTI2YWIyYjJlYTlkNWNlZjViNzQ0ODllMTU0OGRmYzllYWNkZWM2YzA2MDUyYzE2ZDM4NGQ3NDM4Y2FiN2ViY2Y2ZDdlZTdlYTNlYWViOGM4OWEyODMzNTFjN2QxNDIzNmE2YTViODhkZjNhMWNcIn0iXQ==
+    // mimonova13+8@gmail.com
+    {
+        "username": "migrenaa1",
+        "communityID": "01en93qxyer6162knpf7jdkx4a",
+        "skills": [
+            {
+                "skill": "Architecture",
+                "level": 6
+            },
+            {
+                "skill": "Frontend",
+                "level": 5
+            },
+            {
+                "skill": "Game Theory",
+                "level": 9
+            }
+        ]
+    },
+    // Bearer WyIweDJhZTA5OTQ3ZmI2NjYyMjUzMTk5ZjE2YzUzYmRmYzQyMjgzMTQ3YjYzYmYxYjAyMjJhMzFlOTEzYWY2MTMxOTU3OGU3MjYzMDIwNzAxNjJmNzE4OTVmOGQxNGYwZThlYTEzODI5MjJlMzYyMDk2MjFkNDI5OTMyMzc2YTMzMGJkMWIiLCJ7XCJpYXRcIjoxNjAzNDA2OTU2LFwiZXh0XCI6MTYwMzQwNzg1NixcImlzc1wiOlwiZGlkOmV0aHI6MHg0YzEzMmIzRmRGOGFlZThmMkU2Q2JhRDEwZGVkOTgxNzVkNERmNjQ1XCIsXCJzdWJcIjpcIlV6T1FIaEFCUkFGVXBKSmd4QWZDQ1lJa19SWGhMOXRMVmJqYTFtVVJuTU09XCIsXCJhdWRcIjpcImRpZDptYWdpYzo5OTc1NjIwYi01NjE0LTRmM2EtODQ2NS00ZTJkNzU2ZDQ1YTJcIixcIm5iZlwiOjE2MDM0MDY5NTYsXCJ0aWRcIjpcIjVkZjU5YTliLTI4YjQtNGZmZC1hYjdlLWFlN2Q0NGU0NjAyOVwiLFwiYWRkXCI6XCIweDU0ZTllMTMzZmM1NWNjYzQxYzdlZjVhNjI5ZTlmY2ExOWUwODY4ZjBkODU2ZjEyN2Y2YjZlNWZmZWY2YjFmYjczNDU0NTkyMDgwYTA0MzA3YTY5Y2VmY2ZkZTZhMzkzZDg1M2E1OTFiYWEzYzM3NTA0ZWRhY2Y5YjhkMjJhNWQ3MWJcIn0iXQ==
+    // mimonova13+5@gmail.com
+    {
+        "username": "migrenaa2",
+        "communityID": "01en945w3gmx1bg5sh9jr506c3",
+        "skills": [
+            {
+                "skill": "Architecture",
+                "level": 4
+            },
+            {
+                "skill": "Backend",
+                "level": 5
+            },
+            {
+                "skill": "Tokenomics",
+                "level": 3
+            }
+        ]
+    },
+    // Bearer WyIweDhmYjUxODM2M2Y5ZWM1OGNhYzU3MDI4YTBkNzA1Njc4ZGVjNGRlOTk3ZjQzODU0YzhkMTlmODA0OGJkNDU0MTU0MTJkY2VmNzdmNmIyNDM4ZDNhOTJhZDdjMjI5MTczNDE3YjliMmE4Mjc3YzQ5M2Y5NDRkODdhM2M4YjEzYjAzMWIiLCJ7XCJpYXRcIjoxNjAzNDA3MDAxLFwiZXh0XCI6MTYwMzQwNzkwMSxcImlzc1wiOlwiZGlkOmV0aHI6MHhGMzAwYTM3ZDZCMkQzQTFBMDcwMTAzNzk4NDk2ZTZDM2VjOTNEOTQ4XCIsXCJzdWJcIjpcImY0S2Zhei1YWXcyLWdJdmJjdzlWcTZCM1BEejlaSEVHMXhnaVNCV3pBeE09XCIsXCJhdWRcIjpcImRpZDptYWdpYzplZjRlZTA1OC04ZmIzLTQyZWQtOWEwNy0zMzllNTgwYjM5YmNcIixcIm5iZlwiOjE2MDM0MDcwMDEsXCJ0aWRcIjpcIjBkM2Y1NmM3LTE1ZDUtNGFiZC04ZGViLWExOTBmZWQ0OGE4OFwiLFwiYWRkXCI6XCIweGMwZmNjNTBlZTMwMjIxOGNhZDcwYWFiMmY5NmFjOWRjNGM2NjJlNTU4NzVlYTFjMGNmZmViNzliNTI0NzAyYWQ1ODhlMDg3ZjNhOTYxYzkyOWM3MTU4ZDYyMjE3OWRkZDY1NGNjYzk3ZmQ1MzY4YzU4ZDY3YzIzNTUzOTMxOGZlMWJcIn0iXQ==
+    // mimonova13+9@gmail.com
+    {
+        "username": "migrenaa3",
+        "communityID": "01en945w3gmx1bg5sh9jr506c3",
+        "skills": [
+            {
+                "skill": "Architecture",
+                "level": 5
+            },
+            {
+                "skill": "Backend",
+                "level": 5
+            },
+            {
+                "skill": "Tokenomics",
+                "level": 7
+            }
+        ]
+    }
+]
+
+{
+    "category": "Art & Lifestyle",
+    "address": "0x790697f595Aa4F9294566be0d262f71b44b5039c",
+    "name": "DiTo #4"
+}
