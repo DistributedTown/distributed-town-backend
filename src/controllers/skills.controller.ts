@@ -1,4 +1,4 @@
-import { findMainCat, LoggerService } from "../services";
+import { findMainCat, getAllSkills, LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
@@ -30,7 +30,12 @@ export class SkillsController {
   public get = async (req: any, res: Response) => {
     try {
       const skillName = req.query.skill;
-      const skills = await findMainCat(skillName);
+      let skills = undefined;
+      if (skillName) {
+        skills = await findMainCat(skillName);
+      } else {
+        skills = await getAllSkills();
+      }
       res.status(200).send(skills);
     } catch (err) {
       this.loggerService.error(err);

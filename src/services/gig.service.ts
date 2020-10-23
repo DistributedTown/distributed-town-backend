@@ -3,18 +3,18 @@ import { CommunityKeysCollection, GigsCollection, UsersCollection } from '../con
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 
-export async function getGigs(email: string, isOpen: boolean) {
+export async function getGigs(email: string, isOpen: boolean, isProject: boolean) {
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
 
     const communityKey = await threadDBClient.getCommunityPrivKey(user.communityID);
     if (isOpen) {
         const skills = user.skills.map(us => us.skill);
-        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID);
         const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery, communityKey.privKey, communityKey.threadID)) as Gig[];
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
-        const gigQuery = new Where('isOpen').eq(isOpen).and('communityID').eq(user.communityID).and('acceptedUserID').eq(user._id);
+        const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID).and('acceptedUserID').eq(user._id);
         const completedGigs = (await threadDBClient.filter(GigsCollection, gigQuery, communityKey.privKey, communityKey.threadID)) as Gig[];
         return completedGigs;
     }
