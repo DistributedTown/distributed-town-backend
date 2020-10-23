@@ -1,6 +1,7 @@
-export const UsersCollection: string = 'Users';
-// export const SkillsCollection: string = 'Skills';
-// export const SubcategoriesCollection: string = 'Subcategories'
+export const UsersCollection: string = 'Users'
 export const GeneralSkillsCollection: string = 'GeneralSkills'
-export const CommunitiesCollection: string = 'Communities';
-export const GigsCollection: string = "Gigs";
+export const CommunitiesCollection: string = 'Communities'
+export const CommunityKeysCollection: string = 'CommunityKeys'
+
+export const MessagesCollection: string = 'Messages'
+export const GigsCollection: string = 'Gigs'

@@ -1,25 +1,34 @@
-import { Client, KeyInfo, QueryJSON, ThreadID } from '@textile/hub'
+import { Client, createUserAuth, DBInfo, KeyInfo, MailboxEvent, Private, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, UserMessage, Users, Where } from '@textile/hub'
 import {
   UsersCollection,
   CommunitiesCollection,
   GigsCollection,
-  GeneralSkillsCollection
+  CommunityKeysCollection,
+  GeneralSkillsCollection,
+  MessagesCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   communitySchema,
-  gigSchema
+  Community,
+  gigSchema,
+  CommunityKey
 } from './models'
+import { threadId } from 'worker_threads';
 
 const keyInfo: KeyInfo = {
-  key: 'bxrgtfj27tyecvkjprlwnyq7ksa',
-  secret: 'bvnijpfkhvmfmux4oauypbdhgy3uxayfeqhcnvdy'
+  key: 'bzri276u6qt5ppotid4sscghagm',
+  secret: 'bzcdqwxlxuqfoc3adtcbyasff2ef6opt37s2ucwq'
 }
+
+const ditoThreadID = 'bafk4ptq5vyazvev5dx2xxecy23epcyj2bm2vs4sfudysxwc6vkh4hii';
+const ditoPrivKey = 'bbaareqawbqt4jmq74v5aid3lyi6rk3g2bo4b22g6eu2blmedqhanxt2e6dmqsgozwn72phhnleddtttqvonqhjzzvd75u5tffliz7vayztrrw';
 
 @injectable()
 class ThreadDBInit {
   client: Client;
-  threadID: ThreadID;
+  ditoThreadID: ThreadID;
+  communityKeysThreadID: ThreadID;
 
   public async getClient(): Promise<Client> {
     if (!this.client)
@@ -29,34 +38,37 @@ class ThreadDBInit {
   }
   async initialize() {
 
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    const identity = await PrivateKey.fromString(ditoPrivKey);
+    await client.getToken(identity)
 
-    this.client = await Client.withKeyInfo(keyInfo)
-    const thread = await this.client.getThread('distributed-town-33');
-    this.threadID = ThreadID.fromString(thread.id);
+    this.ditoThreadID = ThreadID.fromString(ditoThreadID);
 
-    // this.threadID = ThreadID.fromRandom();
-    // this.client.newDB(this.threadID, 'distributed-town-33');
-
+    // this.cleanTheThreads();
+    try {
+      await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: UsersCollection });
+    }
 
     try {
-      await this.client.getCollectionInfo(this.threadID, CommunitiesCollection);
+      await client.getCollectionInfo(this.ditoThreadID, CommunitiesCollection);
     } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: CommunitiesCollection });
+    }
 
-      // Define the collections 
-      await this.client.newCollection(this.threadID, { name: CommunitiesCollection, schema: communitySchema });
-      await this.client.newCollection(this.threadID, { name: UsersCollection });
-      await this.client.newCollection(this.threadID, { name: GigsCollection, schema: gigSchema });
-      await this.client.newCollection(this.threadID, { name: GeneralSkillsCollection });
-      
-      // Insert the predefined data
-      
-      await this.client.create(this.threadID, CommunitiesCollection, [
-        { scarcityScore: 60, category: 'Art & Lifestyle', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' },
-        { scarcityScore: 70, category: 'DLT & Blockchain', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' },
-        { scarcityScore: 40, category: 'Local communities', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
-      ]);
+    try {
+      await client.getCollectionInfo(this.ditoThreadID, CommunityKeysCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: CommunityKeysCollection });
+    }
 
-      await this.client.create(this.threadID, GeneralSkillsCollection, [
+    try {
+      await client.getCollectionInfo(this.ditoThreadID, GeneralSkillsCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: GeneralSkillsCollection })
+      await client.create(this.ditoThreadID, GeneralSkillsCollection, [
         {
           main: 'Local Community',
           categories: [
@@ -87,17 +99,17 @@ class ThreadDBInit {
             {
               credits: 6,
               subCat: 'Tech',
-              skills: ['Backend', 'Frontend','Web Dev','Mobile Dev']
+              skills: ['Backend', 'Frontend', 'Web Dev', 'Mobile Dev']
             },
             {
               credits: 24,
               subCat: 'Protocol',
-              skills: ['Network Design', 'Tokenomics', 'Game Theory','Governance & Consensus' ]
+              skills: ['Network Design', 'Tokenomics', 'Game Theory', 'Governance & Consensus']
             }
           ]
         },
         {
-          main: 'Art & Lifestyle', 
+          main: 'Art & Lifestyle',
           categories: [
             {
               credits: 12,
@@ -107,12 +119,12 @@ class ThreadDBInit {
             {
               credits: 6,
               subCat: 'Lifestyle',
-              skills: ['Training & Sport', 'Hiking','Biking','Writing']
+              skills: ['Training & Sport', 'Hiking', 'Biking', 'Writing']
             },
             {
               credits: 24,
               subCat: 'Activities',
-              skills: ['Performance & Theather', 'Project Management', 'Production','Gaming' ]
+              skills: ['Performance & Theather', 'Project Management', 'Production', 'Gaming']
             }
           ]
         }
@@ -120,39 +132,221 @@ class ThreadDBInit {
     }
   }
 
-  public async getAll(collectionName: string) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    return await this.client.find(this.threadID, collectionName, {});
+
+  private async auth(keyInfo: KeyInfo) {
+    // Create an expiration and create a signature. 60s or less is recommended.
+    const expiration = new Date(Date.now() + 60 * 1000)
+    // Generate a new UserAuth
+    const userAuth: UserAuth = await createUserAuth(keyInfo.key, keyInfo.secret ?? '', expiration)
+    return userAuth
   }
 
-  public async getByID(collectionName: string, id: string) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    return await this.client.findByID(this.threadID, collectionName, id);
+  public async getAll(collectionName: string, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+
+    const identity = await PrivateKey.fromString(privKey)
+    await client.getToken(identity)
+    return await client.find(thread, collectionName, {});
   }
 
-  public async filter(collectionName: string, filter: QueryJSON) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    return await this.client.find(this.threadID, collectionName, filter);
+  public async getByID(collectionName: string, id: string, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+
+    const identity = await PrivateKey.fromString(privKey)
+    await client.getToken(identity)
+    return await client.findByID(thread, collectionName, id);
   }
 
-
-  public async insert(collectionName: string, model: any) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    return await this.client.create(this.threadID, collectionName, [model]);
+  public async filter(collectionName: string, filter: QueryJSON, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+    const identity = await PrivateKey.fromString(privKey);
+    await client.getToken(identity)
+    const toReturn = await client.find(thread, collectionName, filter);
+    return toReturn;
   }
 
-  public async save(collectionName: string, values: any[]) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    return await this.client.save(this.threadID, collectionName, values);
+  public async insert(collectionName: string, model: any, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+
+    const identity = await PrivateKey.fromString(privKey)
+    await client.getToken(identity)
+    return await client.create(thread, collectionName, [model]);
   }
 
-  public async update(collectionName: string, id: string, model: any) {
-    this.client = await Client.withKeyInfo(keyInfo)
-    let toUpdate = await this.client.findByID(this.threadID, collectionName, id);
+  public async save(collectionName: string, values: any[], privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+
+    const identity = await PrivateKey.fromString(privKey)
+    await client.getToken(identity)
+    return await client.save(thread, collectionName, values);
+  }
+
+  public async update(collectionName: string, id: string, model: any, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+
+    const identity = await PrivateKey.fromString(privKey)
+    await client.getToken(identity)
+    let toUpdate = await client.findByID(thread, collectionName, id);
     toUpdate = model;
-    this.client.save(this.threadID, collectionName, [toUpdate]);
+    client.save(this.ditoThreadID, collectionName, [toUpdate]);
+  }
+
+  public async getCommunityPrivKey(communityID: string): Promise<CommunityKey> {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    const identity = await PrivateKey.fromString(ditoPrivKey);
+    await client.getToken(identity);
+    const communitiesKeyQuery = new Where('communityID').eq(communityID);
+    const communityKeys = (await this.filter(CommunityKeysCollection, communitiesKeyQuery))[0] as CommunityKey;
+    return communityKeys;
+  }
+
+  public async createCommunity(community: Community) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    console.log("Generate community identity (public/private key)");
+    const identity = await PrivateKey.fromRandom()
+    await client.getToken(identity)
+    console.log('setup mailbox for inter-community communication');
+    await this.setupMailbox(identity);
+
+    community.pubKey = identity.public.toString();
+
+    console.log('store the community in the ThreadDB');
+
+    const comID = await client.create(this.ditoThreadID, CommunitiesCollection, [
+      community
+    ])
+
+    const comThread = ThreadID.fromRandom();
+    console.log('store the community keys in another thread in ThreadDB');
+
+    await client.create(this.ditoThreadID, CommunityKeysCollection, [
+      {
+        communityID: comID[0],
+        threadID: comThread.toString(),
+        privKey: identity.toString(),
+      }
+    ]);
+
+    console.log('create a thread and the collections for the community');
+
+    await client.newDB(comThread, `community-${comID[0]}`);
+
+    await client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
+    await client.newCollection(comThread, { name: GeneralSkillsCollection });
+    await client.newCollection(comThread, { name: MessagesCollection });
+
+    return comID[0];
+  }
+
+
+  private async cleanTheThreads() {
+
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    const identity = await PrivateKey.fromString(ditoPrivKey);
+    await client.getToken(identity)
+
+    const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
+    await client.delete(this.ditoThreadID, CommunitiesCollection, ids);
+
+    const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
+    await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
+
+    const ids3 = ((await client.find(this.ditoThreadID, UsersCollection, {})) as any[]).map(s => s._id);
+    await client.delete(this.ditoThreadID, UsersCollection, ids3);
+  }
+
+  public async setupMailbox(identity: PrivateKey) {
+    const user = await Users.withKeyInfo(keyInfo)
+    await user.getToken(identity);
+
+    const mailboxID = await user.setupMailbox()
+    const callback = async (reply?: MailboxEvent, err?: Error) => {
+      if (!reply || !reply.message) return console.log('no message')
+      console.log('message received');
+      const bodyBytes = await identity.decrypt(reply.message.body)
+      const decoder = new TextDecoder()
+      const body = decoder.decode(bodyBytes)
+
+      const auth = await this.auth(keyInfo);
+      const client = Client.withUserAuth(auth);
+
+      const communityKeyQuery = new Where('privKey').eq(identity.toString());
+      const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
+
+      const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
+
+      const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
+
+      const thread = ThreadID.fromString(communityKey.threadID);
+
+      await client.create(thread, MessagesCollection, [{
+        from: community._id,
+        message: body
+      }]);
+      console.log(body)
+    }
+    user.watchInbox(mailboxID, callback)
+  }
+
+  public async getAllMessages(privKey: string) {
+    const user = await Users.withKeyInfo(keyInfo)
+    const identity = PrivateKey.fromString(privKey)
+    await user.getToken(identity);
+
+    const messages = await user.listInboxMessages()
+    const inbox = []
+
+
+    for (const message of messages) {
+
+      const bytes = await identity.decrypt(message.body)
+      const body = new TextDecoder().decode(bytes)
+      const { from } = message
+      const { readAt } = message
+      const { createdAt } = message
+      const { id } = message
+      inbox.push({ body, from, readAt, sent: createdAt, id });
+      console.log({ body, from, readAt, sent: createdAt, id })
+    }
+    return inbox;
+  }
+
+  public async sendMessage(senderPrivKey: string, recipientPubKey: Public, message: string) {
+    console.log('sending message');
+    const identity = PrivateKey.fromString(senderPrivKey)
+    const user = await Users.withKeyInfo(keyInfo)
+    await user.getToken(identity);
+    const encoded = new TextEncoder().encode(message);
+    await user.sendMessage(identity, recipientPubKey, encoded)
   }
 }
+
 
 const threadDBClient = new ThreadDBInit();
 threadDBClient.getClient();

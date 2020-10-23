@@ -2,7 +2,7 @@ import { findMainCat, getAllSkills, LoggerService } from "../services";
 import { Request, Response } from "express";
 import { injectable } from "inversify";
 import threadDBClient from "../threaddb.config";
-import { GeneralSkillsCollection } from "../constants/constants";
+import { GeneralSkillsCollection, MessagesCollection } from "../constants/constants";
 
 @injectable()
 export class SkillsController {

@@ -116,7 +116,7 @@ export class GigsController {
   public accept = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-        const validationResult = await validateAcceptingGig(req.params.gigID);
+        const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
         if (validationResult.isValid) {
           await acceptGig(req.params.gigID, req.body.userID);
           res.status(200).send();

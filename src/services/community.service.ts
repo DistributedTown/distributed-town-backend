@@ -1,4 +1,4 @@
-import { Where } from '@textile/hub';
+import { PublicKey, Where } from '@textile/hub';
 import {
     CommunitiesCollection,
     UsersCollection,
@@ -8,11 +8,14 @@ import {
 import { Community, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
 
+// fixed all
+
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
 
     const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and('isOpen').eq(true);
-    const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery));
+    const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
+    const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
     const members = await getCommunityMembers(communityID);
     return { ...community, members: members.length, openGigs: openGigs.length }
 
@@ -36,10 +39,13 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
             uniqueSkills++;
     });
 
-    const varietyCoefficient =  (uniqueSkills  / totalSkillsCount) * (filledMemberSlots / 4)
-    community.scarcityScore = Math.floor(varietyCoefficient * 100);
-
+    const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 4)
+    community.scarcityScore = Math.floor(varietyCoefficient * 100) - 20;
     await threadDBClient.update(CommunitiesCollection, communityID, community);
+
+    if (community.scarcityScore < 48) {
+        signal(community);
+    }
 }
 
 export async function getCommunityMembers(communityID: string): Promise<User[]> {
@@ -52,4 +58,16 @@ export async function getCommunityMembers(communityID: string): Promise<User[]> 
 export async function getCommunities() {
     const communities = await threadDBClient.getAll(CommunitiesCollection)
     return communities;
+}
+
+export async function signal(community: Community) {
+    // const query = new Where('category').eq(community.category);
+    const communities = (await threadDBClient.filter(CommunitiesCollection, {})) as Community[];
+    const comKey = await threadDBClient.getCommunityPrivKey(community._id);
+
+    const message = `Community ${community.name} needs you help. If you want to join follow the link ..`
+    communities.forEach(async community => {
+        const pubKey = PublicKey.fromString(community.pubKey)
+        await threadDBClient.sendMessage(comKey.privKey, pubKey, message);
+    })
 }
