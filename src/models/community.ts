@@ -2,11 +2,15 @@ export interface Community {
     _id: string;
     scarcityScore: number;
     category: string;
-    address: string;
+    addresses: CommunityAddress[];
     name: string;
     pubKey: string;
 }
 
+export interface CommunityAddress {
+  address: string;
+  blockchain: string;
+}
 export interface CommunityKey {
   _id: string;
   communityID: string;

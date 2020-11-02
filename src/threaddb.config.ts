@@ -21,8 +21,8 @@ const keyInfo: KeyInfo = {
   secret: 'bzcdqwxlxuqfoc3adtcbyasff2ef6opt37s2ucwq'
 }
 
-const ditoThreadID = 'bafk4ptq5vyazvev5dx2xxecy23epcyj2bm2vs4sfudysxwc6vkh4hii';
-const ditoPrivKey = 'bbaareqawbqt4jmq74v5aid3lyi6rk3g2bo4b22g6eu2blmedqhanxt2e6dmqsgozwn72phhnleddtttqvonqhjzzvd75u5tffliz7vayztrrw';
+const ditoThreadID = 'bafksim4camsfpioa5usiia2sp3tiri2tsynvcmkvfszuua63oqzkj2y';
+const ditoPrivKey = 'bbaareqg7v63j3muqpmq4t6ox34cjpsslnqaasaiazjgdmg357cvtdfdz3mxq57zmw5hrkq2asjaayyupuyniwrl74srouwy5d2sqq4tfzmhpq';
 
 @injectable()
 class ThreadDBInit {
@@ -45,7 +45,6 @@ class ThreadDBInit {
 
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
 
-    // this.cleanTheThreads();
     try {
       await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
     } catch (err) {
@@ -130,6 +129,38 @@ class ThreadDBInit {
         }
       ])
     }
+
+    const community1 = {
+      name: 'DiTo #1',
+      scarcityScore: 0,
+      category: 'Art & Lifestyle',
+      addresses: [
+        { blockchain: 'ETH', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' },
+        { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
+      ]
+    }
+    const community2 = {
+      name: 'DiTo #2',
+      scarcityScore: 0,
+      category: 'DLT & Blockchain',
+      addresses: [
+        { blockchain: 'ETH', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' },
+        { blockchain: 'RSK', address: '0x910895DE912A0eB625d6903265658f7EF80c1C19' },
+      ]
+    }
+    const community3 = {
+      name: 'DiTo #3',
+      scarcityScore: 0,
+      category: 'Local communities',
+      addresses: [
+        { blockchain: 'ETH', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
+        { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
+      ]
+    }
+    // await this.createCommunity(community1 as Community)
+    // await this.createCommunity(community2 as Community)
+    // await this.createCommunity(community3 as Community)
+    // console.log('done');
   }
 
 
@@ -270,6 +301,15 @@ class ThreadDBInit {
     const client = Client.withUserAuth(auth);
     const identity = await PrivateKey.fromString(ditoPrivKey);
     await client.getToken(identity)
+
+    const communities = (await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as CommunityKey[];
+    communities.forEach(async c => {
+      const i = await PrivateKey.fromString(c.privKey);
+      const cl = Client.withUserAuth(auth);
+      await cl.getToken(i);
+      const t = ThreadID.fromString(c.threadID);
+      cl.deleteDB(t);
+    });
 
     const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
     await client.delete(this.ditoThreadID, CommunitiesCollection, ids);

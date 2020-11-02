@@ -35,7 +35,6 @@ export const userSchema = {
             items: { "$ref": "#/definitions/userSkill" }
         },
         issuer: 'string', 
-        // email: 'string',
         lastLoginAt: 'string'
     },
     definitions: {

@@ -1,7 +1,7 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { fillUserData, getMessages, validateUser } from "../services/user.service";
+import { fillUserData, getMessages, updateCommunityID, validateUser } from "../services/user.service";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
@@ -79,6 +79,45 @@ export class UsersController {
         } else {
           res.status(400).send({ message: validationResult.message });
         }
+      } else {
+        return res.status(401).end({ message: 'Could not log user in.' });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /user:
+   *  put:
+   *      description: Changes community ID
+   *      parameters:
+   *          - name: User
+   *            type: User
+   *            in: body
+   *            schema:
+   *               $ref: '#/definitions/CreateUser'
+   *      tags:
+   *          - Users
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          201:
+   *              description: Created
+   *          400:
+   *              description: Bad Request
+   *          500:
+   *              description: Server error
+   */
+  public put = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        await updateCommunityID(userMetadata.email, req.body.communityID);
+        res.status(200).send();
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
       }
