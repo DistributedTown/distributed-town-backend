@@ -54,14 +54,20 @@ export async function getCommunityMembers(communityID: string): Promise<User[]> 
     return usersPerCommunity;
 }
 
-
-export async function getCommunities() {
-    const communities = await threadDBClient.getAll(CommunitiesCollection)
-    return communities;
+export async function getCommunities(blockchain: string) {
+    const communities = (await threadDBClient.getAll(CommunitiesCollection)) as Community[];
+    return communities.map(com => {
+        return {
+            _id: com._id,
+            scarcityScore: com.scarcityScore,
+            category: com.category,
+            name: com.name,
+            address: com.addresses.find(a => a.blockchain == blockchain).address
+        }
+    });
 }
 
 export async function signal(community: Community) {
-    // const query = new Where('category').eq(community.category);
     const communities = (await threadDBClient.filter(CommunitiesCollection, {})) as Community[];
     const comKey = await threadDBClient.getCommunityPrivKey(community._id);
 

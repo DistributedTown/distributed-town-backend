@@ -1,5 +1,5 @@
 import threadDBClient from "../threaddb.config";
-import { Community, User, ValidationResponseModel } from "../models";
+import { Community, communitySchema, User, ValidationResponseModel } from "../models";
 import { CommunitiesCollection, MessagesCollection, UsersCollection } from "../constants/constants";
 import { getCommunityMembers, updateScarcityScore } from "./community.service";
 import { calculateInitialCreditsAmount } from "./skills.service";
@@ -50,13 +50,19 @@ export async function fillUserData(email: string, user: User) {
     return { credits: credits, userID: existingUser[0]._id };
 }
 
+
+export async function updateCommunityID(email: string, communityID: string) {
+    const query = new Where('email').eq(email);
+    const existingUser = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+    existingUser.communityID = communityID;
+    await threadDBClient.update(UsersCollection, existingUser[0]._id, existingUser);
+}
+
 export async function getMessages(email: string) {
-    // email = 'mimonova13@gmail.com';
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as any;
 
     const key = await threadDBClient.getCommunityPrivKey(user.communityID);
-    // const messages = await threadDBClient.getAll(MessagesCollection, key.privKey, key.threadID);
 
     const messages = await threadDBClient.getAllMessages(key.privKey);
     console.log(messages);
