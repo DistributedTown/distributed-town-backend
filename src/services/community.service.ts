@@ -8,8 +8,6 @@ import {
 import { Community, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
 
-// fixed all
-
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
 

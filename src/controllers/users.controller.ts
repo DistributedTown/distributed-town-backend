@@ -95,11 +95,11 @@ export class UsersController {
    *  put:
    *      description: Changes community ID
    *      parameters:
-   *          - name: User
-   *            type: User
+   *          - name: ChangeCommunity
+   *            type: ChangeCommunity
    *            in: body
    *            schema:
-   *               $ref: '#/definitions/CreateUser'
+   *               $ref: '#/definitions/ChangeCommunity'
    *      tags:
    *          - Users
    *      produces:
@@ -127,6 +127,25 @@ export class UsersController {
     }
   }
 
+
+  
+  /**
+   * @swagger
+   * /user/messages:
+   *  get:
+   *      description: Gets user messages
+   *      tags:
+   *          - Users
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: Messages returned
+   *          400:
+   *              description: Bad Request
+   *          500:
+   *              description: Server error
+   */
   public getMessages = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {

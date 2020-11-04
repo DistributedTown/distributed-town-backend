@@ -1,3 +1,17 @@
+/**
+ * @swagger
+ * definitions:
+ *  CreateCommunity:
+ *      type: object
+ *      required:
+ *          - category
+ *          - name
+ *      properties:
+ *            category:
+ *              type: string
+ *            name:
+ *              type: string
+ */
 export interface Community {
     _id: string;
     scarcityScore: number;
@@ -7,6 +21,20 @@ export interface Community {
     pubKey: string;
 }
 
+/**
+ * @swagger
+ * definitions:
+ *  CreateGig:
+ *      type: object
+ *      required:
+ *          - address
+ *          - blockchain
+ *      properties:
+ *            address:
+ *              type: string
+ *            blockchain:
+ *              type: string
+ */
 export interface CommunityAddress {
   address: string;
   blockchain: string;

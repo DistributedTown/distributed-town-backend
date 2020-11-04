@@ -7,7 +7,7 @@
  *          - userID
  *          - title
  *          - description
- *          - skillCategories
+ *          - skills
  *          - creditsOffered
  *      properties:
  *            userID:
@@ -16,8 +16,10 @@
  *              type: string
  *            description:
  *              type: string
- *            skillCategories:
- *              type: object
+ *            skills:
+ *               type: array
+ *               items:
+ *                 type: string
  *            creditsOffered:
  *              type: number
  */
@@ -32,6 +34,37 @@ export interface Gig {
     communityID: string;
     isProject: boolean;
     skills: string[];
+}
+
+/**
+ * @swagger
+ * definitions:
+ *  AcceptGig:
+ *      type: object
+ *      required:
+ *          - userID
+ *      properties:
+ *            userID:
+ *              type: string
+ */
+export interface AcceptGig {
+  userID: string;
+}
+
+
+/**
+ * @swagger
+ * definitions:
+ *  RateGig:
+ *      type: object
+ *      required:
+ *          - rate
+ *      properties:
+ *            rate:
+ *              type: number
+ */
+export interface RateGig {
+  rate: number;
 }
 
 

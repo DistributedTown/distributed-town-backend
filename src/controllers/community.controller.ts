@@ -3,7 +3,6 @@ import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunityByID, getCommunities } from "../services/community.service";
 import threadDBClient from "../threaddb.config";
-import { CommunitiesCollection } from "../constants/constants";
 
 @injectable()
 export class CommunityController {
@@ -15,7 +14,12 @@ export class CommunityController {
    * @swagger
    * /community:
    *  get:
-   *      description: Gets all communities from the database
+   *      description: Gets all communities from the database with blockchain addresses. Blockchain value defaults to ETH. Possible values ETH/RSK
+   *      parameters:
+   *          - in: query
+   *            name: blockchain
+   *            type: string
+   *            required: false
    *      tags:
    *          - Community
    *      produces:
@@ -43,9 +47,14 @@ export class CommunityController {
 
   /**
    * @swagger
-   * /community:
-   *  get/:communityID:
+   * /community/:communityID:
+   *  get:
    *      description: Gets community by id
+   *      parameters:
+   *          - in: path
+   *            name: communityID
+   *            type: string
+   *            required: true
    *      tags:
    *          - Community
    *      produces:
@@ -78,6 +87,12 @@ export class CommunityController {
    * /community:
    *  post:
    *      description: Creates a new community 
+   *      parameters:
+   *          - name: CreateCommunity
+   *            type: CreateCommunity
+   *            in: body
+   *            schema:
+   *               $ref: '#/definitions/CreateCommunity'
    *      tags:
    *          - Community
    *      produces:

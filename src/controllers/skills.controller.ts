@@ -1,8 +1,6 @@
 import { findMainCat, getAllSkills, LoggerService } from "../services";
-import { Request, Response } from "express";
+import { Response } from "express";
 import { injectable } from "inversify";
-import threadDBClient from "../threaddb.config";
-import { GeneralSkillsCollection, MessagesCollection } from "../constants/constants";
 
 @injectable()
 export class SkillsController {
@@ -19,6 +17,11 @@ export class SkillsController {
    *      description: Gets all predefined skills from the database
    *      tags:
    *          - Skills
+   *      parameters:
+   *          - in: query
+   *            name: skill
+   *            type: string
+   *            required: false
    *      produces:
    *          - application/json
    *      responses:

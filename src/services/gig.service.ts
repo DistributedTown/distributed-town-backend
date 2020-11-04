@@ -1,12 +1,11 @@
-import { Gig, ValidationResponseModel, User, CommunityKey } from '../models';
-import { CommunityKeysCollection, GigsCollection, UsersCollection } from '../constants/constants';
+import { Gig, ValidationResponseModel, User, CommunityKey, UserSkill } from '../models';
+import { GigsCollection, UsersCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 
 export async function getGigs(email: string, isOpen: boolean, isProject: boolean) {
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
-
     const communityKey = await threadDBClient.getCommunityPrivKey(user.communityID);
     if (isOpen) {
         const skills = user.skills.map(us => us.skill);
@@ -72,4 +71,23 @@ export async function createGig(email: string, gig: Gig): Promise<string> {
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     const inserted = await threadDBClient.insert(GigsCollection, gig, communityKeys.privKey, communityKeys.threadID);
     return inserted[0];
+}
+
+export async function rateGig(gigCreatorEmail: string, gigID: string, rate: number) {
+    const query = new Where('email').eq(gigCreatorEmail);
+    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+    const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
+    const gig = (await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID)) as Gig;
+    const skills = gig.skills;
+    for (const userSkill of user.skills) {
+        if (skills.includes(userSkill.skill)) {
+            if (!userSkill.rates)
+                userSkill.rates = [];
+            userSkill.rates.push(rate);
+            if (userSkill.rates.length >= 5) {
+                userSkill.level = userSkill.rates.reduce((a, b) => a + b) / userSkill.rates.length
+            }
+        }
+    }
+    await threadDBClient.update(UsersCollection, user._id, user);
 }

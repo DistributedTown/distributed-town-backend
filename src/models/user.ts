@@ -5,12 +5,18 @@
  *      type: object
  *      required:
  *          - name
- *          - balance
+ *          - communityID
+ *          - skills
  *      properties:
  *            name:
  *              type: string
- *            balance:
+ *            communityID:
  *              type: string
+ *            skills:
+ *               type: array
+ *               items:
+ *                 $ref: '#/definitions/UserSkill'
+ *                
  */
 export interface User {
     _id: string;
@@ -65,4 +71,20 @@ export const userSchema = {
 export interface UserSkill {
     skill: string;
     level: number;
+    rates: number[];
+}
+
+/**
+ * @swagger
+ * definitions:
+ *  ChangeCommunity:
+ *      type: object
+ *      required:
+ *          - communityID
+ *      properties:
+ *            communityID:
+ *              type: string
+ */
+export interface ChangeCommunity {
+    communityID: string;
 }

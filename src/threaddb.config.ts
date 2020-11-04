@@ -206,6 +206,18 @@ class ThreadDBInit {
     const toReturn = await client.find(thread, collectionName, filter);
     return toReturn;
   }
+  
+  public async delete(collectionName: string, filter: QueryJSON, privKey?: string, threadID?: string) {
+    const auth = await this.auth(keyInfo);
+    const client = Client.withUserAuth(auth);
+    privKey = privKey ? privKey : ditoPrivKey;
+    const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
+    const identity = await PrivateKey.fromString(privKey);
+    await client.getToken(identity)
+    const toDelete = (await client.find(thread, collectionName, {})).map(item => (item as any)._id);
+    await client.delete(thread, collectionName, toDelete);
+    return toDelete;
+  }
 
   public async insert(collectionName: string, model: any, privKey?: string, threadID?: string) {
     const auth = await this.auth(keyInfo);

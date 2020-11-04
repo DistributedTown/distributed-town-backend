@@ -16,6 +16,7 @@ export class GigRouter {
     this._router.get("/", passport.authenticate("magic"), this.gigsController.get);
     this._router.post("/", passport.authenticate("magic"), this.gigsController.post);
     this._router.post("/:gigID/accept", passport.authenticate("magic"), this.gigsController.accept);
+    this._router.post("/:gigID/rate", passport.authenticate("magic"), this.gigsController.rate);
   }
 
   public get router(): Router {
