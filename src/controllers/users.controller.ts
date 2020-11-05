@@ -2,9 +2,11 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { fillUserData, getMessages, updateCommunityID, validateUser } from "../services/user.service";
+import { getGigsToRate } from "../services/gig.service";
 import threadDBClient from "../threaddb.config";
 import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
+
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic('sk_test_A040E804B3F17845');
 
@@ -151,6 +153,37 @@ export class UsersController {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
         const response = await getMessages(userMetadata.email);
+        res.status(200).send(response);
+      } else {
+        return res.status(401).end({ message: 'Could not log user in.' });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /user/gigsToRate:
+   *  get:
+   *      description: Gets all completed gigs placed by the current user so that the user can rate them
+   *      tags:
+   *          - Users
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+  public getGigsToRate = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const response = await getGigsToRate(userMetadata.email);
         res.status(200).send(response);
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
