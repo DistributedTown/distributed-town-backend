@@ -19,12 +19,13 @@ export async function getGigs(email: string, isOpen: boolean, isProject: boolean
         return completedGigs;
     }
 }
-export async function acceptGig(gigID: string, acceptedUser: string) {
-    const user = (await threadDBClient.getByID(UsersCollection, acceptedUser)) as User;
+export async function acceptGig(gigID: string, userEmail: string) {
+    const userQuery = new Where('email').eq(userEmail);
+    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     let gig: any = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID);
     gig.isOpen = false;
-    gig.acceptedUser = acceptedUser;
+    gig.acceptedUser = user._id;
     await threadDBClient.save(GigsCollection, [gig], communityKeys.privKey, communityKeys.threadID);
 }
 export async function validateAcceptingGig(gigID: string, userID: string): Promise<ValidationResponseModel> {

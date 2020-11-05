@@ -112,12 +112,6 @@ export class GigsController {
    * /gig/:gigID/accept:
    *  post:
    *      description: Complete a gig
-   *      parameters:
-   *          - name: AcceptGig
-   *            type: AcceptGig
-   *            in: body
-   *            schema:
-   *               $ref: '#/definitions/AcceptGig'
    *      tags:
    *          - Gigs
    *      produces:
@@ -133,13 +127,14 @@ export class GigsController {
   public accept = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-        const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
-        if (validationResult.isValid) {
-          await acceptGig(req.params.gigID, req.body.userID);
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        // const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
+        // if (validationResult.isValid) {
+          await acceptGig(req.params.gigID, userMetadata.email);
           res.status(200).send();
-        } else {
-          res.status(400).send({ message: validationResult.message });
-        }
+        // } else {
+        //   res.status(400).send({ message: validationResult.message });
+        // }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }
