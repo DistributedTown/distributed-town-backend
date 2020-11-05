@@ -32,6 +32,7 @@ export interface Gig {
     communityID: string;
     isProject: boolean;
     skills: string[];
+    isRated: boolean;
 }
 
 

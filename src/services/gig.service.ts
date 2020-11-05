@@ -73,3 +73,13 @@ export async function createGig(email: string, gig: Gig): Promise<string> {
     const inserted = await threadDBClient.insert(GigsCollection, gig, communityKeys.privKey, communityKeys.threadID);
     return inserted[0];
 }
+
+export async function getGigsToRate(email: string): Promise<Gig[]> {
+    const query = new Where('email').eq(email);
+    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+    const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
+
+    const gigQuery = new Where('userID').eq(user._id).and('isRated').eq(false);
+    const gigsToRate = (await threadDBClient.filter(GigsCollection, gigQuery, communityKeys.privKey, communityKeys.threadID)) as Gig[];
+    return gigsToRate;
+}
