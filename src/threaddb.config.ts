@@ -46,20 +46,6 @@ class ThreadDBInit {
 
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
 
-    let communityKey = await this.client.findByID(this.ditoThreadID, CommunityKeysCollection, '01ep56weapcmt9k8fqqbfmwymq') as CommunityKey;
-    let gigs = (await client.find(ThreadID.fromString(communityKey.threadID), GigsCollection, {}) as Gig[]).map(g => g._id);
-    await client.delete(ThreadID.fromString(communityKey.threadID), GigsCollection, gigs)
-
-
-    communityKey = await this.client.findByID(this.ditoThreadID, CommunityKeysCollection, '01ep56wqqe0s63emzv54n2kfyb') as CommunityKey;
-    gigs = (await client.find(ThreadID.fromString(communityKey.threadID), GigsCollection, {}) as Gig[]).map(g => g._id);
-    await client.delete(ThreadID.fromString(communityKey.threadID), GigsCollection, gigs)
-
-
-    communityKey = await this.client.findByID(this.ditoThreadID, CommunityKeysCollection, '01ep56x0w0g2px4jc56x9de08g') as CommunityKey;
-    gigs = (await client.find(ThreadID.fromString(communityKey.threadID), GigsCollection, {}) as Gig[]).map(g => g._id);
-    await client.delete(ThreadID.fromString(communityKey.threadID), GigsCollection, gigs)
-
     try {
       await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
     } catch (err) {
@@ -269,7 +255,7 @@ class ThreadDBInit {
     await client.getToken(identity)
     let toUpdate = await client.findByID(thread, collectionName, id);
     toUpdate = model;
-    client.save(this.ditoThreadID, collectionName, [toUpdate]);
+    client.save(thread, collectionName, [toUpdate]);
   }
 
   public async getCommunityPrivKey(communityID: string): Promise<CommunityKey> {

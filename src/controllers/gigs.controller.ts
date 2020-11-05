@@ -1,7 +1,15 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { acceptGig, createGig, getGigs, rateGig, validateAcceptingGig, validateGig } from "../services/gig.service";
+import {
+  acceptGig,
+  createGig,
+  getGigs,
+  rateGig,
+  validateAcceptingGig,
+  validateGig,
+  getGigsToRate
+} from "../services/gig.service";
 
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic('sk_test_A040E804B3F17845');
@@ -173,6 +181,37 @@ export class GigsController {
         res.status(200).send();
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /gigs/toRate:
+   *  get:
+   *      description: Gets all completed gigs placed by the current user so that the user can rate them
+   *      tags:
+   *          - Gigs
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+  public getGigsToRate = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const response = await getGigsToRate(userMetadata.email);
+        res.status(200).send(response);
+      } else {
+        return res.status(401).end({ message: 'Could not log user in.' });
       }
     } catch (err) {
       this.loggerService.error(err);
