@@ -152,7 +152,7 @@ class ThreadDBInit {
     const community3 = {
       name: 'DiTo #3',
       scarcityScore: 0,
-      category: 'Local communities',
+      category: 'Local community',
       addresses: [
         { blockchain: 'ETH', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
         { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
@@ -207,7 +207,7 @@ class ThreadDBInit {
     const toReturn = await client.find(thread, collectionName, filter);
     return toReturn;
   }
-  
+
   public async delete(collectionName: string, filter: QueryJSON, privKey?: string, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
