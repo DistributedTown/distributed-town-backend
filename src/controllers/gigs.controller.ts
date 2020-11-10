@@ -10,6 +10,7 @@ import {
   validateGig,
   getGigsToRate
 } from "../services/gig.service";
+import { validateRegisteredUser } from "../services/user.service";
 
 const { Magic } = require("@magic-sdk/admin");
 const magic = new Magic('sk_test_A040E804B3F17845');
@@ -47,11 +48,16 @@ export class GigsController {
   public get = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-        const isOpen: boolean = req.query.isOpen === 'true';
-        const isProject: boolean = req.query.isProject === 'true';
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+      const isOpen: boolean = req.query.isOpen === 'true';
+      const isProject: boolean = req.query.isProject === 'true';
+      const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+      const isValidUser = await validateRegisteredUser(userMetadata.email)
+      if (isValidUser.valid) {
         const gigs = await getGigs(userMetadata.email, isOpen, isProject);
         res.status(200).send(gigs);
+      } else {
+        res.status(400).send({ error: isValidUser.message });
+      }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }
@@ -130,8 +136,8 @@ export class GigsController {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
         // const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
         // if (validationResult.isValid) {
-          await acceptGig(req.params.gigID, userMetadata.email);
-          res.status(200).send();
+        await acceptGig(req.params.gigID, userMetadata.email);
+        res.status(200).send();
         // } else {
         //   res.status(400).send({ message: validationResult.message });
         // }

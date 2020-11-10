@@ -5,6 +5,18 @@ import { getCommunityMembers, updateScarcityScore } from "./community.service";
 import { calculateInitialCreditsAmount } from "./skills.service";
 import { Where } from "@textile/hub";
 
+export async function validateRegisteredUser(email: string) {
+    const userQuery = new Where('email').eq(email);
+    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+
+    if (!user.communityID) {
+        return { valid: false, message: 'User has not joined a community.' }
+    }
+    if (!user.skills || user.skills.length < 1) {
+        return { valid: false, message: 'User has not selected skills.' }
+    }
+}
+
 export async function validateUser(user: User): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     if (!user.username) {
