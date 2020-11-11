@@ -15,6 +15,7 @@ export async function validateRegisteredUser(email: string) {
     if (!user.skills || user.skills.length < 1) {
         return { valid: false, message: 'User has not selected skills.' }
     }
+    return {valid: true}
 }
 
 export async function validateUser(user: User): Promise<ValidationResponseModel> {
