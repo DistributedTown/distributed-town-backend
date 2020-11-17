@@ -6,6 +6,7 @@ import { Where } from "@textile/hub";
 import { UsersCollection } from "../constants/constants";
 import {
   fillUserData,
+  getInvitationLink,
   getMessages,
   updateCommunityID,
   validateUser
@@ -170,6 +171,40 @@ export class UsersController {
 
   /**
      * @swagger
+     * /user/invite:
+     *  get:
+     *      description: Get link for inviting new members to the user's commynity
+     *      tags:
+     *          - Users
+     *      produces:
+     *          - application/json
+     *      responses:
+     *          200:
+     *              description: Created
+     *          401:
+     *              description: Unauthorized
+     *          500:
+     *              description: Server error
+     */
+  public invite = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const linkUrl = await getInvitationLink(userMetadata.email);
+        res.status(200).send({linkUrl: linkUrl});
+      } else {
+        return res.status(401).end({ message: 'Could not log user in.' });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  
+  /**
+     * @swagger
      * /user/login:
      *  post:
      *      description: Login with magic link
@@ -185,18 +220,18 @@ export class UsersController {
      *          500:
      *              description: Server error
      */
-  public login = async (req: any, res: Response) => {
-    try {
-      if (req.user) {
-        res.status(200).end('User is logged in.');
-      } else {
-        return res.status(401).end({ message: 'Could not log user in.' });
+    public login = async (req: any, res: Response) => {
+      try {
+        if (req.user) {
+          res.status(200).end('User is logged in.');
+        } else {
+          return res.status(401).end({ message: 'Could not log user in.' });
+        }
+      } catch (err) {
+        this.loggerService.error(err);
+        res.status(500).send({ error: "Something went wrong, please try again later." });
       }
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
     }
-  }
   public logout = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {

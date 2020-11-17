@@ -26,8 +26,13 @@ export interface User {
     email: string;
     lastLoginAt: string;
     skills: UserSkill[];
+    invites: Invite[];
 }
 
+export interface Invite {
+    guid: string;
+    time: number;
+}
 
 export const userSchema = {
     title: 'User',

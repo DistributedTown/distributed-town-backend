@@ -4,6 +4,7 @@ import { CommunitiesCollection, MessagesCollection, UsersCollection } from "../c
 import { getCommunityMembers, updateScarcityScore } from "./community.service";
 import { calculateInitialCreditsAmount } from "./skills.service";
 import { Where } from "@textile/hub";
+import { v4 as uuidv4 } from 'uuid';
 
 export async function validateRegisteredUser(email: string) {
     const userQuery = new Where('email').eq(email);
@@ -80,5 +81,18 @@ export async function getMessages(email: string) {
     const messages = await threadDBClient.getAllMessages(key.privKey);
     console.log(messages);
     return messages;
+}
 
+
+export async function getInvitationLink(email: string): Promise<string> {
+    const userQuery = new Where('email').eq(email);
+    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+    const guid = uuidv4();
+    user.invites.push({
+        guid: guid, 
+        time: Date.now()
+    });
+
+    await threadDBClient.update(UsersCollection, user._id, user);
+    return `https://distributed.town/community?communityID=${user.communityID}`;
 }

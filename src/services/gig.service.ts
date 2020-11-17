@@ -1,7 +1,9 @@
-import { Gig, ValidationResponseModel, User, CommunityKey, UserSkill } from '../models';
-import { GigsCollection, UsersCollection } from '../constants/constants';
+import { Gig, ValidationResponseModel, User, CommunityKey, UserSkill, Community } from '../models';
+import { CommunitiesCollection, GigsCollection, UsersCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
+import { validateUser } from './user.service';
+import { getCommunityMembers } from './community.service';
 
 export async function getGigs(email: string, isOpen: boolean, isProject: boolean) {
     const userQuery = new Where('email').eq(email);
@@ -11,7 +13,7 @@ export async function getGigs(email: string, isOpen: boolean, isProject: boolean
         const skills = user.skills.map(us => us.skill);
         const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID);
         const openGigs = (await threadDBClient.filter(GigsCollection, {}, communityKey.privKey, communityKey.threadID)) as Gig[];
-       console.log(openGigs);
+        console.log(openGigs);
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
         const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID).and('acceptedUser').eq(user._id);
@@ -40,8 +42,17 @@ export async function validateAcceptingGig(gigID: string, userID: string): Promi
     }
     return response;
 }
-export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
+export async function validateGig(gig: Gig, userEmail: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
+    
+    const user = await threadDBClient.filter(UsersCollection, new Where('email').eq(userEmail))[0] as User;
+    const validUser = await validateUser(user)
+
+    if(!validUser.isValid) {
+        return validUser;
+    }
+
+    const communityMembers = await getCommunityMembers(gig.communityID);
     if (!gig.title) {
         response.isValid = false;
         response.message = 'Title is required field';
@@ -62,7 +73,11 @@ export async function validateGig(gig: Gig): Promise<ValidationResponseModel> {
         response.isValid = false;
         response.message = 'Skills should be selected.';
     }
-    return response;
+    else if (communityMembers.length < 3) {
+        response.isValid = false;
+        response.message = 'The community is not yet active.';
+    }
+        return response;
 };
 
 export async function createGig(email: string, gig: Gig): Promise<string> {

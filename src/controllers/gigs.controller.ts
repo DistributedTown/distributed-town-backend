@@ -6,9 +6,9 @@ import {
   createGig,
   getGigs,
   rateGig,
-  validateAcceptingGig,
   validateGig,
-  getGigsToRate
+  getGigsToRate,
+  validateAcceptingGig
 } from "../services/gig.service";
 import { validateRegisteredUser } from "../services/user.service";
 
@@ -94,9 +94,9 @@ export class GigsController {
     try {
       if (req.isAuthenticated()) {
         req.body.isOpen = true;
-        const validationResult = await validateGig(req.body);
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const validationResult = await validateGig(req.body, userMetadata.email);
         if (validationResult.isValid) {
-          const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
           const gigID = await createGig(userMetadata.email, req.body);
           res.status(201).send({ gigID: gigID });
         } else {
@@ -134,13 +134,13 @@ export class GigsController {
     try {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        // const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
-        // if (validationResult.isValid) {
+        const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
+        if (validationResult.isValid) {
         await acceptGig(req.params.gigID, userMetadata.email);
         res.status(200).send();
-        // } else {
-        //   res.status(400).send({ message: validationResult.message });
-        // }
+        } else {
+          res.status(400).send({ message: validationResult.message });
+        }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }

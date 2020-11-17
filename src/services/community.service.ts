@@ -10,7 +10,6 @@ import threadDBClient from '../threaddb.config';
 
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
-
     const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and('isOpen').eq(true);
     const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
     const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
@@ -20,7 +19,6 @@ export async function getCommunityByID(communityID: string) {
 }
 
 export async function updateScarcityScore(communityID: string): Promise<void> {
-
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
     const usersPerCommunity = await getCommunityMembers(communityID);
     const userSkills = usersPerCommunity.flatMap(user => user.skills.map(skill => skill.skill));
@@ -47,26 +45,27 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
 }
 
 export async function getCommunityMembers(communityID: string): Promise<User[]> {
-    const usersPerCommuntiyQuery = new Where('communityID').eq(communityID);
-    const usersPerCommunity = (await threadDBClient.filter(UsersCollection, usersPerCommuntiyQuery)) as User[];
-    return usersPerCommunity;
+    const users = await threadDBClient.getAll(UsersCollection) as User[];
+    return users.filter(u => u.communityID && u.communityID === communityID);
 }
 
 export async function getCommunities(blockchain: string) {
     const communities = (await threadDBClient.getAll(CommunitiesCollection)) as Community[];
-    return communities.map(com => {
+    return await Promise.all(communities.map(async com => {
         return {
             _id: com._id,
             scarcityScore: com.scarcityScore,
             category: com.category,
             name: com.name,
-            address: com.addresses.find(a => a.blockchain == blockchain).address
+            address: com.addresses.find(a => a.blockchain == blockchain).address,
+            members: (await getCommunityMembers(com._id)).length
         }
-    });
+    }));
 }
 
 export async function signal(community: Community) {
-    const communities = (await threadDBClient.filter(CommunitiesCollection, {})) as Community[];
+    const comFilter = new Where('category').eq(community.category).and('_id').ne(community._id);
+    const communities = (await threadDBClient.filter(CommunitiesCollection, comFilter)) as Community[];
     const comKey = await threadDBClient.getCommunityPrivKey(community._id);
 
     const message = `Community ${community.name} needs you help. If you want to join follow the link ..`

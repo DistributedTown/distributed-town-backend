@@ -271,22 +271,17 @@ class ThreadDBInit {
   public async createCommunity(community: Community) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
-    console.log("Generate community identity (public/private key)");
     const identity = await PrivateKey.fromRandom()
     await client.getToken(identity)
-    console.log('setup mailbox for inter-community communication');
     await this.setupMailbox(identity);
 
     community.pubKey = identity.public.toString();
-
-    console.log('store the community in the ThreadDB');
 
     const comID = await client.create(this.ditoThreadID, CommunitiesCollection, [
       community
     ])
 
     const comThread = ThreadID.fromRandom();
-    console.log('store the community keys in another thread in ThreadDB');
 
     await client.create(this.ditoThreadID, CommunityKeysCollection, [
       {
@@ -296,7 +291,6 @@ class ThreadDBInit {
       }
     ]);
 
-    console.log('create a thread and the collections for the community');
 
     await client.newDB(comThread, `community-${comID[0]}`);
 
