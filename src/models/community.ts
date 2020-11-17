@@ -1,7 +1,9 @@
+import { User } from "./user";
+
 /**
  * @swagger
  * definitions:
- *  CreateCommunity:
+ *  Community:
  *      type: object
  *      required:
  *          - category
@@ -19,6 +21,34 @@ export interface Community {
     addresses: CommunityAddress[];
     name: string;
     pubKey: string;
+    owner: string;
+}
+
+/**
+ * @swagger
+ * definitions:
+ *  CreateCommunity:
+ *      type: object
+ *      required:
+ *          - category
+ *          - name
+ *          - owner
+ *          - addresses
+ *      properties:
+ *            category:
+ *              type: string
+ *            name:
+ *              type: string
+ */
+export interface CreateCommunity {
+  _id: string;
+  scarcityScore: number;
+  category: string;
+  addresses: CommunityAddress[];
+  name: string;
+  pubKey: string;
+  owner: User;
+  ownerID: string;
 }
 
 /**

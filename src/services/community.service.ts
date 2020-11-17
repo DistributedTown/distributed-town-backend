@@ -5,8 +5,9 @@ import {
     GigsCollection,
     GeneralSkillsCollection
 } from '../constants/constants';
-import { Community, SkillsCategory, User } from '../models';
+import { Community, CreateCommunity, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
+import { fillUserData, updateCommunityID } from './user.service';
 
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
@@ -73,4 +74,33 @@ export async function signal(community: Community) {
         const pubKey = PublicKey.fromString(community.pubKey)
         await threadDBClient.sendMessage(comKey.privKey, pubKey, message);
     })
+}
+
+export async function createCommunity(ownerEmail: string, community: CreateCommunity) {
+    let ownerID: string = undefined;
+
+    const communityModel: Community = {
+        scarcityScore: 0,
+        category: community.category, 
+        addresses: community.addresses,
+        name: community.name,
+    } as Community;
+
+    const communityID = await threadDBClient.createCommunity(communityModel);
+
+    if(!community.ownerID) {
+        community.owner.communityID = communityID;
+        const owner = await fillUserData(ownerEmail, community.owner);
+        ownerID = owner.userID;
+    } else {
+        ownerID = community.ownerID;
+        await updateCommunityID(ownerEmail, communityID);
+    }
+    
+    const newCommunity = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
+    newCommunity.owner = ownerID;
+    await threadDBClient.update(CommunitiesCollection, newCommunity._id, newCommunity);
+    
+    return communityID;
+
 }

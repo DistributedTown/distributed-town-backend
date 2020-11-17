@@ -14,7 +14,7 @@ export class CommunityRouter {
 
   private init(): void {
     this._router.get("/", this.communityController.get);
-    this._router.post("/", this.communityController.post);
+    this._router.post("/",  passport.authenticate("magic"),this.communityController.post);
     this._router.get("/:communityID", passport.authenticate("magic"), this.communityController.getByID);
   }
 

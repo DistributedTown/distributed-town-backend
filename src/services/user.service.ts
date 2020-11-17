@@ -69,7 +69,7 @@ export async function updateCommunityID(email: string, communityID: string) {
     const query = new Where('email').eq(email);
     const existingUser = (await threadDBClient.filter(UsersCollection, query))[0] as User;
     existingUser.communityID = communityID;
-    await threadDBClient.update(UsersCollection, existingUser[0]._id, existingUser);
+    await threadDBClient.update(UsersCollection, existingUser._id, existingUser);
 }
 
 export async function getMessages(email: string) {

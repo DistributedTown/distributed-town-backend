@@ -1,8 +1,10 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunityByID, getCommunities } from "../services/community.service";
-import threadDBClient from "../threaddb.config";
+import { getCommunityByID, getCommunities, createCommunity } from "../services/community.service";
+
+const { Magic } = require("@magic-sdk/admin");
+const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class CommunityController {
@@ -93,7 +95,7 @@ export class CommunityController {
    *            in: body
    *            schema:
    *               $ref: '#/definitions/CreateCommunity'
-   *      tags:
+   *      tags: 
    *          - Community
    *      produces:
    *          - application/json
@@ -107,8 +109,9 @@ export class CommunityController {
     try {
       if (req.isAuthenticated()) {
         req.body.scarcityScore = 0;
-        const response = await threadDBClient.createCommunity(req.body);
-        res.status(200).send(response);
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const response = await createCommunity(userMetadata.email, req.body);
+        res.status(200).send({ communityID: response} );
       } else {
         res.status(401).send({ error: 'User not logged in.' });
       }
