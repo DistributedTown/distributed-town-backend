@@ -13,7 +13,6 @@ import {
   Community,
   gigSchema,
   CommunityKey,
-  Gig
 } from './models'
 import { threadId } from 'worker_threads';
 
@@ -131,37 +130,46 @@ class ThreadDBInit {
       ])
     }
 
-    const community1 = {
-      name: 'DiTo #1',
-      scarcityScore: 0,
-      category: 'Art & Lifestyle',
-      addresses: [
-        { blockchain: 'ETH', address: '0x790697f595Aa4F9294566be0d262f71b44b5039c' },
-        { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
-      ]
-    }
-    const community2 = {
-      name: 'DiTo #2',
-      scarcityScore: 0,
-      category: 'DLT & Blockchain',
-      addresses: [
-        { blockchain: 'ETH', address: '0xFdA3DB614eF90Cd96495FceA2D481d8C33C580A2' },
-        { blockchain: 'RSK', address: '0x910895DE912A0eB625d6903265658f7EF80c1C19' },
-      ]
-    }
-    const community3 = {
-      name: 'DiTo #3',
-      scarcityScore: 0,
-      category: 'Local community',
-      addresses: [
-        { blockchain: 'ETH', address: '0x759A224E15B12357b4DB2d3aa20ef84aDAf28bE7' },
-        { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
-      ]
-    }
-    // await this.createCommunity(community1 as Community)
-    // await this.createCommunity(community2 as Community)
-    // await this.createCommunity(community3 as Community)
-    // console.log('done');
+    // const allCommunities = await client.find(this.ditoThreadID, CommunitiesCollection, {}) as Community[];
+    // await client.delete(this.ditoThreadID, CommunitiesCollection, allCommunities.map(c => c._id));
+    // const community1 = {
+    //   name: 'DiTo #1',
+    //   scarcityScore: 0,
+    //   category: 'Art & Lifestyle',
+    //   addresses: [
+    //     { blockchain: 'ETH', address: '0xf8199c9C603C56ff47Ad93B37f9E50D20442758B' },
+    //     { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
+    //   ],
+    //   owner: skilledUsers[0]._id
+
+    // }
+    // const community2 = {
+    //   name: 'DiTo #2',
+    //   scarcityScore: 0,
+    //   category: 'DLT & Blockchain',
+    //   addresses: [
+    //     { blockchain: 'ETH', address: '0xe7C51e3ef623BfdD3172e45169Cfb27B983135EB' },
+    //     { blockchain: 'RSK', address: '0x910895DE912A0eB625d6903265658f7EF80c1C19' },
+    //   ],
+    //   owner: skilledUsers[0]._id
+
+    // }
+    // const community3 = {
+    //   name: 'DiTo #3',
+    //   scarcityScore: 0,
+    //   category: 'Local community',
+    //   addresses: [
+    //     { blockchain: 'ETH', address: '0x1347dBB8803aFa04Abe7D3a736A006502Bee2438' },
+    //     { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
+    //   ],
+    //   owner: skilledUsers[0]._id
+    // }
+
+    // const c1 = await this.createCommunity(community1 as Community)
+    // const c2 = await this.createCommunity(community2 as Community)
+    // const c3 = await this.createCommunity(community3 as Community)
+    
+    console.log('done');
   }
 
 

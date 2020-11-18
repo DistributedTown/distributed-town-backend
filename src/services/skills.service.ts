@@ -1,3 +1,4 @@
+import { Where } from "@textile/hub";
 import { GeneralSkillsCollection } from "../constants/constants";
 import { User, SkillsCategory, UserSkill } from "../models";
 import threadDBClient from "../threaddb.config";
@@ -36,6 +37,13 @@ export async function findMainCat(skillName: string): Promise<SkillsCategory> {
         }
     }));
     return mainCat;
+}
+
+
+export async function getByCategory(category: string): Promise<SkillsCategory> {
+    const query = new Where('main').eq(category);
+    const generalSkills = (await threadDBClient.filter(GeneralSkillsCollection, query)) as SkillsCategory[];
+    return generalSkills[0];
 }
 
 export async function getAllSkills(): Promise<string[]> {
