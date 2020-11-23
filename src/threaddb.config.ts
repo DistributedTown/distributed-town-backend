@@ -130,6 +130,22 @@ class ThreadDBInit {
       ])
     }
 
+    // const c1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdy3jndzjx3rgz2fd4e371p') as Community;
+    // const c2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdyaamhh4zb3fqx30q6239k')as Community;
+    // const c3 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdykjm1qc31enehc4264ber')as Community;
+
+    // const i1 = c1.addresses.findIndex(c => c.blockchain === 'ETH');
+    // c1.addresses[i1].address = '0x21255bC60234359A7aBa6EdB8d1b9cd0070B13aE';
+    // await this.update(CommunitiesCollection, c1._id, c1);
+
+    // const i2 = c2.addresses.findIndex(c => c.blockchain === 'ETH');
+    // c2.addresses[i2].address = '0xA2a01294B4069045Bb125C17E57A8fBB501EE98B';
+    // await this.update(CommunitiesCollection, c2._id, c2);
+
+    // const i3 = c3.addresses.findIndex(c => c.blockchain === 'ETH');
+    // c3.addresses[i3].address = '0xe21A399D47B630eF41Bd3e7874CbA468DDFd38f9';
+    // await this.update(CommunitiesCollection, c3._id, c3);
+    
     // const allCommunities = await client.find(this.ditoThreadID, CommunitiesCollection, {}) as Community[];
     // await client.delete(this.ditoThreadID, CommunitiesCollection, allCommunities.map(c => c._id));
     // const community1 = {
