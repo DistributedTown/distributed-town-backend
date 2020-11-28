@@ -94,5 +94,5 @@ export async function getInvitationLink(email: string): Promise<string> {
     });
 
     await threadDBClient.update(UsersCollection, user._id, user);
-    return `https://distributed.town/community?communityID=${user.communityID}`;
+    return `https://distributed.town/community/join?communityId=${user.communityID}`;
 }
