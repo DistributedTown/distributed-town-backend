@@ -52,7 +52,8 @@ export async function getCommunityMembers(communityID: string): Promise<User[]> 
 
 export async function getCommunities(blockchain: string) {
     const communities = (await threadDBClient.getAll(CommunitiesCollection)) as Community[];
-    return await Promise.all(communities.map(async com => {
+    const blockchainCommunities = communities.filter(c => c.addresses.findIndex(a => a.blockchain === blockchain) >= 0);
+    return await Promise.all(blockchainCommunities.map(async com => {
         return {
             _id: com._id,
             scarcityScore: com.scarcityScore,
