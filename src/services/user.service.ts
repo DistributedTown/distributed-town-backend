@@ -87,12 +87,23 @@ export async function getMessages(email: string) {
 export async function getInvitationLink(email: string): Promise<string> {
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
-    const guid = uuidv4();
-    user.invites.push({
-        guid: guid, 
-        time: Date.now()
-    });
 
-    await threadDBClient.update(UsersCollection, user._id, user);
-    return `https://distributed.town/community/join?communityId=${user.communityID}`;
+    if(user.communityID) {
+        const guid = uuidv4();
+        if(!user.invites) {
+            user.invites = []
+        }
+    
+        user.invites.push({
+            guid: guid, 
+            time: Date.now()
+        });
+    
+        await threadDBClient.update(UsersCollection, user._id, user);
+        const community = await threadDBClient.getByID(CommunitiesCollection, user.communityID) as Community;
+        return `https://distributed.town/community/join?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
+    } else {
+        return undefined;
+    }
+    
 }

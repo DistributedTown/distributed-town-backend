@@ -191,7 +191,11 @@ export class UsersController {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
         const linkUrl = await getInvitationLink(userMetadata.email);
-        res.status(200).send({linkUrl: linkUrl});
+        if(linkUrl){
+          res.status(200).send({linkUrl: linkUrl});
+        } else {
+          res.status(400).send({message: 'User not associated with a community.'});
+        }
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
       }
