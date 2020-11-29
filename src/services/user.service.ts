@@ -101,7 +101,7 @@ export async function getInvitationLink(email: string): Promise<string> {
     
         await threadDBClient.update(UsersCollection, user._id, user);
         const community = await threadDBClient.getByID(CommunitiesCollection, user.communityID) as Community;
-        return `https://distributed.town/community/join?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
+        return `https://distributed.town/community/invite?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
     } else {
         return undefined;
     }
