@@ -358,6 +358,8 @@ class ThreadDBInit {
 
     const mailboxID = await user.setupMailbox()
     const callback = async (reply?: MailboxEvent, err?: Error) => {
+      const user = await Users.withKeyInfo(keyInfo)
+      await user.getToken(identity);
       if (!reply || !reply.message) return console.log('no message')
       console.log('message received');
       const bodyBytes = await identity.decrypt(reply.message.body)
