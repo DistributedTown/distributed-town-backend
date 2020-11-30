@@ -15,6 +15,7 @@ import {
   CommunityKey,
 } from './models'
 import { threadId } from 'worker_threads';
+import { loggers } from 'winston';
 
 const keyInfo: KeyInfo = {
   key: 'bzri276u6qt5ppotid4sscghagm',
@@ -145,7 +146,7 @@ class ThreadDBInit {
     // const i3 = c3.addresses.findIndex(c => c.blockchain === 'ETH');
     // c3.addresses[i3].address = '0xe21A399D47B630eF41Bd3e7874CbA468DDFd38f9';
     // await this.update(CommunitiesCollection, c3._id, c3);
-    
+
     // const allCommunities = await client.find(this.ditoThreadID, CommunitiesCollection, {}) as Community[];
     // await client.delete(this.ditoThreadID, CommunitiesCollection, allCommunities.map(c => c._id));
     // const community1 = {
@@ -184,7 +185,7 @@ class ThreadDBInit {
     // const c1 = await this.createCommunity(community1 as Community)
     // const c2 = await this.createCommunity(community2 as Community)
     // const c3 = await this.createCommunity(community3 as Community)
-    
+
     console.log('done');
   }
 
@@ -297,7 +298,7 @@ class ThreadDBInit {
     const client = Client.withUserAuth(auth);
     const identity = await PrivateKey.fromRandom()
     await client.getToken(identity)
-    await this.setupMailbox(identity);
+    // await this.setupMailbox(identity);
 
     community.pubKey = identity.public.toString();
 
@@ -353,38 +354,46 @@ class ThreadDBInit {
   }
 
   public async setupMailbox(identity: PrivateKey) {
-    const user = await Users.withKeyInfo(keyInfo)
-    await user.getToken(identity);
-
-    const mailboxID = await user.setupMailbox()
-    const callback = async (reply?: MailboxEvent, err?: Error) => {
+    try {
       const user = await Users.withKeyInfo(keyInfo)
       await user.getToken(identity);
-      if (!reply || !reply.message) return console.log('no message')
-      console.log('message received');
-      const bodyBytes = await identity.decrypt(reply.message.body)
-      const decoder = new TextDecoder()
-      const body = decoder.decode(bodyBytes)
 
-      const auth = await this.auth(keyInfo);
-      const client = Client.withUserAuth(auth);
+      const mailboxID = await user.setupMailbox()
+      const callback = async (reply?: MailboxEvent, err?: Error) => {
+        try {
+          const user = await Users.withKeyInfo(keyInfo)
+          await user.getToken(identity);
+          if (!reply || !reply.message) return console.log('no message')
+          console.log('message received');
+          const bodyBytes = await identity.decrypt(reply.message.body)
+          const decoder = new TextDecoder()
+          const body = decoder.decode(bodyBytes)
 
-      const communityKeyQuery = new Where('privKey').eq(identity.toString());
-      const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
+          const auth = await this.auth(keyInfo);
+          const client = Client.withUserAuth(auth);
 
-      const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
+          const communityKeyQuery = new Where('privKey').eq(identity.toString());
+          const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
 
-      const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
+          const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
 
-      const thread = ThreadID.fromString(communityKey.threadID);
+          const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
 
-      await client.create(thread, MessagesCollection, [{
-        from: community._id,
-        message: body
-      }]);
-      console.log(body)
+          const thread = ThreadID.fromString(communityKey.threadID);
+
+          await client.create(thread, MessagesCollection, [{
+            from: community._id,
+            message: body
+          }]);
+          console.log(body)
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      user.watchInbox(mailboxID, callback)
+    } catch (err) {
+      console.log(err);
     }
-    user.watchInbox(mailboxID, callback)
   }
 
   public async getAllMessages(privKey: string) {

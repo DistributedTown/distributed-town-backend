@@ -41,7 +41,8 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
     await threadDBClient.update(CommunitiesCollection, communityID, community);
 
     if (community.scarcityScore < 48) {
-        signal(community);
+        // signal(community);
+        console.log('send signal');
     }
 }
 
