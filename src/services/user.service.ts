@@ -16,7 +16,7 @@ export async function validateRegisteredUser(email: string) {
     if (!user.skills || user.skills.length < 1) {
         return { valid: false, message: 'User has not selected skills.' }
     }
-    return {valid: true}
+    return { valid: true }
 }
 
 export async function validateUser(user: User): Promise<ValidationResponseModel> {
@@ -26,23 +26,20 @@ export async function validateUser(user: User): Promise<ValidationResponseModel>
         response.message = 'Username is required field';
         return response;
     }
-    if (!user.communityID) {
-        response.isValid = false;
-        response.message = 'Community is required field';
-        return response;
-    }
-    try {
-        await threadDBClient.getByID(CommunitiesCollection, user.communityID)
-    } catch (err) {
-        response.isValid = false;
-        response.message = 'Community not found';
-        return response;
-    }
-    const communityMembers = await getCommunityMembers(user.communityID);
-    if (communityMembers.length >= 24) {
-        response.isValid = false;
-        response.message = 'Community cannot exceed 24 members';
-        return response;
+    if (user.communityID) {
+        try {
+            await threadDBClient.getByID(CommunitiesCollection, user.communityID)
+        } catch (err) {
+            response.isValid = false;
+            response.message = 'Community not found';
+            return response;
+        }
+        const communityMembers = await getCommunityMembers(user.communityID);
+        if (communityMembers.length >= 24) {
+            response.isValid = false;
+            response.message = 'Community cannot exceed 24 members';
+            return response;
+        }
     }
     return response;
 }
@@ -60,7 +57,6 @@ export async function fillUserData(email: string, user: User) {
     user._id = existingUser[0]._id;
     await threadDBClient.update(UsersCollection, existingUser[0]._id, user);
     const credits = await calculateInitialCreditsAmount(user);
-    await updateScarcityScore(user.communityID);
     return { credits: credits, userID: existingUser[0]._id };
 }
 
@@ -70,6 +66,7 @@ export async function updateCommunityID(email: string, communityID: string) {
     const existingUser = (await threadDBClient.filter(UsersCollection, query))[0] as User;
     existingUser.communityID = communityID;
     await threadDBClient.update(UsersCollection, existingUser._id, existingUser);
+    await updateScarcityScore(communityID);
 }
 
 export async function getMessages(email: string) {
@@ -88,22 +85,22 @@ export async function getInvitationLink(email: string): Promise<string> {
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
 
-    if(user.communityID) {
+    if (user.communityID) {
         const guid = uuidv4();
-        if(!user.invites) {
+        if (!user.invites) {
             user.invites = []
         }
-    
+
         user.invites.push({
-            guid: guid, 
+            guid: guid,
             time: Date.now()
         });
-    
+
         await threadDBClient.update(UsersCollection, user._id, user);
         const community = await threadDBClient.getByID(CommunitiesCollection, user.communityID) as Community;
         return `https://distributed.town/community/invite?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
     } else {
         return undefined;
     }
-    
+
 }

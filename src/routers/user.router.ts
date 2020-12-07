@@ -78,10 +78,11 @@ export class UserRouter {
   }
 
   private init(): void {
+    this._router.get('/',passport.authenticate("magic"), this.userController.get);
     this._router.post('/', passport.authenticate("magic"), this.userController.post);
+    this._router.put('/',passport.authenticate("magic"), this.userController.put);
     this._router.post('/login', passport.authenticate("magic"), this.userController.login);
     this._router.post('/logout',passport.authenticate("magic"), this.userController.logout);
-    this._router.get('/',passport.authenticate("magic"), this.userController.get);
     this._router.get('/messages',passport.authenticate("magic"), this.userController.getMessages);
     this._router.get('/invite',passport.authenticate("magic"), this.userController.invite);
   }
