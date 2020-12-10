@@ -45,9 +45,10 @@ export async function validateAcceptingGig(gigID: string, userID: string): Promi
 export async function validateGig(gig: Gig, userEmail: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     
-    
+    const userQuery = new Where('email').eq(userEmail);
+    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
 
-    const communityMembers = await getCommunityMembers(gig.communityID);
+    const communityMembers = await getCommunityMembers(user.communityID);
     if (!gig.title) {
         response.isValid = false;
         response.message = 'Title is required field';
