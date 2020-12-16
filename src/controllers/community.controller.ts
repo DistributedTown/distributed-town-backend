@@ -22,6 +22,10 @@ export class CommunityController {
    *            name: blockchain
    *            type: string
    *            required: false
+   *          - in: query
+   *            name: category
+   *            type: string
+   *            required: false
    *      tags:
    *          - Community
    *      produces:
@@ -35,10 +39,11 @@ export class CommunityController {
   public get = async (req: any, res: Response) => {
     try {
       let blockchain = req.query.blockchain; 
+      let category = req.query.category; 
       if(!blockchain) {
         blockchain = 'ETH';
       }
-      const com = await getCommunities(blockchain);
+      const com = await getCommunities(blockchain, category);
       res.status(200).send(com);
     } catch (err) {
       this.loggerService.error(err);
