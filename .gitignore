@@ -57,3 +57,5 @@ hfc-key-store
 # MongoDB data
 data/
 data-dev/
+
+.env

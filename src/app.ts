@@ -39,6 +39,9 @@ export class App {
       includeMethod: true,
       includePath: true
     });
+
+    require('dotenv').config()
+
     this._app.use(metricsMiddleware);
 
     // support application/json
