@@ -1,4 +1,4 @@
-import { Client, createUserAuth, DBInfo, KeyInfo, MailboxEvent, Private, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, UserMessage, Users, Where } from '@textile/hub'
+import { Client, createUserAuth, KeyInfo, MailboxEvent, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, Users, Where } from '@textile/hub'
 import {
   UsersCollection,
   CommunitiesCollection,
@@ -9,22 +9,19 @@ import {
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  communitySchema,
   Community,
   gigSchema,
   CommunityKey,
 } from './models'
-import { threadId } from 'worker_threads';
-import { loggers } from 'winston';
+require('dotenv').config()
 
-const keyInfo: KeyInfo = {
-  key: 'bzri276u6qt5ppotid4sscghagm',
-  secret: 'bzcdqwxlxuqfoc3adtcbyasff2ef6opt37s2ucwq'
+
+const ditoThreadID = process.env.DITO_THREADID;
+const ditoPrivKey = process.env.DITO_PRIVATE_KEY;
+const keyInfo = {
+  key: process.env.TEXTILE_KEY,
+  secret: process.env.TEXTILE_SECRET
 }
-
-const ditoThreadID = 'bafksim4camsfpioa5usiia2sp3tiri2tsynvcmkvfszuua63oqzkj2y';
-const ditoPrivKey = 'bbaareqg7v63j3muqpmq4t6ox34cjpsslnqaasaiazjgdmg357cvtdfdz3mxq57zmw5hrkq2asjaayyupuyniwrl74srouwy5d2sqq4tfzmhpq';
-
 @injectable()
 class ThreadDBInit {
   client: Client;
@@ -131,9 +128,10 @@ class ThreadDBInit {
       ])
     }
 
-    // const c1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdy3jndzjx3rgz2fd4e371p') as Community;
-    // const c2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdyaamhh4zb3fqx30q6239k')as Community;
-    // const c3 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdykjm1qc31enehc4264ber')as Community;
+
+    // // const c1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdy3jndzjx3rgz2fd4e371p') as Community;
+    // // const c2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdyaamhh4zb3fqx30q6239k')as Community;
+    // // const c3 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdykjm1qc31enehc4264ber')as Community;
 
     // const i1 = c1.addresses.findIndex(c => c.blockchain === 'ETH');
     // c1.addresses[i1].address = '0x21255bC60234359A7aBa6EdB8d1b9cd0070B13aE';
@@ -158,7 +156,6 @@ class ThreadDBInit {
     //     { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
     //   ],
     //   owner: skilledUsers[0]._id
-
     // }
     // const community2 = {
     //   name: 'DiTo #2',
@@ -186,7 +183,6 @@ class ThreadDBInit {
     // const c2 = await this.createCommunity(community2 as Community)
     // const c3 = await this.createCommunity(community3 as Community)
 
-    console.log('done');
   }
 
 

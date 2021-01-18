@@ -26,31 +26,24 @@
 export interface Gig {
     _id: string;
     userID: string;
-    acceptedUserID: string;
+    takerUserID: string;
     title: string;
     description: string;
     creditsOffered: number;
-    isOpen: boolean;
+    status: GigStatus;
     communityID: string;
     isProject: boolean;
     skills: string[];
     isRated: boolean;
 }
 
-/**
- * @swagger
- * definitions:
- *  AcceptGig:
- *      type: object
- *      required:
- *          - userID
- *      properties:
- *            userID:
- *              type: string
- */
-export interface AcceptGig {
-  userID: string;
+export enum GigStatus {
+  Open, 
+  TakenNotAccepted, 
+  TakenAccepted,
+  Completed
 }
+
 
 
 /**
