@@ -52,8 +52,6 @@ ethereum/
 package-lock.json
 npm-debug.log
 
-hfc-key-store
-
 # MongoDB data
 data/
 data-dev/

@@ -1,8 +1,7 @@
-import { Gig, ValidationResponseModel, User, CommunityKey, UserSkill, Community } from '../models';
-import { CommunitiesCollection, GigsCollection, UsersCollection } from '../constants/constants';
+import { Gig, ValidationResponseModel, User, GigStatus } from '../models';
+import { GigsCollection, UsersCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
-import { validateUser } from './user.service';
 import { getCommunityMembers } from './community.service';
 
 export async function getGigs(email: string, isOpen: boolean, isProject: boolean) {
@@ -12,8 +11,7 @@ export async function getGigs(email: string, isOpen: boolean, isProject: boolean
     if (isOpen) {
         const skills = user.skills.map(us => us.skill);
         const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID);
-        const openGigs = (await threadDBClient.filter(GigsCollection, {}, communityKey.privKey, communityKey.threadID)) as Gig[];
-        console.log(openGigs);
+        const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery, communityKey.privKey, communityKey.threadID)) as Gig[];
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
     } else {
         const gigQuery = new Where('isOpen').eq(isOpen).and('isProject').eq(isProject).and('communityID').eq(user.communityID).and('acceptedUser').eq(user._id);
@@ -21,30 +19,61 @@ export async function getGigs(email: string, isOpen: boolean, isProject: boolean
         return completedGigs;
     }
 }
-export async function acceptGig(gigID: string, userEmail: string) {
+export async function takeGig(gigID: string, userEmail: string) {
     const userQuery = new Where('email').eq(userEmail);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
-    let gig: any = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID);
-    gig.isOpen = false;
-    gig.acceptedUser = user._id;
+    let gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
+    gig.status = GigStatus.TakenNotAccepted;
+    gig.takerUserID = user._id;
     await threadDBClient.save(GigsCollection, [gig], communityKeys.privKey, communityKeys.threadID);
 }
-export async function validateAcceptingGig(gigID: string, userID: string): Promise<ValidationResponseModel> {
+
+
+export async function startGig(gigID: string, takerEmail: string) {
+    const userQuery = new Where('email').eq(takerEmail);
+    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+    const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
+    let gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
+    if (gig.status === GigStatus.TakenNotAccepted) {
+        gig.status = GigStatus.TakenAccepted;
+        await threadDBClient.save(GigsCollection, [gig], communityKeys.privKey, communityKeys.threadID);
+    }
+}
+
+export async function validateTakingGig(gigID: string, userID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     const user = (await threadDBClient.getByID(UsersCollection, userID)) as User;
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     const gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID);
     const gigTyped = gig as Gig;
-    if (!gigTyped.isOpen) {
+    if (gigTyped.status !== GigStatus.Open) {
         response.isValid = false;
-        response.message = 'The gig has already been accepted.'
+        response.message = 'The gig has already been taken.'
     }
     return response;
 }
+
+
+export async function validateStartingGig(gigID: string, userID: string): Promise<ValidationResponseModel> {
+    let response: ValidationResponseModel = { isValid: true }
+    const user = (await threadDBClient.getByID(UsersCollection, userID)) as User;
+    const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
+    const gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
+    if (gig.status !== GigStatus.TakenAccepted) {
+        response.isValid = false;
+        response.message = 'The gig has not been taken.'
+    }
+    if(gig.userID !== userID) {
+        response.isValid = false;
+        response.message = 'Only the user creator can start a gig!'
+    }
+    return response;
+}
+
 export async function validateGig(gig: Gig, userEmail: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
-    
+
     const userQuery = new Where('email').eq(userEmail);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
 
@@ -73,7 +102,7 @@ export async function validateGig(gig: Gig, userEmail: string): Promise<Validati
         response.isValid = false;
         response.message = 'The community is not yet active.';
     }
-        return response;
+    return response;
 };
 
 export async function createGig(email: string, gig: Gig): Promise<string> {

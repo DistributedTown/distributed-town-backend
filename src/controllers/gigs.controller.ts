@@ -2,13 +2,15 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import {
-  acceptGig,
+  takeGig,
   createGig,
   getGigs,
   rateGig,
   validateGig,
   getGigsToRate,
-  validateAcceptingGig
+  validateTakingGig,
+  validateStartingGig,
+  startGig
 } from "../services/gig.service";
 import { validateRegisteredUser } from "../services/user.service";
 
@@ -115,7 +117,7 @@ export class GigsController {
 
   /**
    * @swagger
-   * /gig/:gigID/accept:
+   * /gig/:gigID/take:
    *  post:
    *      description: Complete a gig
    *      tags:
@@ -130,13 +132,51 @@ export class GigsController {
    *          500:
    *              description: Server error
    */
-  public accept = async (req: any, res: Response) => {
+  public take = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await validateAcceptingGig(req.params.gigID, req.body.userID);
+        const validationResult = await validateTakingGig(req.params.gigID, req.body.userID);
         if (validationResult.isValid) {
-        await acceptGig(req.params.gigID, userMetadata.email);
+        await takeGig(req.params.gigID, userMetadata.email);
+        res.status(200).send();
+        } else {
+          res.status(400).send({ message: validationResult.message });
+        }
+      } else {
+        return res.status(401).end({ message: `User is not logged in.` });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /gig/start:
+   *  post:
+   *      description: Start a gig
+   *      tags:
+   *          - Gigs
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: Completed
+   *          400:
+   *              description: Bad Request
+   *          500:
+   *              description: Server error
+   */
+  public start = async (req: any, res: Response) => {
+    try {
+      if (req.isAuthenticated()) {
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const validationResult = await validateStartingGig(req.params.gigID, req.query.userID);
+        if (validationResult.isValid) {
+        await startGig(req.body.gigID, userMetadata.email);
         res.status(200).send();
         } else {
           res.status(400).send({ message: validationResult.message });

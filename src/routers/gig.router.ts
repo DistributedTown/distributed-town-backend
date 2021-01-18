@@ -15,7 +15,8 @@ export class GigRouter {
   private init(): void {
     this._router.get("/", this.gigsController.get);
     this._router.post("/", this.gigsController.post);
-    this._router.post("/:gigID/accept", this.gigsController.accept);
+    this._router.post("/:gigID/accept", this.gigsController.take);
+    this._router.get("/start", this.gigsController.start);
     this._router.post("/:gigID/rate", this.gigsController.rate);
     this._router.get("/toRate", this.gigsController.getGigsToRate);
   }

@@ -66,17 +66,14 @@ export async function updateCommunityID(email: string, communityID: string) {
     const existingUser = (await threadDBClient.filter(UsersCollection, query))[0] as User;
     existingUser.communityID = communityID;
     await threadDBClient.update(UsersCollection, existingUser._id, existingUser);
-    await updateScarcityScore(communityID);
+    updateScarcityScore(communityID);
 }
 
 export async function getMessages(email: string) {
     const userQuery = new Where('email').eq(email);
     const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as any;
-
     const key = await threadDBClient.getCommunityPrivKey(user.communityID);
-
     const messages = await threadDBClient.getAllMessages(key.privKey);
-    console.log(messages);
     return messages;
 }
 
