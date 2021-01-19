@@ -11,7 +11,7 @@ import { fillUserData, updateCommunityID } from './user.service';
 
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
-    const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and('isOpen').eq(true);
+    const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and(status).ne(4);
     const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
     const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
     const members = await getCommunityMembers(communityID);

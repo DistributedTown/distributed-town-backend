@@ -8,9 +8,9 @@ import {
   rateGig,
   validateGig,
   getGigsToRate,
-  validateTakingGig,
-  validateStartingGig,
-  startGig
+  startGig,
+  submitGig,
+  completeGig
 } from "../services/gig.service";
 import { validateRegisteredUser } from "../services/user.service";
 
@@ -50,16 +50,16 @@ export class GigsController {
   public get = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-      const isOpen: boolean = req.query.isOpen === 'true';
-      const isProject: boolean = req.query.isProject === 'true';
-      const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-      const isValidUser = await validateRegisteredUser(userMetadata.email)
-      if (isValidUser.valid) {
-        const gigs = await getGigs(userMetadata.email, isOpen, isProject);
-        res.status(200).send(gigs);
-      } else {
-        res.status(400).send({ error: isValidUser.message });
-      }
+        const isOpen: boolean = req.query.isOpen === 'true';
+        const isProject: boolean = req.query.isProject === 'true';
+        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
+        const isValidUser = await validateRegisteredUser(userMetadata.email)
+        if (isValidUser.valid) {
+          const gigs = await getGigs(userMetadata.email, isOpen, isProject);
+          res.status(200).send(gigs);
+        } else {
+          res.status(400).send({ error: isValidUser.message });
+        }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }
@@ -95,7 +95,6 @@ export class GigsController {
   public post = async (req: any, res: Response) => {
     try {
       if (req.isAuthenticated()) {
-        req.body.isOpen = true;
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
         const validationResult = await validateGig(req.body, userMetadata.email);
         if (validationResult.isValid) {
@@ -136,10 +135,9 @@ export class GigsController {
     try {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await validateTakingGig(req.params.gigID, req.body.userID);
+        const validationResult = await takeGig(req.params.gigID, userMetadata.email);
         if (validationResult.isValid) {
-        await takeGig(req.params.gigID, userMetadata.email);
-        res.status(200).send();
+          res.status(200).send();
         } else {
           res.status(400).send({ message: validationResult.message });
         }
@@ -156,7 +154,7 @@ export class GigsController {
   /**
    * @swagger
    * /gig/start:
-   *  post:
+   *  get:
    *      description: Start a gig
    *      tags:
    *          - Gigs
@@ -172,17 +170,79 @@ export class GigsController {
    */
   public start = async (req: any, res: Response) => {
     try {
+      const validationResult = await startGig(req.params.gigID, req.query.takerID, req.query.creatorID);
+      if (validationResult.isValid) {
+        res.status(200).send();
+      } else {
+        res.status(400).send({ message: validationResult.message });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /gig/:gigID/submit:
+   *  post:
+   *      description: Start a gig
+   *      tags:
+   *          - Gigs
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: Completed
+   *          400:
+   *              description: Bad Request
+   *          500:
+   *              description: Server error
+   */
+  public submit = async (req: any, res: Response) => {
+    try {
       if (req.isAuthenticated()) {
         const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await validateStartingGig(req.params.gigID, req.query.userID);
-        if (validationResult.isValid) {
-        await startGig(req.body.gigID, userMetadata.email);
-        res.status(200).send();
-        } else {
-          res.status(400).send({ message: validationResult.message });
-        }
+        const validationResult = await submitGig(req.params.gigID, userMetadata.email);
+        if (validationResult.isValid)
+          return res.status(200).send();
+        else
+          return res.status(400).send({ message: validationResult.message })
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /gig/complete:
+   *  get:
+   *      description: Start a gig
+   *      tags:
+   *          - Gigs
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: Completed
+   *          400:
+   *              description: Bad Request
+   *          500:
+   *              description: Server error
+   */
+  public complete = async (req: any, res: Response) => {
+    try {
+      const validationResult = await completeGig(req.params.gigID, req.query.creatorID);
+      if (validationResult.isValid) {
+        res.status(200).send();
+      } else {
+        res.status(400).send({ message: validationResult.message });
       }
     } catch (err) {
       this.loggerService.error(err);

@@ -41,6 +41,7 @@ export enum GigStatus {
   Open, 
   TakenNotAccepted, 
   TakenAccepted,
+  Submited,
   Completed
 }
 
@@ -62,6 +63,7 @@ export interface RateGig {
 }
 
 
+// TODO fix schema
 export const gigSchema = {
     title: 'Gig',
     type: 'object',
