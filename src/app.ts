@@ -11,10 +11,9 @@ import {
   SwaggerRouter,
 } from "./routers";
 const session = require("express-session");
-const passport = require("passport");
 const cookieParser = require("cookie-parser");
 var cors = require('cors');
-
+import { initializeSkillWallet } from './skillWallet/skillWallet.client';
 @injectable()
 export class App {
   private _app: express.Application;
@@ -65,19 +64,40 @@ export class App {
         }
       })
     );
-    this._app.use(passport.initialize());
-    this._app.use(passport.session());
+
+    // const onAuth = (address, done) => {
+    //   // optional additional validation. To deny auth:
+    //   // done(new Error('User is not authorized.'));
+    //   console.log('aaaaaaaa');
+    //   const query = new Where('address').eq(address);
+    //   threadDBClient.filter(UsersCollection, query).then(users => {
+    //     if (users.length > 0)
+    //       done(undefined, users[0])
+    //     else
+    //       done(new Error('User not found'), undefined);
+    //   })
+    //     .catch(err => done(err, undefined))
+    // }
+
+    // const web3Strategy = new Web3Strategy(onAuth);
+
+    // passport.use(web3Strategy);
+
+    // this._app.use(passport.initialize());
+    // this._app.use(passport.session());
     this._app.use(cors());
     //Initialize app routes
     this._initRoutes();
+
+    initializeSkillWallet();
 
   }
 
   private _initRoutes() {
     this._app.use("/api/docs", this.swaggerRouter.router);
-    this._app.use("/api/user",passport.authenticate("magic"),  this.userRouter.router);
-    this._app.use("/api/skill",  this.skillsRouter.router);
+    this._app.use("/api/user", this.userRouter.router);
+    this._app.use("/api/skill", this.skillsRouter.router);
     this._app.use("/api/community", this.communityRouter.router);
-    this._app.use("/api/gig", passport.authenticate("magic"), this.gigRouter.router);
+    this._app.use("/api/gig", this.gigRouter.router);
   }
 }

@@ -1,3 +1,4 @@
+import { SkillWallet } from "../skillWallet/skillWallet.client";
 import { User } from "./user";
 
 /**
@@ -47,7 +48,7 @@ export interface CreateCommunity {
   addresses: CommunityAddress[];
   name: string;
   pubKey: string;
-  owner: User;
+  owner: SkillWallet;
   ownerID: string;
 }
 

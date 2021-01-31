@@ -1,15 +1,14 @@
 import { Gig, ValidationResponseModel, User, GigStatus } from '../models';
-import { GigsCollection, UsersCollection } from '../constants/constants';
+import { GigsCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
-import { getCommunityMembers } from './community.service';
+import { getCommunityMembers, getSkillWalletByID } from '../skillWallet/skillWallet.client';
 
-export async function getGigs(email: string, isOpen: boolean, isProject: boolean) {
-    const userQuery = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+export async function getGigs(skillWalletID: string, isOpen: boolean, isProject: boolean) {
+    const user = await getSkillWalletByID(skillWalletID);
     const communityKey = await threadDBClient.getCommunityPrivKey(user.communityID);
     if (isOpen) {
-        const skills = user.skills.map(us => us.skill);
+        const skills = user.skillWallet.map(us => us.skill);
         const gigQuery = new Where('status').eq(0).and('isProject').eq(isProject).and('communityID').eq(user.communityID);
         const openGigs = (await threadDBClient.filter(GigsCollection, gigQuery, communityKey.privKey, communityKey.threadID)) as Gig[];
         return openGigs.filter(gig => gig.skills.every(skill => skills.includes(skill)));
@@ -19,17 +18,16 @@ export async function getGigs(email: string, isOpen: boolean, isProject: boolean
         return completedGigs;
     }
 }
-export async function takeGig(gigID: string, takerEmail: string): Promise<ValidationResponseModel> {
+export async function takeGig(gigID: string, takerSkillWalletID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
-    const userQuery = new Where('email').eq(takerEmail);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+    const user = await getSkillWalletByID(takerSkillWalletID);
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     const gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
     const gigTyped = gig as Gig;
     if (gigTyped.status !== GigStatus.Open) {
         response.isValid = false;
         response.message = 'The gig has already been taken.'
-    } else if (!gig.skills.every(gigSkill => user.skills.findIndex(us => us.skill === gigSkill) !== -1)) {
+    } else if (!gig.skills.every(gigSkill => user.skillWallet.findIndex(us => us.skill === gigSkill) !== -1)) {
         response.isValid = false;
         response.message = 'The gig taker does not have the needed skills.'
     } else {
@@ -43,7 +41,7 @@ export async function takeGig(gigID: string, takerEmail: string): Promise<Valida
 
 export async function startGig(gigID: string, takerID: string, creatorID: string): Promise<ValidationResponseModel> {
     const response: ValidationResponseModel = { isValid: true };
-    const creator = await threadDBClient.getByID(UsersCollection, creatorID) as User;
+    const creator = await getSkillWalletByID(creatorID);
     const communityKeys = await threadDBClient.getCommunityPrivKey(creator.communityID);
     let gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
     if (gig.status !== GigStatus.TakenNotAccepted) {
@@ -62,10 +60,9 @@ export async function startGig(gigID: string, takerID: string, creatorID: string
     return response;
 }
 
-export async function submitGig(gigID: string, takerEmail: string): Promise<ValidationResponseModel> {
+export async function submitGig(gigID: string, takerSkillWalletID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
-    const userQuery = new Where('email').eq(takerEmail);
-    const taker = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+    const taker = await getSkillWalletByID(takerSkillWalletID);
 
     const communityKeys = await threadDBClient.getCommunityPrivKey(taker.communityID);
     let gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
@@ -85,7 +82,7 @@ export async function submitGig(gigID: string, takerEmail: string): Promise<Vali
 
 export async function completeGig(gigID: string, creatorID: string): Promise<ValidationResponseModel> {
     const response: ValidationResponseModel = { isValid: true };
-    const creator = await threadDBClient.getByID(UsersCollection, creatorID) as User;
+    const creator = await getSkillWalletByID(creatorID);
     const communityKeys = await threadDBClient.getCommunityPrivKey(creator.communityID);
     let gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
     if (gig.status !== GigStatus.Submited) {
@@ -101,11 +98,9 @@ export async function completeGig(gigID: string, creatorID: string): Promise<Val
     return response;
 }
 
-export async function validateGig(gig: Gig, userEmail: string): Promise<ValidationResponseModel> {
+export async function validateGig(gig: Gig, skillWalletID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
-
-    const userQuery = new Where('email').eq(userEmail);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+    const user = await getSkillWalletByID(skillWalletID);
 
     const communityMembers = await getCommunityMembers(user.communityID);
     if (!gig.title) {
@@ -135,9 +130,8 @@ export async function validateGig(gig: Gig, userEmail: string): Promise<Validati
     return response;
 };
 
-export async function createGig(email: string, gig: Gig): Promise<string> {
-    const query = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+export async function createGig(skillWalletID: string, gig: Gig): Promise<string> {
+    const user = await getSkillWalletByID(skillWalletID);
     gig.communityID = user.communityID;
     gig.userID = user._id;
     gig.isRated = false;
@@ -147,30 +141,28 @@ export async function createGig(email: string, gig: Gig): Promise<string> {
     return inserted[0];
 }
 
-export async function rateGig(gigCreatorEmail: string, gigID: string, rate: number) {
-    const query = new Where('email').eq(gigCreatorEmail);
-    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
-    const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
-    const gig = (await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID)) as Gig;
-    const skills = gig.skills;
-    for (const userSkill of user.skills) {
-        if (skills.includes(userSkill.skill)) {
-            if (!userSkill.rates)
-                userSkill.rates = [];
-            userSkill.rates.push(rate);
-            if (userSkill.rates.length >= 5) {
-                userSkill.level = Math.round(userSkill.rates.reduce((a, b) => a + b) / userSkill.rates.length);
-            }
-        }
-    }
+// export async function rateGig(gigCreatorSkillWalletID: string, gigID: string, rate: number) {
+//     const user = await getSkillWalletByID(gigCreatorSkillWalletID);
+//     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
+//     const gig = (await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID)) as Gig;
+//     const skills = gig.skills;
+//     for (const userSkill of user.skillWallet) {
+//         if (skills.includes(userSkill.skill)) {
+//             if (!userSkill.rates)
+//                 userSkill.rates = [];
+//             userSkill.rates.push(rate);
+//             if (userSkill.rates.length >= 5) {
+//                 userSkill.level = Math.round(userSkill.rates.reduce((a, b) => a + b) / userSkill.rates.length);
+//             }
+//         }
+//     }
 
-    gig.isRated = true;
-    await threadDBClient.update(GigsCollection, gig._id, gig, communityKeys.privKey, communityKeys.threadID);
-    await threadDBClient.update(UsersCollection, user._id, user);
-}
-export async function getGigsToRate(email: string): Promise<Gig[]> {
-    const query = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+//     gig.isRated = true;
+//     await threadDBClient.update(GigsCollection, gig._id, gig, communityKeys.privKey, communityKeys.threadID);
+//     await threadDBClient.update(UsersCollection, user._id, user);
+// }
+export async function getGigsToRate(skillWalletID: string): Promise<Gig[]> {
+    const user = await getSkillWalletByID(skillWalletID);
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
 
     const gigQuery = new Where('userID').eq(user._id).and('isRated').eq(false).and(status).eq(4);

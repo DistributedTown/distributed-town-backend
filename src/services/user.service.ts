@@ -1,19 +1,16 @@
 import threadDBClient from "../threaddb.config";
-import { Community, communitySchema, User, ValidationResponseModel } from "../models";
-import { CommunitiesCollection, MessagesCollection, UsersCollection } from "../constants/constants";
-import { getCommunityMembers, updateScarcityScore } from "./community.service";
-import { calculateInitialCreditsAmount } from "./skills.service";
-import { Where } from "@textile/hub";
-import { v4 as uuidv4 } from 'uuid';
+import { User, ValidationResponseModel } from "../models";
+import { CommunitiesCollection } from "../constants/constants";
+import { updateScarcityScore } from "./community.service";
+import { getCommunityMembers, getSkillWalletByID, storeSkillWallet } from "../skillWallet/skillWallet.client";
 
-export async function validateRegisteredUser(email: string) {
-    const userQuery = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+export async function validateRegisteredUser(skillWalletID: string) {
+    const user = await getSkillWalletByID(skillWalletID);
 
     if (!user.communityID) {
         return { valid: false, message: 'User has not joined a community.' }
     }
-    if (!user.skills || user.skills.length < 1) {
+    if (!user.skillWallet || user.skillWallet.length < 1) {
         return { valid: false, message: 'User has not selected skills.' }
     }
     return { valid: true }
@@ -45,59 +42,40 @@ export async function validateUser(user: User): Promise<ValidationResponseModel>
 }
 
 
-// validate
-// insert 
-// update scarcity score
-export async function fillUserData(email: string, user: User) {
-    const query = new Where('email').eq(email);
-    const existingUser = (await threadDBClient.filter(UsersCollection, query)) as any[];
-    user.issuer = existingUser[0].issuer;
-    user.email = existingUser[0].email;
-    user.lastLoginAt = existingUser[0].lastLoginAt;
-    user._id = existingUser[0]._id;
-    await threadDBClient.update(UsersCollection, existingUser[0]._id, user);
-    const credits = await calculateInitialCreditsAmount(user);
-    return { credits: credits, userID: existingUser[0]._id };
-}
-
-
-export async function updateCommunityID(email: string, communityID: string) {
-    const query = new Where('email').eq(email);
-    const existingUser = (await threadDBClient.filter(UsersCollection, query))[0] as User;
+export async function updateCommunityID(skillWalletID: string, communityID: string) {
+    const existingUser = await getSkillWalletByID(skillWalletID);
     existingUser.communityID = communityID;
-    await threadDBClient.update(UsersCollection, existingUser._id, existingUser);
+    updateCommunityID(skillWalletID, communityID);
     updateScarcityScore(communityID);
 }
 
-export async function getMessages(email: string) {
-    const userQuery = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as any;
+export async function getMessages(skillWalletID: string) {
+    const user = await getSkillWalletByID(skillWalletID);
     const key = await threadDBClient.getCommunityPrivKey(user.communityID);
     const messages = await threadDBClient.getAllMessages(key.privKey);
     return messages;
 }
 
 
-export async function getInvitationLink(email: string): Promise<string> {
-    const userQuery = new Where('email').eq(email);
-    const user = (await threadDBClient.filter(UsersCollection, userQuery))[0] as User;
+// export async function getInvitationLink(skillWalletID: string): Promise<string> {
+//     const user = await getSkillWalletByID(skillWalletID);
 
-    if (user.communityID) {
-        const guid = uuidv4();
-        if (!user.invites) {
-            user.invites = []
-        }
+//     if (user.communityID) {
+//         const guid = uuidv4();
+//         if (!user.invites) {
+//             user.invites = []
+//         }
 
-        user.invites.push({
-            guid: guid,
-            time: Date.now()
-        });
+//         user.invites.push({
+//             guid: guid,
+//             time: Date.now()
+//         });
 
-        await threadDBClient.update(UsersCollection, user._id, user);
-        const community = await threadDBClient.getByID(CommunitiesCollection, user.communityID) as Community;
-        return `https://distributed.town/community/invite?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
-    } else {
-        return undefined;
-    }
+//         await threadDBClient.update(UsersCollection, user._id, user);
+//         const community = await threadDBClient.getByID(CommunitiesCollection, user.communityID) as Community;
+//         return `https://distributed.town/community/invite?communityId=${community._id}&communityName=${encodeURIComponent(community.name)}`;
+//     } else {
+//         return undefined;
+//     }
 
-}
+// }

@@ -15,7 +15,6 @@ services:
       - ENVIRONMENT_IP=3.250.29.111
       - SERVER_PORT=3005
       - NODE_ENV=production
-      - MAGIC_SECRET_KEY=sk_live_B4234DDF6AE0251D
     ports:
       - "3005:3005"
     command: /bin/bash -c 'yarn; yarn start;'

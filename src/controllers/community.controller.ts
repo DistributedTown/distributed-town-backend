@@ -3,8 +3,6 @@ import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunityByID, getCommunities, createCommunity } from "../services/community.service";
 
-const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class CommunityController {
@@ -38,9 +36,9 @@ export class CommunityController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      let blockchain = req.query.blockchain; 
-      let category = req.query.category; 
-      if(!blockchain) {
+      let blockchain = req.query.blockchain;
+      let category = req.query.category;
+      if (!blockchain) {
         blockchain = 'ETH';
       }
       const com = await getCommunities(blockchain, category);
@@ -74,7 +72,7 @@ export class CommunityController {
    */
   public getByID = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
+      if (req.get('skillWalletID')) {
         const communityID = req.params.communityID;
         var response = await getCommunityByID(communityID);
         res.status(200).send(response);
@@ -88,7 +86,7 @@ export class CommunityController {
   }
 
 
-  
+
   /**
    * @swagger
    * /community:
@@ -112,14 +110,9 @@ export class CommunityController {
    */
   public post = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        req.body.scarcityScore = 0;
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const response = await createCommunity(userMetadata.email, req.body);
-        res.status(200).send({ communityID: response} );
-      } else {
-        res.status(401).send({ error: 'User not logged in.' });
-      }
+      req.body.scarcityScore = 0;
+      const response = await createCommunity(req.get('skillWalletID'), req.body);
+      res.status(200).send(response);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

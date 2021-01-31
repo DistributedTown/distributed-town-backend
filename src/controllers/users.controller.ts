@@ -1,19 +1,13 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import threadDBClient from "../threaddb.config";
-import { Where } from "@textile/hub";
-import { UsersCollection } from "../constants/constants";
 import {
-  fillUserData,
-  getInvitationLink,
   getMessages,
   updateCommunityID,
   validateUser
 } from "../services/user.service";
+import { getSkillWalletByID, SkillWallet, storeSkillWallet } from "../skillWallet/skillWallet.client";
 
-const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class UsersController {
@@ -38,10 +32,9 @@ export class UsersController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const query = new Where('email').eq(userMetadata.email);
-        const user = (await threadDBClient.filter(UsersCollection, query));
+      if (req.get('skillWalletID')) {
+
+        const user = await getSkillWalletByID(req.get('skillWalletID'))
         return res.status(200).send(user);
       }
       else
@@ -77,17 +70,18 @@ export class UsersController {
    */
   public post = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await validateUser(req.body);
-        if (validationResult.isValid) {
-          const response = await fillUserData(userMetadata.email, req.body);
-          res.status(201).send(response);
-        } else {
-          res.status(400).send({ message: validationResult.message });
+      const validationResult = await validateUser(req.body);
+      if (validationResult.isValid) {
+        const skillWallet: SkillWallet = {
+          _id: undefined,
+          username: req.body.username,
+          communityID: req.body.communityID,
+          skillWallet: req.body.skillWallet
         }
+        const skillWalletID = await storeSkillWallet(skillWallet);
+        res.status(201).send({ skillWalletID });
       } else {
-        return res.status(401).end({ message: 'Could not log user in.' });
+        res.status(400).send({ message: validationResult.message });
       }
     } catch (err) {
       this.loggerService.error(err);
@@ -121,9 +115,8 @@ export class UsersController {
    */
   public put = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        await updateCommunityID(userMetadata.email, req.body.communityID);
+      if (req.get('skillWalletID')) {
+        await updateCommunityID(req.get('skillWalletID'), req.body.communityID);
         res.status(200).send();
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
@@ -155,9 +148,8 @@ export class UsersController {
    */
   public getMessages = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const response = await getMessages(userMetadata.email);
+      if (req.get('skillWalletID')) {
+        const response = await getMessages(req.get('skillWalletID'));
         res.status(200).send(response);
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
@@ -188,13 +180,14 @@ export class UsersController {
      */
   public invite = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const linkUrl = await getInvitationLink(userMetadata.email);
-        if(linkUrl){
-          res.status(200).send({linkUrl: linkUrl});
+      if (req.get('skillWalletID')) {
+        //TODO : invitation links
+        // const linkUrl = await getInvitationLink(req.get('skillWalletID'));
+        const linkUrl = 'a'
+        if (linkUrl) {
+          res.status(200).send({ linkUrl: linkUrl });
         } else {
-          res.status(400).send({message: 'User not associated with a community.'});
+          res.status(400).send({ message: 'User not associated with a community.' });
         }
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
@@ -206,48 +199,5 @@ export class UsersController {
   }
 
 
-  
-  /**
-     * @swagger
-     * /user/login:
-     *  post:
-     *      description: Login with magic link
-     *      tags:
-     *          - Users
-     *      produces:
-     *          - application/json
-     *      responses:
-     *          200:
-     *              description: Created
-     *          401:
-     *              description: Unauthorized
-     *          500:
-     *              description: Server error
-     */
-    public login = async (req: any, res: Response) => {
-      try {
-        if (req.user) {
-          res.status(200).end('User is logged in.');
-        } else {
-          return res.status(401).end({ message: 'Could not log user in.' });
-        }
-      } catch (err) {
-        this.loggerService.error(err);
-        res.status(500).send({ error: "Something went wrong, please try again later." });
-      }
-    }
-  public logout = async (req: any, res: Response) => {
-    try {
-      if (req.isAuthenticated()) {
-        await magic.users.logoutByIssuer(req.user.issuer);
-        req.logout();
-        return res.status(200).end();
-      } else {
-        return res.status(401).end({ message: `User is not logged in.` });
-      }
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
+
 }

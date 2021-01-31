@@ -1,6 +1,5 @@
 import { Client, createUserAuth, KeyInfo, MailboxEvent, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, Users, Where } from '@textile/hub'
 import {
-  UsersCollection,
   CommunitiesCollection,
   GigsCollection,
   CommunityKeysCollection,
@@ -42,12 +41,6 @@ class ThreadDBInit {
     await client.getToken(identity)
 
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
-
-    try {
-      await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
-    } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: UsersCollection });
-    }
 
     try {
       await client.getCollectionInfo(this.ditoThreadID, CommunitiesCollection);
@@ -127,62 +120,6 @@ class ThreadDBInit {
         }
       ])
     }
-
-
-    // // const c1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdy3jndzjx3rgz2fd4e371p') as Community;
-    // // const c2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdyaamhh4zb3fqx30q6239k')as Community;
-    // // const c3 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdykjm1qc31enehc4264ber')as Community;
-
-    // const i1 = c1.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c1.addresses[i1].address = '0x21255bC60234359A7aBa6EdB8d1b9cd0070B13aE';
-    // await this.update(CommunitiesCollection, c1._id, c1);
-
-    // const i2 = c2.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c2.addresses[i2].address = '0xA2a01294B4069045Bb125C17E57A8fBB501EE98B';
-    // await this.update(CommunitiesCollection, c2._id, c2);
-
-    // const i3 = c3.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c3.addresses[i3].address = '0xe21A399D47B630eF41Bd3e7874CbA468DDFd38f9';
-    // await this.update(CommunitiesCollection, c3._id, c3);
-
-    // const allCommunities = await client.find(this.ditoThreadID, CommunitiesCollection, {}) as Community[];
-    // await client.delete(this.ditoThreadID, CommunitiesCollection, allCommunities.map(c => c._id));
-    // const community1 = {
-    //   name: 'DiTo #1',
-    //   scarcityScore: 0,
-    //   category: 'Art & Lifestyle',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0xf8199c9C603C56ff47Ad93B37f9E50D20442758B' },
-    //     { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-    // }
-    // const community2 = {
-    //   name: 'DiTo #2',
-    //   scarcityScore: 0,
-    //   category: 'DLT & Blockchain',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0xe7C51e3ef623BfdD3172e45169Cfb27B983135EB' },
-    //     { blockchain: 'RSK', address: '0x910895DE912A0eB625d6903265658f7EF80c1C19' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-
-    // }
-    // const community3 = {
-    //   name: 'DiTo #3',
-    //   scarcityScore: 0,
-    //   category: 'Local community',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0x1347dBB8803aFa04Abe7D3a736A006502Bee2438' },
-    //     { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-    // }
-
-    // const c1 = await this.createCommunity(community1 as Community)
-    // const c2 = await this.createCommunity(community2 as Community)
-    // const c3 = await this.createCommunity(community3 as Community)
-
   }
 
 
@@ -345,8 +282,6 @@ class ThreadDBInit {
     const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
     await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
 
-    const ids3 = ((await client.find(this.ditoThreadID, UsersCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, UsersCollection, ids3);
   }
 
   public async setupMailbox(identity: PrivateKey) {

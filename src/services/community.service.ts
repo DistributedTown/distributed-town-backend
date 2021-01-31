@@ -1,17 +1,17 @@
 import { PublicKey, Where } from '@textile/hub';
+import { getCommunityMembers, storeSkillWallet } from '../skillWallet/skillWallet.client';
 import {
     CommunitiesCollection,
-    UsersCollection,
     GigsCollection,
     GeneralSkillsCollection
 } from '../constants/constants';
 import { Community, CreateCommunity, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
-import { fillUserData, updateCommunityID } from './user.service';
+ import { updateCommunityID } from './user.service';
 
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
-    const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and(status).ne(4);
+    const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and('status').ne(4);
     const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
     const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
     const members = await getCommunityMembers(communityID);
@@ -22,7 +22,7 @@ export async function getCommunityByID(communityID: string) {
 export async function updateScarcityScore(communityID: string): Promise<void> {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
     const usersPerCommunity = await getCommunityMembers(communityID);
-    const userSkills = usersPerCommunity.flatMap(user => user.skills.map(skill => skill.skill));
+    const userSkills = usersPerCommunity.flatMap(user => user.skillWallet.map(skill => skill.skill));
     const totalSkills = [... new Set(userSkills)];
     const totalSkillsCount = totalSkills.length;
     const filledMemberSlots = usersPerCommunity.length;
@@ -44,11 +44,6 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
         // signal(community);
         console.log('send signal');
     }
-}
-
-export async function getCommunityMembers(communityID: string): Promise<User[]> {
-    const users = await threadDBClient.getAll(UsersCollection) as User[];
-    return users.filter(u => u.communityID && u.communityID === communityID);
 }
 
 export async function getCommunities(blockchain: string, category: string) {
@@ -84,7 +79,7 @@ export async function signal(community: Community) {
     })
 }
 
-export async function createCommunity(ownerEmail: string, community: CreateCommunity) {
+export async function createCommunity(ownerSkillWalletID: string, community: CreateCommunity): Promise<any> {
     let ownerID: string = undefined;
 
     const communityModel: Community = {
@@ -97,18 +92,25 @@ export async function createCommunity(ownerEmail: string, community: CreateCommu
     const communityID = await threadDBClient.createCommunity(communityModel);
 
     if (!community.ownerID) {
-        community.owner.communityID = communityID;
-        const owner = await fillUserData(ownerEmail, community.owner);
-        ownerID = owner.userID;
+        const skillWalletID = await storeSkillWallet({
+            _id: undefined,
+            username: community.owner.username,
+            communityID: communityID,
+            skillWallet: community.owner.skillWallet
+        });
+        ownerID = skillWalletID;
     } else {
         ownerID = community.ownerID;
-        await updateCommunityID(ownerEmail, communityID);
+        await updateCommunityID(ownerSkillWalletID, communityID);
     }
 
     const newCommunity = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
     newCommunity.owner = ownerID;
     await threadDBClient.update(CommunitiesCollection, newCommunity._id, newCommunity);
 
-    return communityID;
+    return { 
+        communityID: communityID,
+        skillWalletID: ownerID
+    };
 
 }
