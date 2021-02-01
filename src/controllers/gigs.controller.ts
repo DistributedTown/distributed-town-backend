@@ -310,4 +310,8 @@ export class GigsController {
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
   }
+
+  public validateGigHash = async (req: any, res: Response) => {
+    return res.status(200).send({ message: 'The gig hash is valid.' });
+  }
 }
