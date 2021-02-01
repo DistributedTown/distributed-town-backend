@@ -23,7 +23,7 @@ export class GigRouter {
 
     this._router.post("/:gigID/rate", this.gigsController.rate);
     this._router.get("/toRate", this.gigsController.getGigsToRate);
-    this._router.get("/validateHash", this.gigsController.validateGigHash);
+    this._router.get("/:gigID/validateHash", this.gigsController.validateGigHash);
   }
 
   public get router(): Router {

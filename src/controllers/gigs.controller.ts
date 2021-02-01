@@ -312,6 +312,6 @@ export class GigsController {
   }
 
   public validateGigHash = async (req: any, res: Response) => {
-    return res.status(200).send({ message: 'The gig hash is valid.' });
+    return res.status(200).send({ isValid: true });
   }
 }
