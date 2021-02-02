@@ -9,7 +9,8 @@ import {
   getGigsToRate,
   startGig,
   submitGig,
-  completeGig
+  completeGig,
+  validateHash
 } from "../services/gig.service";
 import { validateRegisteredUser } from "../services/user.service";
 
@@ -45,7 +46,7 @@ export class GigsController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      if(req.get('skillWalletID')) {
+      if (req.get('skillWalletID')) {
         const isOpen: boolean = req.query.isOpen === 'true';
         const isProject: boolean = req.query.isProject === 'true';
         const isValidUser = await validateRegisteredUser(req.get('skillWalletID'))
@@ -89,11 +90,11 @@ export class GigsController {
    */
   public post = async (req: any, res: Response) => {
     try {
-      if(req.get('skillWalletID')) {
+      if (req.get('skillWalletID')) {
         const validationResult = await validateGig(req.body, req.get('skillWalletID'));
         if (validationResult.isValid) {
-          const gigID = await createGig(req.get('skillWalletID'), req.body);
-          res.status(201).send({ gigID: gigID });
+          const gigResult = await createGig(req.get('skillWalletID'), req.body);
+          res.status(201).send(gigResult);
         } else {
           res.status(400).send({ message: validationResult.message });
         }
@@ -127,7 +128,7 @@ export class GigsController {
    */
   public take = async (req: any, res: Response) => {
     try {
-      if(req.get('skillWalletID')) {
+      if (req.get('skillWalletID')) {
         const validationResult = await takeGig(req.params.gigID, req.get('skillWalletID'));
         if (validationResult.isValid) {
           res.status(200).send();
@@ -195,7 +196,7 @@ export class GigsController {
    */
   public submit = async (req: any, res: Response) => {
     try {
-      if(req.get('skillWalletID')) {
+      if (req.get('skillWalletID')) {
         const validationResult = await submitGig(req.params.gigID, req.get('skillWalletID'));
         if (validationResult.isValid)
           return res.status(200).send();
@@ -312,6 +313,12 @@ export class GigsController {
   }
 
   public validateGigHash = async (req: any, res: Response) => {
-    return res.status(200).send({ isValid: true });
+    const isMock: boolean = req.query.isMock === 'true';
+    if (isMock) {
+      res.status(200).send({ isValid: true });
+    } else {
+      const isValid = await validateHash(req.params.gigID, req.query.communityID, req.query.hash);
+      res.status(200).send({ isValid });
+    }
   }
 }

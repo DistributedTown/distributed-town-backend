@@ -38,7 +38,8 @@
     "swagger-ui-express": "^3.0.10",
     "winston": "^3.2.1",
     "cors": "2.8.5",
-    "passport-web3":"0.1.7"
+    "passport-web3":"0.1.7",
+    "crypto-js": "4.0.0"
   },
   "devDependencies": {
     "@types/big.js": "4.0.5",

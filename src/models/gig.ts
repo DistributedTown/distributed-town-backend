@@ -35,6 +35,7 @@ export interface Gig {
     isProject: boolean;
     skills: string[];
     isRated: boolean;
+    hash: string;
 }
 
 export enum GigStatus {

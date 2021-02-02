@@ -3,6 +3,7 @@ import { GigsCollection } from '../constants/constants';
 import threadDBClient from '../threaddb.config';
 import { Where } from '@textile/hub';
 import { getCommunityMembers, getSkillWalletByID } from '../skillWallet/skillWallet.client';
+import { getGigStringForHashing, getHash } from '../utils/hash.service';
 
 export async function getGigs(skillWalletID: string, isOpen: boolean, isProject: boolean) {
     const user = await getSkillWalletByID(skillWalletID);
@@ -130,7 +131,7 @@ export async function validateGig(gig: Gig, skillWalletID: string): Promise<Vali
     return response;
 };
 
-export async function createGig(skillWalletID: string, gig: Gig): Promise<string> {
+export async function createGig(skillWalletID: string, gig: Gig): Promise<any> {
     const user = await getSkillWalletByID(skillWalletID);
     gig.communityID = user.communityID;
     gig.userID = user._id;
@@ -138,8 +139,24 @@ export async function createGig(skillWalletID: string, gig: Gig): Promise<string
     gig.status = GigStatus.Open;
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     const inserted = await threadDBClient.insert(GigsCollection, gig, communityKeys.privKey, communityKeys.threadID);
-    return inserted[0];
+    const gigID =  inserted[0];
+    const hashData = getGigStringForHashing(gigID, gig.communityID, gig.userID, gig.creditsOffered);
+    const hash = getHash(JSON.stringify(hashData));
+    return {
+        gigID: gigID, 
+        hash: hash
+    }
 }
+
+export async function validateHash(gigID: string, communityID: string, hash: string): Promise<boolean> {
+
+    const communityKeys = await threadDBClient.getCommunityPrivKey(communityID);
+    const gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
+    const hashData = getGigStringForHashing(gigID, gig.communityID, gig.userID, gig.creditsOffered);
+    const generatedHash = getHash(JSON.stringify(hashData));
+    return generatedHash === hash;
+}
+
 
 // export async function rateGig(gigCreatorSkillWalletID: string, gigID: string, rate: number) {
 //     const user = await getSkillWalletByID(gigCreatorSkillWalletID);
