@@ -314,8 +314,9 @@ export class GigsController {
 
   public validateGigHash = async (req: any, res: Response) => {
     const isMock: boolean = req.query.isMock === 'true';
+    const returnTrue: boolean = req.query.returnTrue === 'true';
     if (isMock) {
-      res.status(200).send({ isValid: true });
+      res.status(200).send({ isValid: returnTrue });
     } else {
       const isValid = await validateHash(req.params.gigID, req.query.communityID, req.query.hash);
       res.status(200).send({ isValid });
