@@ -90,7 +90,7 @@ export class App {
     this._initRoutes();
 
     initializeSkillWallet();
-
+    
   }
 
   private _initRoutes() {

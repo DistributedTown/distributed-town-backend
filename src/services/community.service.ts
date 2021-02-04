@@ -1,5 +1,5 @@
 import { PublicKey, Where } from '@textile/hub';
-import { getCommunityMembers, storeSkillWallet } from '../skillWallet/skillWallet.client';
+import { getCommunityMembers } from '../skillWallet/skillWallet.client';
 import {
     CommunitiesCollection,
     GigsCollection,
@@ -7,7 +7,6 @@ import {
 } from '../constants/constants';
 import { Community, CreateCommunity, SkillsCategory, User } from '../models';
 import threadDBClient from '../threaddb.config';
- import { updateCommunityID } from './user.service';
 
 export async function getCommunityByID(communityID: string) {
     const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
@@ -79,38 +78,20 @@ export async function signal(community: Community) {
     })
 }
 
-export async function createCommunity(ownerSkillWalletID: string, community: CreateCommunity): Promise<any> {
-    let ownerID: string = undefined;
+export async function createCommunity(skillWalletID: string, community: CreateCommunity): Promise<any> {
 
     const communityModel: Community = {
         scarcityScore: 0,
         category: community.category,
         addresses: community.addresses,
         name: community.name,
+        owner: skillWalletID
     } as Community;
 
     const communityID = await threadDBClient.createCommunity(communityModel);
 
-    if (!community.ownerID) {
-        const skillWalletID = await storeSkillWallet({
-            _id: undefined,
-            username: community.owner.username,
-            communityID: communityID,
-            skillWallet: community.owner.skillWallet
-        });
-        ownerID = skillWalletID;
-    } else {
-        ownerID = community.ownerID;
-        await updateCommunityID(ownerSkillWalletID, communityID);
-    }
-
-    const newCommunity = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
-    newCommunity.owner = ownerID;
-    await threadDBClient.update(CommunitiesCollection, newCommunity._id, newCommunity);
-
-    return { 
-        communityID: communityID,
-        skillWalletID: ownerID
+    return {
+        communityID: communityID
     };
 
 }

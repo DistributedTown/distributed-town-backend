@@ -1,5 +1,6 @@
 import { Client, createUserAuth, PrivateKey, QueryJSON, ThreadID, Where } from '@textile/hub'
 import { interfaces } from 'inversify';
+import { threadId } from 'worker_threads';
 
 const skillWalletCollection = 'SkillWallet'
 
@@ -10,6 +11,14 @@ const keyInfo = {
 
 const skillWalletThreadID = ThreadID.fromString(process.env.SKILL_WALLET_TEXTILE_THREAD_ID);
 const skillWalletPrivateKey = process.env.SKILL_WALLET_TEXTILE_PRIV_KEY
+
+async function auth(keyInfo) {
+	// Create an expiration and create a signature. 60s or less is recommended.
+	const expiration = new Date(Date.now() + 60 * 1000)
+	// Generate a new UserAuth
+	const userAuth = await createUserAuth(keyInfo.key, keyInfo.secret ?? '', expiration)
+	return userAuth
+}
 
 export async function initializeSkillWallet() {
 
@@ -46,7 +55,6 @@ export async function getSkillWalletByID(id): Promise<SkillWallet> {
 	return await client.findByID(skillWalletThreadID, skillWalletCollection, id);
 }
 
-
 export async function filter(query: QueryJSON): Promise<SkillWallet[]> {
 	const userAuth = await auth(keyInfo);
 	const client = Client.withUserAuth(userAuth);
@@ -78,8 +86,8 @@ export async function storeSkillWallet(model: SkillWallet): Promise<string> {
 }
 
 export async function changeCommunityID(id: string, communityID) {
-    const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
+    const userAuth = await auth(keyInfo);
+    const client = Client.withUserAuth(userAuth);
 	const identity = await PrivateKey.fromString(skillWalletPrivateKey)
 	
     await client.getToken(identity)
@@ -87,14 +95,6 @@ export async function changeCommunityID(id: string, communityID) {
 	toUpdate.communityID = communityID;
     client.save(skillWalletThreadID, skillWalletCollection, [toUpdate]);
   }
-
-async function auth(keyInfo) {
-	// Create an expiration and create a signature. 60s or less is recommended.
-	const expiration = new Date(Date.now() + 60 * 1000)
-	// Generate a new UserAuth
-	const userAuth = await createUserAuth(keyInfo.key, keyInfo.secret ?? '', expiration)
-	return userAuth
-}
 
 export interface SkillWallet { 
 	_id: string;

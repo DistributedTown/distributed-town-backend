@@ -33,7 +33,7 @@ export async function takeGig(gigID: string, takerSkillWalletID: string): Promis
         response.message = 'The gig taker does not have the needed skills.'
     } else {
         gig.status = GigStatus.TakenNotAccepted;
-        gig.takerUserID = user._id;
+        gig.taker = user._id;
         await threadDBClient.save(GigsCollection, [gig], communityKeys.privKey, communityKeys.threadID);
     }
     return response;
@@ -48,10 +48,10 @@ export async function startGig(gigID: string, takerID: string, creatorID: string
     if (gig.status !== GigStatus.TakenNotAccepted) {
         response.isValid = false;
         response.message = 'Gig is not yet taken';
-    } else if (gig.userID !== creatorID) {
+    } else if (gig.creator !== creatorID) {
         response.isValid = false;
         response.message = 'Only the creator can start the gig';
-    } else if (gig.takerUserID !== takerID) {
+    } else if (gig.taker !== takerID) {
         response.isValid = false;
         response.message = 'The taker has not requested this gig';
     } else {
@@ -70,7 +70,7 @@ export async function submitGig(gigID: string, takerSkillWalletID: string): Prom
     if (gig.status !== GigStatus.TakenAccepted) {
         response.isValid = false;
         response.message = 'Gig is not yet taken';
-    } else if (gig.takerUserID !== taker._id) {
+    } else if (gig.taker !== taker._id) {
         response.isValid = false;
         response.message = 'Only the taker can submit the gig.';
     } else {
@@ -89,7 +89,7 @@ export async function completeGig(gigID: string, creatorID: string): Promise<Val
     if (gig.status !== GigStatus.Submited) {
         response.isValid = false;
         response.message = 'Gig is not submited by the taker';
-    } else if (gig.userID !== creatorID) {
+    } else if (gig.creator !== creatorID) {
         response.isValid = false;
         response.message = 'Only the creator can complete the gig';
     } else {
@@ -134,25 +134,29 @@ export async function validateGig(gig: Gig, skillWalletID: string): Promise<Vali
 export async function createGig(skillWalletID: string, gig: Gig): Promise<any> {
     const user = await getSkillWalletByID(skillWalletID);
     gig.communityID = user.communityID;
-    gig.userID = user._id;
+    gig.creator = user._id;
     gig.isRated = false;
     gig.status = GigStatus.Open;
+    gig.taker = "";
+    gig.hash = "";
     const communityKeys = await threadDBClient.getCommunityPrivKey(user.communityID);
     const inserted = await threadDBClient.insert(GigsCollection, gig, communityKeys.privKey, communityKeys.threadID);
-    const gigID =  inserted[0];
-    const hashData = getGigStringForHashing(gigID, gig.communityID, gig.userID, gig.creditsOffered);
-    const hash = getHash(JSON.stringify(hashData));
+    const gigID = inserted[0];
+    const hashData = getGigStringForHashing(gigID, gig.communityID, gig.creator, gig.creditsOffered);
+    gig.hash = getHash(JSON.stringify(hashData));
+    threadDBClient.update(GigsCollection, gigID, gig, communityKeys.privKey, communityKeys.threadID);
     return {
-        gigID: gigID, 
-        hash: hash
+        gigID: gigID,
+        hash: gig.hash
     }
 }
 
-export async function validateHash(gigID: string, communityID: string, hash: string): Promise<boolean> {
-
+export async function validateHash(communityID: string, hash: string): Promise<boolean> {
     const communityKeys = await threadDBClient.getCommunityPrivKey(communityID);
-    const gig = await threadDBClient.getByID(GigsCollection, gigID, communityKeys.privKey, communityKeys.threadID) as Gig;
-    const hashData = getGigStringForHashing(gigID, gig.communityID, gig.userID, gig.creditsOffered);
+    const query = new Where('hash').eq(hash);
+    const gigs = await threadDBClient.filter(GigsCollection, query, communityKeys.privKey, communityKeys.threadID) as Gig[];
+    const gig = gigs[0];
+    const hashData = getGigStringForHashing(gig._id, gig.communityID, gig.creator, gig.creditsOffered);
     const generatedHash = getHash(JSON.stringify(hashData));
     return generatedHash === hash;
 }

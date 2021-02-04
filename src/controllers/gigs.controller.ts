@@ -318,7 +318,7 @@ export class GigsController {
     if (isMock) {
       res.status(200).send({ isValid: returnTrue });
     } else {
-      const isValid = await validateHash(req.params.gigID, req.query.communityID, req.query.hash);
+      const isValid = await validateHash(req.query.communityID, req.query.hash);
       res.status(200).send({ isValid });
     }
   }

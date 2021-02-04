@@ -4,13 +4,14 @@ import {
   GigsCollection,
   CommunityKeysCollection,
   GeneralSkillsCollection,
-  MessagesCollection
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   Community,
   gigSchema,
   CommunityKey,
+  communitySchema,
+  communityKeySchema,
 } from './models'
 require('dotenv').config()
 
@@ -45,13 +46,13 @@ class ThreadDBInit {
     try {
       await client.getCollectionInfo(this.ditoThreadID, CommunitiesCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: CommunitiesCollection });
+      await client.newCollection(this.ditoThreadID, { name: CommunitiesCollection, schema: communitySchema });
     }
 
     try {
       await client.getCollectionInfo(this.ditoThreadID, CommunityKeysCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: CommunityKeysCollection });
+      await client.newCollection(this.ditoThreadID, { name: CommunityKeysCollection, schema: communityKeySchema });
     }
 
     try {
@@ -253,8 +254,6 @@ class ThreadDBInit {
     await client.newDB(comThread, `community-${comID[0]}`);
 
     await client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
-    await client.newCollection(comThread, { name: GeneralSkillsCollection });
-    await client.newCollection(comThread, { name: MessagesCollection });
 
     return comID[0];
   }
@@ -276,11 +275,16 @@ class ThreadDBInit {
       cl.deleteDB(t);
     });
 
-    const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, CommunitiesCollection, ids);
 
-    const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
+    await client.deleteCollection(this.ditoThreadID, CommunitiesCollection);
+    await client.deleteCollection(this.ditoThreadID, CommunityKeysCollection);
+    console.log('deleted communities and keys');
+
+    // const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
+    // await client.delete(this.ditoThreadID, CommunitiesCollection, ids);
+
+    // const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
+    // await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
 
   }
 
@@ -300,22 +304,6 @@ class ThreadDBInit {
           const decoder = new TextDecoder()
           const body = decoder.decode(bodyBytes)
 
-          const auth = await this.auth(keyInfo);
-          const client = Client.withUserAuth(auth);
-
-          const communityKeyQuery = new Where('privKey').eq(identity.toString());
-          const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
-
-          const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
-
-          const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
-
-          const thread = ThreadID.fromString(communityKey.threadID);
-
-          await client.create(thread, MessagesCollection, [{
-            from: community._id,
-            message: body
-          }]);
           console.log(body)
         } catch (err) {
           console.log(err);
