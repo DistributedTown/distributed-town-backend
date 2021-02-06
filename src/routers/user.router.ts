@@ -12,7 +12,6 @@ export class UserRouter {
 
   private init(): void {
     this._router.get('/', this.userController.get);
-    this._router.post('/', this.userController.post);
     this._router.put('/', this.userController.put);
     this._router.get('/messages', this.userController.getMessages);
     this._router.get('/invite', this.userController.invite);

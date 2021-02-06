@@ -1,6 +1,5 @@
 import { Client, createUserAuth, PrivateKey, QueryJSON, ThreadID, Where } from '@textile/hub'
-import { interfaces } from 'inversify';
-import { threadId } from 'worker_threads';
+require('dotenv').config()
 
 const skillWalletCollection = 'SkillWallet'
 
@@ -40,7 +39,7 @@ export async function initializeSkillWallet() {
 	// 	s.username = s._id
 	// })
 	// await client.save(skillWalletThreadID, skillWalletCollection, skillWallets)
-	
+
 	// const skillWalletsUpdated = await client.find(skillWalletThreadID, skillWalletCollection, {}) as SkillWallet[];
 	// console.log(skillWalletsUpdated);
 
@@ -70,9 +69,8 @@ export async function getCommunityMembers(communityID: string): Promise<SkillWal
 	const client = Client.withUserAuth(userAuth);
 	const identity = await PrivateKey.fromString(skillWalletPrivateKey);
 	await client.getToken(identity)
-	const query = new Where('communityID').eq(communityID);
-	
-	return await client.find(skillWalletThreadID, skillWalletCollection, query);
+	const users = await client.find(skillWalletThreadID, skillWalletCollection, {}) as SkillWallet[];
+	return users.filter(u => u.communityID === communityID);
 }
 
 export async function storeSkillWallet(model: SkillWallet): Promise<string> {
@@ -86,17 +84,17 @@ export async function storeSkillWallet(model: SkillWallet): Promise<string> {
 }
 
 export async function changeCommunityID(id: string, communityID) {
-    const userAuth = await auth(keyInfo);
-    const client = Client.withUserAuth(userAuth);
+	const userAuth = await auth(keyInfo);
+	const client = Client.withUserAuth(userAuth);
 	const identity = await PrivateKey.fromString(skillWalletPrivateKey)
-	
-    await client.getToken(identity)
+
+	await client.getToken(identity)
 	let toUpdate = await client.findByID(skillWalletThreadID, skillWalletCollection, id) as SkillWallet;
 	toUpdate.communityID = communityID;
-    client.save(skillWalletThreadID, skillWalletCollection, [toUpdate]);
-  }
+	client.save(skillWalletThreadID, skillWalletCollection, [toUpdate]);
+}
 
-export interface SkillWallet { 
+export interface SkillWallet {
 	_id: string;
 	communityID: string;
 	username: string;
@@ -106,7 +104,7 @@ export interface SkillLevels {
 	skill: string;
 	level: number;
 }
-const DiToSkillWalletSchema = {
+export const skillWalletSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://example.com/object1610669989.json",
@@ -117,8 +115,8 @@ const DiToSkillWalletSchema = {
 	],
 	"properties": {
 		_id: { type: 'string' },
-		communityID: {type: 'string'},
-		username: {type: 'string'},
+		communityID: { type: 'string' },
+		username: { type: 'string' },
 		"skillWallet": {
 			"$id": "#root/skillWallet",
 			"title": "Skillwallet",

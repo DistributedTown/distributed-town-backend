@@ -3,3 +3,4 @@ export * from "./community"
 export * from "./skillCategory";
 export * from "./gig";
 export * from "./validationResponseModel";
+export * from "./project";

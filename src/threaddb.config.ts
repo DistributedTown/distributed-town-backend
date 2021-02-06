@@ -1,9 +1,23 @@
-import { Client, createUserAuth, KeyInfo, MailboxEvent, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, Users, Where } from '@textile/hub'
+import { 
+  Client, 
+  createUserAuth, 
+  KeyInfo, 
+  MailboxEvent, 
+  PrivateKey, 
+  Public, 
+  QueryJSON, 
+  ThreadID, 
+  UserAuth, 
+  Users, 
+  Where 
+} from '@textile/hub'
+
 import {
   CommunitiesCollection,
   GigsCollection,
   CommunityKeysCollection,
   GeneralSkillsCollection,
+  ProjectsCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
@@ -12,6 +26,7 @@ import {
   CommunityKey,
   communitySchema,
   communityKeySchema,
+  projectSchema,
 } from './models'
 require('dotenv').config()
 
@@ -254,6 +269,7 @@ class ThreadDBInit {
     await client.newDB(comThread, `community-${comID[0]}`);
 
     await client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
+    await client.newCollection(comThread, { name: ProjectsCollection, schema: projectSchema });
 
     return comID[0];
   }

@@ -2,7 +2,7 @@ import threadDBClient from "../threaddb.config";
 import { User, ValidationResponseModel } from "../models";
 import { CommunitiesCollection } from "../constants/constants";
 import { updateScarcityScore } from "./community.service";
-import { getCommunityMembers, getSkillWalletByID, storeSkillWallet } from "../skillWallet/skillWallet.client";
+import { getCommunityMembers, getSkillWalletByID, changeCommunityID } from "../skillWallet/skillWallet.client";
 
 export async function validateRegisteredUser(skillWalletID: string) {
     const user = await getSkillWalletByID(skillWalletID);
@@ -43,9 +43,7 @@ export async function validateUser(user: User): Promise<ValidationResponseModel>
 
 
 export async function updateCommunityID(skillWalletID: string, communityID: string) {
-    const existingUser = await getSkillWalletByID(skillWalletID);
-    existingUser.communityID = communityID;
-    updateCommunityID(skillWalletID, communityID);
+    await changeCommunityID(skillWalletID, communityID)
     updateScarcityScore(communityID);
 }
 

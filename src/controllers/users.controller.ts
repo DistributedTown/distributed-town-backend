@@ -45,50 +45,6 @@ export class UsersController {
     }
   }
 
-  /**
-   * @swagger
-   * /user:
-   *  post:
-   *      description: Creates a new user
-   *      parameters:
-   *          - name: User
-   *            type: User
-   *            in: body
-   *            schema:
-   *               $ref: '#/definitions/CreateUser'
-   *      tags:
-   *          - Users
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          201:
-   *              description: Created
-   *          400:
-   *              description: Bad Request
-   *          500:
-   *              description: Server error
-   */
-  public post = async (req: any, res: Response) => {
-    try {
-      const validationResult = await validateUser(req.body);
-      if (validationResult.isValid) {
-        const skillWallet: SkillWallet = {
-          _id: undefined,
-          username: req.body.username,
-          communityID: req.body.communityID,
-          skillWallet: req.body.skillWallet
-        }
-        const skillWalletID = await storeSkillWallet(skillWallet);
-        res.status(201).send({ skillWalletID });
-      } else {
-        res.status(400).send({ message: validationResult.message });
-      }
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
 
   /**
    * @swagger

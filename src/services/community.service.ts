@@ -1,11 +1,11 @@
 import { PublicKey, Where } from '@textile/hub';
-import { getCommunityMembers } from '../skillWallet/skillWallet.client';
+import { changeCommunityID, getCommunityMembers } from '../skillWallet/skillWallet.client';
 import {
     CommunitiesCollection,
     GigsCollection,
     GeneralSkillsCollection
 } from '../constants/constants';
-import { Community, CreateCommunity, SkillsCategory, User } from '../models';
+import { Community, CreateCommunity, SkillsCategory } from '../models';
 import threadDBClient from '../threaddb.config';
 
 export async function getCommunityByID(communityID: string) {
@@ -15,7 +15,6 @@ export async function getCommunityByID(communityID: string) {
     const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
     const members = await getCommunityMembers(communityID);
     return { ...community, members: members.length, openGigs: openGigs.length }
-
 }
 
 export async function updateScarcityScore(communityID: string): Promise<void> {
@@ -89,7 +88,8 @@ export async function createCommunity(skillWalletID: string, community: CreateCo
     } as Community;
 
     const communityID = await threadDBClient.createCommunity(communityModel);
-
+    await changeCommunityID(skillWalletID, communityID)
+    updateScarcityScore(communityID)
     return {
         communityID: communityID
     };

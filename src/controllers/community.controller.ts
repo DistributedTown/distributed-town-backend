@@ -86,6 +86,40 @@ export class CommunityController {
   }
 
 
+  /**
+   * @swagger
+   * /community/:communityID:
+   *  get:
+   *      description: Gets community by id
+   *      parameters:
+   *          - in: path
+   *            name: communityID
+   *            type: string
+   *            required: true
+   *      tags:
+   *          - Community
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+  public getProjects = async (req: any, res: Response) => {
+    try {
+      if (req.get('skillWalletID')) {
+        const communityID = req.params.communityID;
+        var response = await getCommunityByID(communityID);
+        res.status(200).send(response);
+      } else {
+        res.status(401).send({ error: 'User not logged in.' });
+      }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
 
   /**
    * @swagger

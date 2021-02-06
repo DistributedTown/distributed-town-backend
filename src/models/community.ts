@@ -48,7 +48,7 @@ export interface CreateCommunity {
   addresses: CommunityAddress[];
   name: string;
   pubKey: string;
-  ownerID: string;
+  owner: string;
 }
 
 /**
