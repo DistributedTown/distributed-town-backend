@@ -158,7 +158,7 @@ export async function createGig(skillWalletID: string, gig: Gig): Promise<any> {
         threadDBClient.update(GigsCollection, gigID, gig, communityKeys.privKey, communityKeys.threadID);
         return {
             id: id,
-            hash: '6d914edc36e14d6c880c9c55bda5bc04'
+            hash: '0x3664393134656463333665313464366338383063396335356264613562633034'
         }
     }
 
