@@ -36,7 +36,7 @@ export async function updateScarcityScore(communityID: string): Promise<void> {
             uniqueSkills++;
     });
 
-    const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 2)
+    const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 6)
     community.scarcityScore = Math.floor(varietyCoefficient * 100);
     await threadDBClient.update(CommunitiesCollection, communityID, community);
 
