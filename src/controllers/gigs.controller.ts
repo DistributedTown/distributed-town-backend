@@ -12,7 +12,6 @@ import {
   completeGig,
   validateHash
 } from "../services/gig.service";
-import { validateRegisteredUser } from "../services/user.service";
 
 @injectable()
 export class GigsController {
@@ -48,14 +47,13 @@ export class GigsController {
     try {
       if (req.get('skillWalletID')) {
         const isOpen: boolean = req.query.isOpen === 'true';
-        const isProject: boolean = req.query.isProject === 'true';
-        const isValidUser = await validateRegisteredUser(req.get('skillWalletID'))
-        if (isValidUser.valid) {
-          const gigs = await getGigs(req.get('skillWalletID'), isOpen, isProject);
+        // const isValidUser = await validateRegisteredUser(req.get('skillWalletID'))
+        // if (isValidUser.valid) {
+          const gigs = await getGigs(req.get('skillWalletID'), isOpen);
           res.status(200).send(gigs);
-        } else {
-          res.status(400).send({ error: isValidUser.message });
-        }
+        // } else {
+        //   res.status(400).send({ error: isValidUser.message });
+        // }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }

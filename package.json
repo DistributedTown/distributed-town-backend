@@ -4,7 +4,7 @@
   "description": "A project for the Babylon Hackaton aiming to build self-sustainable community hubs.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --resolveJsonModule",
     "dev": "npm install && nodemon",
     "start": "npm run build && node ./dist/server.js",
     "test": "mocha -r ts-node/register --timeout 40000 test/*.spec.ts"
@@ -21,9 +21,11 @@
   "license": "ISC",
   "dependencies": {
     "@textile/hub": "1.2.0",
-    "uuid": "8.3.1",
+    "ethers": "^5.0.24",
     "body-parser": "^1.19.0",
     "cookie-parser": "1.4.5",
+    "cors": "2.8.5",
+    "crypto-js": "4.0.0",
     "dotenv": "^8.0.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
@@ -32,14 +34,14 @@
     "helmet": "^3.20.0",
     "inversify": "^5.0.1",
     "passport": "0.4.1",
+    "passport-web3": "0.1.7",
     "prom-client": "^11.1.2",
     "reflect-metadata": "^0.1.13",
     "swagger-jsdoc": "1.9.6",
     "swagger-ui-express": "^3.0.10",
-    "winston": "^3.2.1",
-    "cors": "2.8.5",
-    "passport-web3":"0.1.7",
-    "crypto-js": "4.0.0"
+    "unique-string": "^1.0.0",
+    "uuid": "8.3.1",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/big.js": "4.0.5",

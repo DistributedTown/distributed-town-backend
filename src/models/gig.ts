@@ -25,8 +25,8 @@
  */
 export interface Gig {
     _id: string;
-    creator: string;
-    taker: string;
+    creator: number;
+    taker: number;
     title: string;
     description: string;
     creditsOffered: number;
@@ -98,7 +98,7 @@ export const gigSchema = {
 		"creator": {
 			"$id": "#root/creator", 
 			"title": "Creator", 
-			"type": "string",
+			"type": "integer",
 			"default": "",
 			"examples": [
 				"string"
@@ -107,7 +107,7 @@ export const gigSchema = {
 		"taker": {
 			"$id": "#root/taker", 
 			"title": "Taker", 
-			"type": "string",
+			"type": "integer",
 			"default": "",
 			"examples": [
 				"string"

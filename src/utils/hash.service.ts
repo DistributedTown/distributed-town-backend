@@ -1,3 +1,4 @@
+
 var crypto = require('crypto');
 
 export function getHash(data: string): string {
@@ -5,6 +6,6 @@ export function getHash(data: string): string {
     return `0x${hash}`;
 }
 
-export function getGigStringForHashing(id: string, communityID: string, owner: string, credits: number): string {
+export function getGigStringForHashing(id: string, communityID: string, owner: number, credits: number): string {
     return `${id}-${communityID}-${owner}-${credits}`;
 }

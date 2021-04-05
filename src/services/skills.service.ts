@@ -1,6 +1,6 @@
 import { Where } from "@textile/hub";
 import { GeneralSkillsCollection } from "../constants/constants";
-import { User, SkillsCategory, UserSkill } from "../models";
+import { User, SkillsCategory, UserSkill, skillNames } from "../models";
 import threadDBClient from "../threaddb.config";
 
 export async function calculateInitialCreditsAmount(user: User): Promise<number> {
@@ -39,7 +39,6 @@ export async function findMainCat(skillName: string): Promise<SkillsCategory> {
     return mainCat;
 }
 
-
 export async function getByCategory(category: string): Promise<SkillsCategory> {
     const query = new Where('main').eq(category);
     const generalSkills = (await threadDBClient.filter(GeneralSkillsCollection, query)) as SkillsCategory[];
@@ -47,7 +46,5 @@ export async function getByCategory(category: string): Promise<SkillsCategory> {
 }
 
 export async function getAllSkills(): Promise<string[]> {
-    const generalSkills = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
-    const skills = generalSkills.flatMap(gs => gs.categories.flatMap(s => s.skills));
-    return skills;
+    return skillNames;
 }
