@@ -8,7 +8,7 @@ export const getSkillWallet = async (tokenId: number): Promise<SkillWallet> => {
 
     const skillWallet: SkillWallet = {
         nickname: "jabyl",
-        imageUrl: '',
+        imageUrl: 'https://hub.textile.io/thread/bafkwfcy3l745x57c7vy3z2ss6ndokatjllz5iftciq4kpr4ez2pqg3i/buckets/bafzbeiaorr5jomvdpeqnqwfbmn72kdu7vgigxvseenjgwshoij22vopice/3d0ec3cc-5946-4cae-9dfd-9ef93f247b11.png',
         diToCredits: 2740,
         currentCommunity: {
             name: 'DiTo #24',
