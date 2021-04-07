@@ -1,6 +1,8 @@
 import { findMainCat, getAllSkills, getByCategory, LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
+import { skillNames } from "../models";
+import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
 
 @injectable()
 export class SkillsController {
@@ -48,6 +50,41 @@ export class SkillsController {
         skills = await getAllSkills();
       }
       res.status(200).send(skills);
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+
+  /**
+   * @swagger
+   * /skill:
+   *  get:
+   *      description: Gets all predefined skills from the database
+   *      tags:
+   *          - Skills
+   *      parameters:
+   *          - in: query
+   *            name: skill
+   *            type: string
+   *            required: false
+   *          - in: query
+   *            name: category
+   *            type: string
+   *            required: false
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+  public getNames = async (req: any, res: Response) => {
+    try {
+      res.status(200).send(skillNames);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

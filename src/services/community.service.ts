@@ -6,16 +6,22 @@ import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await CommunityRegistryContracts.getCommunities();
     const result: CommunityListView[] = [];
-    allCommunities.forEach(async communityAddress => {
-        const name = await CommunityContracts.getName(communityAddress);
-        const members = await CommunityContracts.getMembersCount(communityAddress);
-        const scarcityScore = await calculateScarcityStore(communityAddress);
-        result.push({
-            name,
-            members,
-            scarcityScore
-        })
-    });
+    for (let community of allCommunities) {
+        // const comTemplate = await CommunityContracts.getTemplate(community);
+        // console.log(template);
+        // if (comTemplate == template) {
+            const name = await CommunityContracts.getName(community);
+            const members = await CommunityContracts.getMembersCount(community);
+            const scarcityScore = await calculateScarcityStore(community);
+
+            result.push({
+                name,
+                members,
+                scarcityScore
+            });
+        // }
+    }
+    return result;
 }
 
 async function calculateScarcityStore(address: string): Promise<number> {

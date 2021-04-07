@@ -6,18 +6,32 @@ export class CommunityRegistryContracts {
   ) {
     try {
       const contract = communityRegistryContract();
-      const addresses = await contract.communities();
+      const addresses = await contract.getCommunities();
+      console.log(addresses);
       return addresses;
     } catch (err) {
       console.log(err);
     }
   }
 
+  public static async getCommunityByIndex(
+    ) {
+      try {
+        const contract = communityRegistryContract();
+        const addresses = await contract.communityAddresses(0);
+        console.log(addresses);
+        return addresses;
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  
   public static async getCommunitiesCount(
   ) {
     try {
       const contract = communityRegistryContract();
-      const communitiesCount = await contract.numOf();
+      const communitiesCount = await contract.numOfCommunities();
+      console.log(communitiesCount);
       return communitiesCount;
     } catch (err) {
       console.log(err);

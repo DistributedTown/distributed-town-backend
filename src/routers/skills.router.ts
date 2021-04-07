@@ -13,6 +13,7 @@ export class SkillsRouter {
 
   private init(): void {
     this._router.get("/", this.skillsController.get);
+    this._router.get("/names", this.skillsController.getNames);
   }
 
   public get router(): Router {

@@ -8,7 +8,7 @@ export class CommunityContracts {
   ) {
     try {
       const contract = communityContract(address);
-      const skills = await contract.getName();
+      const skills = await contract.name();
       return skills;
     } catch (err) {
       console.log(err);
@@ -20,7 +20,7 @@ export class CommunityContracts {
   ) {
     try {
       const contract = communityContract(address);
-      const skills = await contract.getMembersSkillWalletIds();
+      const skills = await contract.getSkillWalletIds();
       return skills;
     } catch (err) {
       console.log(err);
@@ -32,7 +32,31 @@ export class CommunityContracts {
   ) {
     try {
       const contract = communityContract(address);
-      const skills = await contract.getMembersCount();
+      const skills = await contract.activeMembersCount();
+      return skills;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  public static async getTemplate(
+    address: string
+  ) {
+    try {
+      const contract = communityContract(address);
+      const skills = await contract.getTemplate();
+      return skills;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  public static async getPositionalValues(
+    address: string
+  ) {
+    try {
+      const contract = communityContract(address);
+      const skills = await contract.getPositionalValues();
       return skills;
     } catch (err) {
       console.log(err);
