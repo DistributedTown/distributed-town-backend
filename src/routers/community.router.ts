@@ -14,6 +14,7 @@ export class CommunityRouter {
 
   private init(): void {
     this._router.get("/", this.communityController.get);
+    this._router.get("/testjoin", this.communityController.join)
     // this._router.post("/",  this.communityController.post);
     // this._router.get("/:communityID", this.communityController.getByID);
   }

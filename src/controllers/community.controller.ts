@@ -1,7 +1,7 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunities } from "../services/community.service";
+import { getCommunities, testJoin } from "../services/community.service";
 
 
 @injectable()
@@ -47,6 +47,11 @@ export class CommunityController {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
+  }
+
+  public join = async (req: any, res: any) => {
+    await testJoin();
+    return res.status(200).send({message: "test passed"});
   }
 }
 
