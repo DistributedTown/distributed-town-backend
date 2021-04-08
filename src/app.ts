@@ -1,5 +1,5 @@
 import express from "express";
-import * as bodyParser from "body-parser";
+var bodyParser = require('body-parser')
 import helmet from "helmet";
 import { injectable } from "inversify";
 import {
@@ -34,6 +34,10 @@ export class App {
 
   private config(): void {
 
+    // parse application/x-www-form-urlencoded
+    this._app.use(bodyParser.urlencoded({ extended: false }))
+
+    // parse application/json
     this._app.use(bodyParser.json());
     // helmet security
     this._app.use(helmet());

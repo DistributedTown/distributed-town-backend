@@ -3,8 +3,17 @@ import { skillWalletContract} from './index';
 
 export class SkillWalletContracts {
 
+    public static async getSkillWalletIdByOwner(address: string): Promise<string> {
+        try {
+            const contract = skillWalletContract();
+            const tokenId = await contract.getSkillWalletIdByOwner(address);
+            return tokenId.toString();
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
-    public static async getTokenURI(tokenId: number): Promise<string> {
+    public static async getTokenURI(tokenId: string): Promise<string> {
         try {
             const contract = skillWalletContract();
             const uri = await contract.tokenURI(tokenId);
@@ -14,7 +23,7 @@ export class SkillWalletContracts {
         }
     }
 
-    public static async getCommunityHistory(tokenId: number): Promise<any> {
+    public static async getCommunityHistory(tokenId: string): Promise<any> {
         try {
             const contract = skillWalletContract();
             const history = await contract.getCommunityHistory(tokenId);
@@ -24,7 +33,7 @@ export class SkillWalletContracts {
         }
     }
 
-    public static async getCurrentCommunity(tokenId: number): Promise<any> {
+    public static async getCurrentCommunity(tokenId: string): Promise<any> {
         try {
             const contract = skillWalletContract();
             const community = await contract.getActiveCommunity(tokenId);
@@ -34,7 +43,7 @@ export class SkillWalletContracts {
         }
     }
 
-    public static async getSkills(tokenId: number): Promise<any> {
+    public static async getSkills(tokenId: string): Promise<any> {
         try {
             const contract = skillWalletContract();
             const skills = await contract.getSkillSet(tokenId);
@@ -45,7 +54,7 @@ export class SkillWalletContracts {
     }
 
 
-    public static async isSkillWalletRegistered(tokenId: number): Promise<boolean> {
+    public static async isSkillWalletRegistered(tokenId: string): Promise<boolean> {
         try {
             const contract = skillWalletContract();
             const isRegistered = await contract.isSkillWalletRegistered(tokenId);

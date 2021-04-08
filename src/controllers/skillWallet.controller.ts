@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import { getSkillWallet } from '../services/skillWallet.service';
+import { getCommunityDetails, getSkillWallet } from '../services/skillWallet.service';
 
 @injectable()
 export class SkillWalletController {
@@ -27,7 +27,33 @@ export class SkillWalletController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      const skillWallet = await getSkillWallet(req.params.skillWalletId);
+      const skillWallet = await getSkillWallet(req.query.address);
+      return res.status(200).send(skillWallet);
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  /**
+   * @swagger
+   * /skillWallet:
+   *  get:
+   *      description: Returns skill wallet data
+   *      tags:
+   *          - SkillWallet
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+   public getCommunity = async (req: any, res: Response) => {
+    try {
+      const skillWallet = await getCommunityDetails(req.query.address);
       return res.status(200).send(skillWallet);
     } catch (err) {
       this.loggerService.error(err);

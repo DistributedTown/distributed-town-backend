@@ -1,22 +1,22 @@
 import { Where } from "@textile/hub";
 import { GeneralSkillsCollection } from "../constants/constants";
-import { User, SkillsCategory, UserSkill, skillNames } from "../models";
+import { SkillsCategory, skillNames, Skill } from "../models";
 import threadDBClient from "../threaddb.config";
 
-export async function calculateInitialCreditsAmount(user: User): Promise<number> {
-    const skillsCredits = await getCreditsBySkill(user.skills);
+export async function calculateInitialCreditsAmount(skills: Skill[]): Promise<number> {
+    const skillsCredits = await getCreditsBySkill(skills);
     return 2000 + skillsCredits;
 }
 
-async function getCreditsBySkill(userSkills: UserSkill[]): Promise<number> {
+async function getCreditsBySkill(skills: Skill[]): Promise<number> {
     let credits = 0;
     const skillsTree = (await threadDBClient.getAll(GeneralSkillsCollection)) as SkillsCategory[];
-    userSkills.forEach(us => {
+    skills.forEach(us => {
         skillsTree.forEach(root => {
             root.categories.forEach(cat => {
-                const sk = cat.skills.find(s => s == us.skill);
+                const sk = cat.skills.find(s => s == us.name);
                 if (sk) {
-                    credits += cat.credits * us.level;
+                    credits += cat.credits * us.value;
                 }
             })
         });

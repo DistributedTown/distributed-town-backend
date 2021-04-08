@@ -79,33 +79,37 @@ export class CommunityRegistryContracts {
 
 
   public static async joinNewMember(
-    address: string,
-    skills: any,
+    communityAddress: string,
+    userAddress: string,
+    skillLevel1: number,
+    displayStringId1: number,
+    skillLevel2: number,
+    displayStringId2: number,
+    skillLevel3: number,
+    displayStringId3: number,
     url: string,
-    ditos: number
+    ditos: string
   ) {
     const communityRegistryContractInst = communityRegistryContract();
 
-    // communityRegistryContractInst.on(
-    //   'MemberAdded',
-    //   (newMemberAddress, tokenId, credits) => {
-    //     console.log('Member added!');
-    //     console.log(newMemberAddress);
-    //     console.log(tokenId);
-    //     console.log(credits);
-    //   },
-    // );
     try {
-      const tokens = ethers.utils.parseEther("2006");
-      let one_bn = ethers.BigNumber.from(1);
-      let skill = [one_bn, one_bn]
-      let skillSet = [skill, skill, skill];
-
+      const tokens = ethers.utils.parseEther(ditos);
+      let overrides = {
+        // The maximum units of gas for the transaction to use
+        gasLimit: 2300000,
+    };
       let result = await communityRegistryContractInst.joinNewMember(
-        address,
-        skillSet,
+        communityAddress,
+        userAddress,
+        displayStringId1,
+        skillLevel1,
+        displayStringId2,
+        skillLevel2,
+        displayStringId3,
+        skillLevel3,
         url,
-        tokens
+        tokens,
+        overrides
       );
 
       console.log(result);

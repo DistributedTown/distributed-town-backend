@@ -1,16 +1,14 @@
-import { CommunityListView } from '../models';
+import { CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
+import { calculateInitialCreditsAmount } from './skills.service';
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await CommunityRegistryContracts.getCommunities();
-    
+
     const result: CommunityListView[] = [];
     for (let community of allCommunities) {
-        // const comTemplate = await CommunityContracts.getTemplate(community);
-        // console.log(template);
-        // if (comTemplate == template) {
         const name = await CommunityContracts.getName(community);
         const members = await CommunityContracts.getMembersCount(community);
         const scarcityScore = await calculateScarcityStore(community);
@@ -21,16 +19,29 @@ export async function getCommunities(template: number): Promise<any> {
             scarcityScore,
             address: community
         });
-        // }
     }
     return result;
 }
 
-export async function testJoin() {
-    const allCommunities = await CommunityRegistryContracts.getCommunities();
-    const url = 'https://hub.textile.io/thread/bafkwfcy3l745x57c7vy3z2ss6ndokatjllz5iftciq4kpr4ez2pqg3i/buckets/bafzbeiaorr5jomvdpeqnqwfbmn72kdu7vgigxvseenjgwshoij22vopice';
-    const joined = await CommunityRegistryContracts.joinNewMember(allCommunities[0], {}, url, 2006);
-    console.log(joined);
+export async function join(communityAddress: string, userAddress: string, skills: SkillSet, url: string) {
+    console.log(skills);
+    const displayName1 = skillNames.indexOf(skills.skills[0].name);
+    const displayName2 = skillNames.indexOf(skills.skills[1].name);
+    const displayName3 = skillNames.indexOf(skills.skills[2].name);
+    const calculateDitos = await calculateInitialCreditsAmount(skills.skills)
+    const joined = await CommunityRegistryContracts.joinNewMember(
+        communityAddress,
+        userAddress,
+        displayName1,
+        skills.skills[0].value,
+        displayName2,
+        skills.skills[1].value,
+        displayName3,
+        skills.skills[2].value,
+        url,
+        calculateDitos.toString()
+    );
+    return calculateDitos;
 }
 
 async function calculateScarcityStore(address: string): Promise<number> {

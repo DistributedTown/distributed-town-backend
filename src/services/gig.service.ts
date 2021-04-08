@@ -5,7 +5,7 @@ import { Where } from '@textile/hub';
 import { getGigStringForHashing, getHash } from '../utils/hash.service';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 
-export async function getGigs(tokenId: number, isOpen: boolean) {
+export async function getGigs(tokenId: string, isOpen: boolean) {
     const communityId = await SkillWalletContracts.getCurrentCommunity(tokenId);
     const skills = await SkillWalletContracts.getSkills(tokenId);
     const userSkills = [];
@@ -26,7 +26,7 @@ export async function getGigs(tokenId: number, isOpen: boolean) {
     }
 }
 
-export async function takeGig(gigID: string, takerSkillWalletID: number): Promise<ValidationResponseModel> {
+export async function takeGig(gigID: string, takerSkillWalletID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     const gig = await threadDBClient.getByID(GigsCollection, gigID) as Gig;
     const gigTyped = gig as Gig;
@@ -46,7 +46,7 @@ export async function takeGig(gigID: string, takerSkillWalletID: number): Promis
     return response;
 }
 
-export async function startGig(gigID: string, takerID: number, creatorID: number): Promise<ValidationResponseModel> {
+export async function startGig(gigID: string, takerID: string, creatorID: string): Promise<ValidationResponseModel> {
     const response: ValidationResponseModel = { isValid: true };
     // const creator = await getSkillWalletByID(creatorID);
     let gig = await threadDBClient.getByID(GigsCollection, gigID) as Gig;
@@ -66,7 +66,7 @@ export async function startGig(gigID: string, takerID: number, creatorID: number
     return response;
 }
 
-export async function submitGig(gigID: string, takerSkillWalletID: number): Promise<ValidationResponseModel> {
+export async function submitGig(gigID: string, takerSkillWalletID: string): Promise<ValidationResponseModel> {
     let response: ValidationResponseModel = { isValid: true }
     let gig = await threadDBClient.getByID(GigsCollection, gigID) as Gig;
     if (gig.status !== GigStatus.TakenAccepted) {
@@ -82,7 +82,7 @@ export async function submitGig(gigID: string, takerSkillWalletID: number): Prom
     return response;
 }
 
-export async function completeGig(gigID: string, creatorID: number): Promise<ValidationResponseModel> {
+export async function completeGig(gigID: string, creatorID: string): Promise<ValidationResponseModel> {
     const response: ValidationResponseModel = { isValid: true };
     let gig = await threadDBClient.getByID(GigsCollection, gigID) as Gig;
     if (gig.status !== GigStatus.Submited) {
@@ -128,7 +128,7 @@ export async function validateGig(gig: Gig, skillWalletID: number): Promise<Vali
     return response;
 };
 
-export async function createGig(skillWalletID: number, gig: Gig): Promise<any> {
+export async function createGig(skillWalletID: string, gig: Gig): Promise<any> {
     let id = undefined;
     const communityAddress = await SkillWalletContracts.getCurrentCommunity(skillWalletID);
     if (gig.isProject) {
@@ -147,7 +147,7 @@ export async function createGig(skillWalletID: number, gig: Gig): Promise<any> {
         gig.creator = skillWalletID;
         gig.isRated = false;
         gig.status = GigStatus.Open;
-        gig.taker = 0;
+        gig.taker = "";
         gig.hash = "";
         const inserted = await threadDBClient.insert(GigsCollection, gig);
         const gigID = inserted[0];

@@ -1,84 +1,79 @@
 
-import { skillNames, SkillWallet } from '../models';
+import { CommunityListView, skillNames, SkillWallet } from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
 const fs = require('fs');
 
-export const getSkillWallet = async (tokenId: number): Promise<SkillWallet> => {
+export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> => {
 
     const skillWallet: SkillWallet = {
-        nickname: "jabyl",
-        imageUrl: 'https://hub.textile.io/thread/bafkwfcy3l745x57c7vy3z2ss6ndokatjllz5iftciq4kpr4ez2pqg3i/buckets/bafzbeiaorr5jomvdpeqnqwfbmn72kdu7vgigxvseenjgwshoij22vopice/3d0ec3cc-5946-4cae-9dfd-9ef93f247b11.png',
-        diToCredits: 2740,
-        currentCommunity: {
-            name: 'DiTo #24',
-            address: '0x2CEF62C91Dd92FC35f008D1d6Ed08EADF64306bc'
-        },
-        pastCommunities: [
-            {
-                name: 'DiTo #24',
-                address: '0x2CEF62C91Dd92FC35f008D1d6Ed08EADF64306bc'
-            }
-        ],
-        skills: [
-            {
-                name: 'Tokenomics',
-                value: 6
-            },
-            {
-                name: 'Network Design',
-                value: 6
-            },
-            {
-                name: 'Game Theory',
-                value: 6
-            }
-        ]
+        pastCommunities: [],
+        skills: [],
+        currentCommunity: {}
+    } as SkillWallet;
 
+    const isActive = await SkillWalletContracts.isSkillWalletRegistered(userAddress);
+    const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
+    if (isActive) {
+        // const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
+
+        // let rawdata = fs.readFileSync(jsonUri);
+        // let jsonMetadata = JSON.parse(rawdata);
+        skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg';
+        skillWallet.nickname = 'migrenaa';
+
+        const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
+        console.log(oldCommunityAddresses)
+        oldCommunityAddresses.forEach(async address => {
+            const name = await CommunityContracts.getName(address);
+            skillWallet.pastCommunities.push({
+                name,
+                address
+            })
+        });
+
+        const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
+
+        skillWallet.currentCommunity.address = currentCommunity;
+        skillWallet.currentCommunity.name = await CommunityContracts.getName(currentCommunity);
+        skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
+        const skills = await SkillWalletContracts.getSkills(tokenId);
+        skillWallet.skills.push({
+            name: skillNames[skills.skill1.displayStringId],
+            value: skills.skill1.level
+        });
+        if (skills.skill2)
+            skillWallet.skills.push({
+                name: skillNames[skills.skill2.displayStringId],
+                value: skills.skill2.level
+            });
+        if (skills.skill3)
+            skillWallet.skills.push({
+                name: skillNames[skills.skill3.displayStringId],
+                value: skills.skill3.level
+            });
+        return skillWallet;
+    } else {
+        return undefined;
     }
-    return Promise.resolve(skillWallet);
+}
 
-    // const skillWallet: SkillWallet = undefined;
-    // const isActive = await SkillWalletContracts.isSkillWalletRegistered(tokenId);
-    // if (isActive) {
-    //     const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
+export const getCommunityDetails = async (userAddress: string): Promise<CommunityListView> => {
+    const isActive = await SkillWalletContracts.isSkillWalletRegistered(userAddress);
+    const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
+    if (isActive) {
+        const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
+        
+        const members = await CommunityContracts.getMembersCount(currentCommunity);
+        const name = await CommunityContracts.getName(currentCommunity);
 
-    //     let rawdata = fs.readFileSync(jsonUri);
-    //     let jsonMetadata = JSON.parse(rawdata);
-    //     skillWallet.imageUrl = jsonMetadata.image;
-    //     skillWallet.nickname = jsonMetadata.nickname;
-
-    //     const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
-
-    //     oldCommunityAddresses.forEach(async address => {
-    //         const name = await CommunityContracts.getName(address);
-    //         skillWallet.pastCommunities.push({
-    //             name,
-    //             address
-    //         })
-    //     });
-
-    //     const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
-
-    //     skillWallet.currentCommunity.address = currentCommunity;
-    //     skillWallet.currentCommunity.name = await CommunityContracts.getName(currentCommunity);
-
-    //     const skills = await SkillWalletContracts.getSkills(tokenId);
-    //     skillWallet.skills.push({
-    //         name: skillNames[skills.skill1.displayStringId],
-    //         value: skills.skill1.level
-    //     });
-    //     if (skills.skill2)
-    //         skillWallet.skills.push({
-    //             name: skillNames[skills.skill2.displayStringId],
-    //             value: skills.skill2.level
-    //         });
-    //     if (skills.skill3)
-    //         skillWallet.skills.push({
-    //             name: skillNames[skills.skill3.displayStringId],
-    //             value: skills.skill3.level
-    //         });
-    // } else {
-    //     return undefined;
-    // }
+        return {
+            members,
+            name,
+            scarcityScore: 0,
+            address: currentCommunity
+        };
+    } else {
+        return undefined;
+    }
 }

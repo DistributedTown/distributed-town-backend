@@ -3,7 +3,7 @@ export interface Project {
     gigs: string[];
     title: string;
     description: string;
-    owner: number;
+    owner: string;
 }
 
 export const projectSchema = {
@@ -69,7 +69,7 @@ export const projectSchema = {
 		"owner": {
 			"$id": "#root/owner", 
 			"title": "Owner", 
-			"type": "integer",
+			"type": "string",
 			"default": "",
 			"examples": [
 				"asd"

@@ -3,6 +3,18 @@ import { communityContract } from "./index";
 
 export class CommunityContracts {
 
+  public static async getDiToBalance(
+    communityAddress: string,
+    userAddress: string
+  ) {
+    try {
+      const contract = communityContract(communityAddress);
+      const balance = await contract.balanceOf(userAddress, 0);
+      return balance.toString();
+    } catch (err) {
+      console.log(err);
+    }
+  }
   public static async getName(
     address: string
   ) {

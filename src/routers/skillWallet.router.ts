@@ -11,10 +11,8 @@ export class SkillWalletRouter {
   }
 
   private init(): void {
-    this._router.get('/:skillWalletIds', this.skillWalletController.get);
-    // this._router.put('/', this.skillWalletController.put);
-    // this._router.get('/messages', this.skillWalletController.getMessages);
-    // this._router.get('/invite', this.skillWalletController.invite);
+    this._router.get('/', this.skillWalletController.get);
+    this._router.get("/community", this.skillWalletController.getCommunity)
   }
 
   public get router(): Router {
