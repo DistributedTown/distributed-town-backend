@@ -1,114 +1,72 @@
-import { PublicKey, Where } from '@textile/hub';
-import {
-    CommunitiesCollection,
-    UsersCollection,
-    GigsCollection,
-    GeneralSkillsCollection
-} from '../constants/constants';
-import { Community, CreateCommunity, SkillsCategory, User } from '../models';
-import threadDBClient from '../threaddb.config';
-import { fillUserData, updateCommunityID } from './user.service';
+import { CommunityListView, skillNames, SkillSet } from '../models';
+import { CommunityContracts } from '../contracts/community.contracts';
+import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
+import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
+import { calculateInitialCreditsAmount } from './skills.service';
 
-export async function getCommunityByID(communityID: string) {
-    const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
-    const gigsPerCommunityQuery = new Where('communityID').eq(communityID).and(status).ne(4);
-    const communityPrivKey = await threadDBClient.getCommunityPrivKey(communityID);
-    const openGigs = (await threadDBClient.filter(GigsCollection, gigsPerCommunityQuery, communityPrivKey.privKey, communityPrivKey.threadID));
-    const members = await getCommunityMembers(communityID);
-    return { ...community, members: members.length, openGigs: openGigs.length }
+export async function getCommunities(template: number): Promise<any> {
+    const allCommunities = await CommunityRegistryContracts.getCommunities();
 
-}
+    const result: CommunityListView[] = [];
+    for (let community of allCommunities) {
+        const name = await CommunityContracts.getName(community);
+        const members = await CommunityContracts.getMembersCount(community);
+        const scarcityScore = await calculateScarcityStore(community);
 
-export async function updateScarcityScore(communityID: string): Promise<void> {
-    const community = (await threadDBClient.getByID(CommunitiesCollection, communityID)) as Community;
-    const usersPerCommunity = await getCommunityMembers(communityID);
-    const userSkills = usersPerCommunity.flatMap(user => user.skills.map(skill => skill.skill));
-    const totalSkills = [... new Set(userSkills)];
-    const totalSkillsCount = totalSkills.length;
-    const filledMemberSlots = usersPerCommunity.length;
-    let uniqueSkills = 0;
-
-    const skillsQuery = new Where('main').eq(community.category);
-    const communitySkills = (await threadDBClient.filter(GeneralSkillsCollection, skillsQuery)) as SkillsCategory[];
-    const comSkillsFlatMap = communitySkills[0].categories.flatMap(cat => cat.skills);
-    comSkillsFlatMap.forEach(comSkill => {
-        if (userSkills.includes(comSkill))
-            uniqueSkills++;
-    });
-
-    const varietyCoefficient = (uniqueSkills / totalSkillsCount) * (filledMemberSlots / 2)
-    community.scarcityScore = Math.floor(varietyCoefficient * 100);
-    await threadDBClient.update(CommunitiesCollection, communityID, community);
-
-    if (community.scarcityScore < 48) {
-        // signal(community);
-        console.log('send signal');
+        result.push({
+            name,
+            members,
+            scarcityScore,
+            address: community
+        });
     }
+    return result;
 }
 
-export async function getCommunityMembers(communityID: string): Promise<User[]> {
-    const users = await threadDBClient.getAll(UsersCollection) as User[];
-    return users.filter(u => u.communityID && u.communityID === communityID);
+export async function join(communityAddress: string, userAddress: string, skills: SkillSet, url: string) {
+    console.log(skills);
+    const displayName1 = skillNames.indexOf(skills.skills[0].name);
+    const displayName2 = skillNames.indexOf(skills.skills[1].name);
+    const displayName3 = skillNames.indexOf(skills.skills[2].name);
+    const calculateDitos = await calculateInitialCreditsAmount(skills.skills)
+    const joined = await CommunityRegistryContracts.joinNewMember(
+        communityAddress,
+        userAddress,
+        displayName1,
+        skills.skills[0].value,
+        displayName2,
+        skills.skills[1].value,
+        displayName3,
+        skills.skills[2].value,
+        url,
+        calculateDitos.toString()
+    );
+    return calculateDitos;
 }
 
-export async function getCommunities(blockchain: string, category: string) {
-    let communities = [];
-    if (category) {
-        const communitiesQuery = new Where('category').eq(category);
-        communities = await threadDBClient.filter(CommunitiesCollection, communitiesQuery) as Community[];
-    } else {
-        communities = await threadDBClient.getAll(CommunitiesCollection) as Community[];
-    }
-    const blockchainCommunities = communities.filter(c => c.addresses.findIndex(a => a.blockchain === blockchain) >= 0);
-    return await Promise.all(blockchainCommunities.map(async com => {
-        return {
-            _id: com._id,
-            scarcityScore: com.scarcityScore,
-            category: com.category,
-            name: com.name,
-            address: com.addresses.find(a => a.blockchain == blockchain).address,
-            members: (await getCommunityMembers(com._id)).length
+async function calculateScarcityStore(address: string): Promise<number> {
+    const members = await CommunityContracts.getMembersCount(address);
+    const skillWalletIds = await CommunityContracts.getMembersSkillWalletIds(address);
+    const uniqueSkills = [];
+    let totalSkills: number = 0;
+
+    skillWalletIds.forEach(async tokenId => {
+        const skills = await SkillWalletContracts.getSkills(tokenId);
+        if (!uniqueSkills.includes(skills.skill1.displayStringId))
+            uniqueSkills.push(skills.skill1.displayStringId);
+        totalSkills++;
+        if (skills.skill2) {
+            if (!uniqueSkills.includes(skills.skill2.displayStringId))
+                uniqueSkills.push(skills.skill2.displayStringId);
+            totalSkills++;
         }
-    }));
-}
-
-export async function signal(community: Community) {
-    const comFilter = new Where('category').eq(community.category).and('_id').ne(community._id);
-    const communities = (await threadDBClient.filter(CommunitiesCollection, comFilter)) as Community[];
-    const comKey = await threadDBClient.getCommunityPrivKey(community._id);
-
-    const message = `Community ${community.name} needs you help. If you want to join follow the link ..`
-    communities.forEach(async community => {
-        const pubKey = PublicKey.fromString(community.pubKey)
-        await threadDBClient.sendMessage(comKey.privKey, pubKey, message);
-    })
-}
-
-export async function createCommunity(ownerEmail: string, community: CreateCommunity) {
-    let ownerID: string = undefined;
-
-    const communityModel: Community = {
-        scarcityScore: 0,
-        category: community.category,
-        addresses: community.addresses,
-        name: community.name,
-    } as Community;
-
-    const communityID = await threadDBClient.createCommunity(communityModel);
-
-    if (!community.ownerID) {
-        community.owner.communityID = communityID;
-        const owner = await fillUserData(ownerEmail, community.owner);
-        ownerID = owner.userID;
-    } else {
-        ownerID = community.ownerID;
-        await updateCommunityID(ownerEmail, communityID);
-    }
-
-    const newCommunity = await threadDBClient.getByID(CommunitiesCollection, communityID) as Community;
-    newCommunity.owner = ownerID;
-    await threadDBClient.update(CommunitiesCollection, newCommunity._id, newCommunity);
-
-    return communityID;
-
+        if (skills.skill3) {
+            if (!uniqueSkills.includes(skills.skill3.displayStringId))
+                uniqueSkills.push(skills.skill3.displayStringId);
+            totalSkills++;
+        }
+    });
+    const uniqueSkillsCount = uniqueSkills.length;
+    const vc = (uniqueSkillsCount / totalSkills) * (members / 2);
+    return vc * 100;
 }

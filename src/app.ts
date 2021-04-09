@@ -1,30 +1,28 @@
-import * as express from "express";
-import * as bodyParser from "body-parser";
-import * as helmet from "helmet";
+import express from "express";
+var bodyParser = require('body-parser')
+import helmet from "helmet";
 import { injectable } from "inversify";
-import * as promBundle from "express-prom-bundle";
 import {
-  UserRouter,
+  SkillWalletRouter,
   SkillsRouter,
   CommunityRouter,
   GigRouter,
   SwaggerRouter,
 } from "./routers";
 const session = require("express-session");
-const passport = require("passport");
 const cookieParser = require("cookie-parser");
 var cors = require('cors');
+require('dotenv').config()
 
 @injectable()
 export class App {
   private _app: express.Application;
 
   constructor(
-    private userRouter: UserRouter,
+    private skillWalletRouter: SkillWalletRouter,
     private skillsRouter: SkillsRouter,
     private communityRouter: CommunityRouter,
     private gigRouter: GigRouter,
-    private swaggerRouter: SwaggerRouter
   ) {
     this._app = express();
     this.config();
@@ -35,16 +33,11 @@ export class App {
   }
 
   private config(): void {
-    const metricsMiddleware = promBundle({
-      includeMethod: true,
-      includePath: true
-    });
 
-    require('dotenv').config()
+    // parse application/x-www-form-urlencoded
+    this._app.use(bodyParser.urlencoded({ extended: false }))
 
-    this._app.use(metricsMiddleware);
-
-    // support application/json
+    // parse application/json
     this._app.use(bodyParser.json());
     // helmet security
     this._app.use(helmet());
@@ -65,8 +58,7 @@ export class App {
         }
       })
     );
-    this._app.use(passport.initialize());
-    this._app.use(passport.session());
+
     this._app.use(cors());
     //Initialize app routes
     this._initRoutes();
@@ -74,10 +66,10 @@ export class App {
   }
 
   private _initRoutes() {
-    this._app.use("/api/docs", this.swaggerRouter.router);
-    this._app.use("/api/user",passport.authenticate("magic"),  this.userRouter.router);
-    this._app.use("/api/skill",  this.skillsRouter.router);
+    // this._app.use("/api/docs", this.swaggerRouter.router);
+    this._app.use("/api/skillWallet", this.skillWalletRouter.router);
+    this._app.use("/api/skill", this.skillsRouter.router);
     this._app.use("/api/community", this.communityRouter.router);
-    this._app.use("/api/gig", passport.authenticate("magic"), this.gigRouter.router);
+    this._app.use("/api/gig", this.gigRouter.router);
   }
 }

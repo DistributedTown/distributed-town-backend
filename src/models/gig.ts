@@ -25,8 +25,8 @@
  */
 export interface Gig {
     _id: string;
-    userID: string;
-    takerUserID: string;
+    creator: string;
+    taker: string;
     title: string;
     description: string;
     creditsOffered: number;
@@ -35,7 +35,9 @@ export interface Gig {
     isProject: boolean;
     skills: string[];
     isRated: boolean;
+    hash: string;
 }
+
 
 export enum GigStatus {
   Open, 
@@ -63,22 +65,142 @@ export interface RateGig {
 }
 
 
-// TODO fix schema
 export const gigSchema = {
-    title: 'Gig',
-    type: 'object',
-    properties: {
-      _id: { type: 'string' },
-      userID: { type: 'string' },
-      acceptedUserID: { type: 'string' },
-      title: { type: 'string' },
-      description: { type: 'string' },
-      creditsOffered: { type: 'number' },
-      isOpen: { type: 'boolean' },
-      isProject: { type: 'boolean' },
-      communityID: { type: 'string' },
-      skills: { type: 'array', items: {
-        type: 'string'
-      } },
-    },
-  }
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#", 
+	"$id": "https://example.com/object1612283285.json", 
+	"title": "Root", 
+	"type": "object",
+	"required": [
+		"_id",
+		"creator",
+		"taker",
+		"title",
+		"description",
+		"creditsOffered",
+		"status",
+		"communityID",
+		"isProject",
+		"skills",
+		"isRated",
+		"hash"
+	],
+	"properties": {
+		"_id": {
+			"$id": "#root/_id", 
+			"title": "_id", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"asdasd"
+			],
+		},
+		"creator": {
+			"$id": "#root/creator", 
+			"title": "Creator", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+		},
+		"taker": {
+			"$id": "#root/taker", 
+			"title": "Taker", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+		},
+		"title": {
+			"$id": "#root/title", 
+			"title": "Title", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+			"pattern": "^.*$"
+		},
+		"description": {
+			"$id": "#root/description", 
+			"title": "Description", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+			"pattern": "^.*$"
+		},
+		"creditsOffered": {
+			"$id": "#root/creditsOffered", 
+			"title": "Creditsoffered", 
+			"type": "integer",
+			"examples": [
+				12
+			],
+			"default": 0
+		},
+		"status": {
+			"$id": "#root/status", 
+			"title": "Status", 
+			"type": "integer",
+			"examples": [
+				1
+			],
+			"default": 0
+		},
+		"communityID": {
+			"$id": "#root/communityID", 
+			"title": "Communityid", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+		},
+		"isProject": {
+			"$id": "#root/isProject", 
+			"title": "Isproject", 
+			"type": "boolean",
+			"examples": [
+				false
+			],
+			"default": false
+		},
+		"skills": {
+			"$id": "#root/skills", 
+			"title": "Skills", 
+			"type": "array",
+			"default": [],
+			"items":{
+				"$id": "#root/skills/items", 
+				"title": "Items", 
+				"type": "string",
+				"default": "",
+				"examples": [
+					"teaching"
+				],
+			}
+		},
+		"isRated": {
+			"$id": "#root/isRated", 
+			"title": "Israted", 
+			"type": "boolean",
+			"examples": [
+				false
+			],
+			"default": false
+		},
+		"hash": {
+			"$id": "#root/hash", 
+			"title": "Hash", 
+			"type": "string",
+			"default": "",
+			"examples": [
+				"string"
+			],
+		}
+	}
+}

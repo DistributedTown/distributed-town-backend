@@ -1,10 +1,8 @@
 import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunityByID, getCommunities, createCommunity } from "../services/community.service";
+import { getCommunities, join } from "../services/community.service";
 
-const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class CommunityController {
@@ -38,12 +36,12 @@ export class CommunityController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      let blockchain = req.query.blockchain; 
-      let category = req.query.category; 
-      if(!blockchain) {
-        blockchain = 'ETH';
+      let blockchain = req.query.blockchain;
+      let template = req.query.template;
+      if (!blockchain) {
+        blockchain = 'MATIC';
       }
-      const com = await getCommunities(blockchain, category);
+      const com = await getCommunities(template);
       res.status(200).send(com);
     } catch (err) {
       this.loggerService.error(err);
@@ -51,75 +49,11 @@ export class CommunityController {
     }
   }
 
-
-  /**
-   * @swagger
-   * /community/:communityID:
-   *  get:
-   *      description: Gets community by id
-   *      parameters:
-   *          - in: path
-   *            name: communityID
-   *            type: string
-   *            required: true
-   *      tags:
-   *          - Community
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          200:
-   *              description: OK
-   *          500:
-   *              description: Server error
-   */
-  public getByID = async (req: any, res: Response) => {
+  public joinNewUser = async (req: any, res: any) => {
     try {
-      if (req.isAuthenticated()) {
-        const communityID = req.params.communityID;
-        var response = await getCommunityByID(communityID);
-        res.status(200).send(response);
-      } else {
-        res.status(401).send({ error: 'User not logged in.' });
-      }
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-
-  
-  /**
-   * @swagger
-   * /community:
-   *  post:
-   *      description: Creates a new community 
-   *      parameters:
-   *          - name: CreateCommunity
-   *            type: CreateCommunity
-   *            in: body
-   *            schema:
-   *               $ref: '#/definitions/CreateCommunity'
-   *      tags: 
-   *          - Community
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          200:
-   *              description: OK
-   *          500:
-   *              description: Server error
-   */
-  public post = async (req: any, res: Response) => {
-    try {
-      if (req.isAuthenticated()) {
-        req.body.scarcityScore = 0;
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const response = await createCommunity(userMetadata.email, req.body);
-        res.status(200).send({ communityID: response} );
-      } else {
-        res.status(401).send({ error: 'User not logged in.' });
-      }
+      console.log(req.body);
+      const credits = await join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
+      res.status(200).send({ credits });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

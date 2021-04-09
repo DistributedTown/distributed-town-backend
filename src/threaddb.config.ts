@@ -1,17 +1,22 @@
-import { Client, createUserAuth, KeyInfo, MailboxEvent, PrivateKey, Public, Query, QueryJSON, ThreadID, UserAuth, Users, Where } from '@textile/hub'
 import {
-  UsersCollection,
-  CommunitiesCollection,
+  Client,
+  createUserAuth,
+  KeyInfo,
+  PrivateKey,
+  QueryJSON,
+  ThreadID,
+  UserAuth,
+} from '@textile/hub'
+
+import {
   GigsCollection,
-  CommunityKeysCollection,
   GeneralSkillsCollection,
-  MessagesCollection
+  AuthenticationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  Community,
   gigSchema,
-  CommunityKey,
+  authenticationSchema
 } from './models'
 require('dotenv').config()
 
@@ -40,26 +45,7 @@ class ThreadDBInit {
     const client = Client.withUserAuth(auth);
     const identity = await PrivateKey.fromString(ditoPrivKey);
     await client.getToken(identity)
-
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
-
-    try {
-      await client.getCollectionInfo(this.ditoThreadID, UsersCollection);
-    } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: UsersCollection });
-    }
-
-    try {
-      await client.getCollectionInfo(this.ditoThreadID, CommunitiesCollection);
-    } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: CommunitiesCollection });
-    }
-
-    try {
-      await client.getCollectionInfo(this.ditoThreadID, CommunityKeysCollection);
-    } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: CommunityKeysCollection });
-    }
 
     try {
       await client.getCollectionInfo(this.ditoThreadID, GeneralSkillsCollection);
@@ -128,61 +114,19 @@ class ThreadDBInit {
       ])
     }
 
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, GigsCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: GigsCollection, schema: gigSchema });
+    }
 
-    // // const c1 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdy3jndzjx3rgz2fd4e371p') as Community;
-    // // const c2 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdyaamhh4zb3fqx30q6239k')as Community;
-    // // const c3 = await client.findByID(this.ditoThreadID, CommunitiesCollection, '01eqdykjm1qc31enehc4264ber')as Community;
 
-    // const i1 = c1.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c1.addresses[i1].address = '0x21255bC60234359A7aBa6EdB8d1b9cd0070B13aE';
-    // await this.update(CommunitiesCollection, c1._id, c1);
 
-    // const i2 = c2.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c2.addresses[i2].address = '0xA2a01294B4069045Bb125C17E57A8fBB501EE98B';
-    // await this.update(CommunitiesCollection, c2._id, c2);
-
-    // const i3 = c3.addresses.findIndex(c => c.blockchain === 'ETH');
-    // c3.addresses[i3].address = '0xe21A399D47B630eF41Bd3e7874CbA468DDFd38f9';
-    // await this.update(CommunitiesCollection, c3._id, c3);
-
-    // const allCommunities = await client.find(this.ditoThreadID, CommunitiesCollection, {}) as Community[];
-    // await client.delete(this.ditoThreadID, CommunitiesCollection, allCommunities.map(c => c._id));
-    // const community1 = {
-    //   name: 'DiTo #1',
-    //   scarcityScore: 0,
-    //   category: 'Art & Lifestyle',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0xf8199c9C603C56ff47Ad93B37f9E50D20442758B' },
-    //     { blockchain: 'RSK', address: '0x5786A4a3B022FeD43DfcC18008077383B4281B95' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-    // }
-    // const community2 = {
-    //   name: 'DiTo #2',
-    //   scarcityScore: 0,
-    //   category: 'DLT & Blockchain',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0xe7C51e3ef623BfdD3172e45169Cfb27B983135EB' },
-    //     { blockchain: 'RSK', address: '0x910895DE912A0eB625d6903265658f7EF80c1C19' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-
-    // }
-    // const community3 = {
-    //   name: 'DiTo #3',
-    //   scarcityScore: 0,
-    //   category: 'Local community',
-    //   addresses: [
-    //     { blockchain: 'ETH', address: '0x1347dBB8803aFa04Abe7D3a736A006502Bee2438' },
-    //     { blockchain: 'RSK', address: '0xa8C98103F0A97BE465D660B9ebB181744AbF7138' },
-    //   ],
-    //   owner: skilledUsers[0]._id
-    // }
-
-    // const c1 = await this.createCommunity(community1 as Community)
-    // const c2 = await this.createCommunity(community2 as Community)
-    // const c3 = await this.createCommunity(community3 as Community)
-
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, AuthenticationCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: AuthenticationCollection, schema: authenticationSchema });
+    }
   }
 
 
@@ -277,151 +221,6 @@ class ThreadDBInit {
     let toUpdate = await client.findByID(thread, collectionName, id);
     toUpdate = model;
     client.save(thread, collectionName, [toUpdate]);
-  }
-
-  public async getCommunityPrivKey(communityID: string): Promise<CommunityKey> {
-    const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
-    const identity = await PrivateKey.fromString(ditoPrivKey);
-    await client.getToken(identity);
-    const communitiesKeyQuery = new Where('communityID').eq(communityID);
-    const communityKeys = (await this.filter(CommunityKeysCollection, communitiesKeyQuery))[0] as CommunityKey;
-    return communityKeys;
-  }
-
-  public async createCommunity(community: Community) {
-    const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
-    const identity = await PrivateKey.fromRandom()
-    await client.getToken(identity)
-    // await this.setupMailbox(identity);
-
-    community.pubKey = identity.public.toString();
-
-    const comID = await client.create(this.ditoThreadID, CommunitiesCollection, [
-      community
-    ])
-
-    const comThread = ThreadID.fromRandom();
-
-    await client.create(this.ditoThreadID, CommunityKeysCollection, [
-      {
-        communityID: comID[0],
-        threadID: comThread.toString(),
-        privKey: identity.toString(),
-      }
-    ]);
-
-
-    await client.newDB(comThread, `community-${comID[0]}`);
-
-    await client.newCollection(comThread, { name: GigsCollection, schema: gigSchema });
-    await client.newCollection(comThread, { name: GeneralSkillsCollection });
-    await client.newCollection(comThread, { name: MessagesCollection });
-
-    return comID[0];
-  }
-
-
-  private async cleanTheThreads() {
-
-    const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
-    const identity = await PrivateKey.fromString(ditoPrivKey);
-    await client.getToken(identity)
-
-    const communities = (await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as CommunityKey[];
-    communities.forEach(async c => {
-      const i = await PrivateKey.fromString(c.privKey);
-      const cl = Client.withUserAuth(auth);
-      await cl.getToken(i);
-      const t = ThreadID.fromString(c.threadID);
-      cl.deleteDB(t);
-    });
-
-    const ids = ((await client.find(this.ditoThreadID, CommunitiesCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, CommunitiesCollection, ids);
-
-    const ids2 = ((await client.find(this.ditoThreadID, CommunityKeysCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, CommunityKeysCollection, ids2);
-
-    const ids3 = ((await client.find(this.ditoThreadID, UsersCollection, {})) as any[]).map(s => s._id);
-    await client.delete(this.ditoThreadID, UsersCollection, ids3);
-  }
-
-  public async setupMailbox(identity: PrivateKey) {
-    try {
-      const user = await Users.withKeyInfo(keyInfo)
-      await user.getToken(identity);
-
-      const mailboxID = await user.setupMailbox()
-      const callback = async (reply?: MailboxEvent, err?: Error) => {
-        try {
-          const user = await Users.withKeyInfo(keyInfo)
-          await user.getToken(identity);
-          if (!reply || !reply.message) return console.log('no message')
-          console.log('message received');
-          const bodyBytes = await identity.decrypt(reply.message.body)
-          const decoder = new TextDecoder()
-          const body = decoder.decode(bodyBytes)
-
-          const auth = await this.auth(keyInfo);
-          const client = Client.withUserAuth(auth);
-
-          const communityKeyQuery = new Where('privKey').eq(identity.toString());
-          const communityKey = (await client.find(this.ditoThreadID, CommunityKeysCollection, communityKeyQuery))[0] as CommunityKey;
-
-          const communityQuery = new Where('pubKey').eq(identity.pubKey.toString());
-
-          const community = (await client.find(this.ditoThreadID, CommunitiesCollection, communityQuery))[0] as Community;
-
-          const thread = ThreadID.fromString(communityKey.threadID);
-
-          await client.create(thread, MessagesCollection, [{
-            from: community._id,
-            message: body
-          }]);
-          console.log(body)
-        } catch (err) {
-          console.log(err);
-        }
-      }
-      user.watchInbox(mailboxID, callback)
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  public async getAllMessages(privKey: string) {
-    const user = await Users.withKeyInfo(keyInfo)
-    const identity = PrivateKey.fromString(privKey)
-    await user.getToken(identity);
-
-    const messages = await user.listInboxMessages()
-    const inbox = []
-
-
-    for (const message of messages) {
-
-      const bytes = await identity.decrypt(message.body)
-      const body = new TextDecoder().decode(bytes)
-      const { from } = message
-      const { readAt } = message
-      const { createdAt } = message
-      const { id } = message
-      inbox.push({ body, from, readAt, sent: createdAt, id });
-      console.log({ body, from, readAt, sent: createdAt, id })
-    }
-    return inbox;
-  }
-
-  public async sendMessage(senderPrivKey: string, recipientPubKey: Public, message: string) {
-    console.log('sending message');
-    const identity = PrivateKey.fromString(senderPrivKey)
-    const user = await Users.withKeyInfo(keyInfo)
-    await user.getToken(identity);
-    const encoded = new TextEncoder().encode(message);
-    await user.sendMessage(identity, recipientPubKey, encoded)
   }
 }
 

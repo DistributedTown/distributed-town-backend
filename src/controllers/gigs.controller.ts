@@ -5,17 +5,13 @@ import {
   takeGig,
   createGig,
   getGigs,
-  rateGig,
   validateGig,
   getGigsToRate,
   startGig,
   submitGig,
-  completeGig
+  completeGig,
+  validateHash
 } from "../services/gig.service";
-import { validateRegisteredUser } from "../services/user.service";
-
-const { Magic } = require("@magic-sdk/admin");
-const magic = new Magic('sk_test_A040E804B3F17845');
 
 @injectable()
 export class GigsController {
@@ -49,17 +45,15 @@ export class GigsController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
+      if (req.get('skillWalletID')) {
         const isOpen: boolean = req.query.isOpen === 'true';
-        const isProject: boolean = req.query.isProject === 'true';
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const isValidUser = await validateRegisteredUser(userMetadata.email)
-        if (isValidUser.valid) {
-          const gigs = await getGigs(userMetadata.email, isOpen, isProject);
+        // const isValidUser = await validateRegisteredUser(req.get('skillWalletID'))
+        // if (isValidUser.valid) {
+          const gigs = await getGigs(req.get('skillWalletID'), isOpen);
           res.status(200).send(gigs);
-        } else {
-          res.status(400).send({ error: isValidUser.message });
-        }
+        // } else {
+        //   res.status(400).send({ error: isValidUser.message });
+        // }
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
       }
@@ -94,12 +88,11 @@ export class GigsController {
    */
   public post = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await validateGig(req.body, userMetadata.email);
+      if (req.get('skillWalletID')) {
+        const validationResult = await validateGig(req.body, req.get('skillWalletID'));
         if (validationResult.isValid) {
-          const gigID = await createGig(userMetadata.email, req.body);
-          res.status(201).send({ gigID: gigID });
+          const gigResult = await createGig(req.get('skillWalletID'), req.body);
+          res.status(201).send(gigResult);
         } else {
           res.status(400).send({ message: validationResult.message });
         }
@@ -133,9 +126,8 @@ export class GigsController {
    */
   public take = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await takeGig(req.params.gigID, userMetadata.email);
+      if (req.get('skillWalletID')) {
+        const validationResult = await takeGig(req.params.gigID, req.get('skillWalletID'));
         if (validationResult.isValid) {
           res.status(200).send();
         } else {
@@ -202,9 +194,8 @@ export class GigsController {
    */
   public submit = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const validationResult = await submitGig(req.params.gigID, userMetadata.email);
+      if (req.get('skillWalletID')) {
+        const validationResult = await submitGig(req.params.gigID, req.get('skillWalletID'));
         if (validationResult.isValid)
           return res.status(200).send();
         else
@@ -276,9 +267,9 @@ export class GigsController {
    */
   public rate = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        await rateGig(userMetadata.email, req.params.gigID, req.body.rate);
+      if (req.get('skillWalletID')) {
+        // TODO: rate gigs
+        // await rateGig(req.get('skillWalletID'), req.params.gigID, req.body.rate);
         res.status(200).send();
       } else {
         return res.status(401).end({ message: `User is not logged in.` });
@@ -307,9 +298,8 @@ export class GigsController {
    */
   public getGigsToRate = async (req: any, res: Response) => {
     try {
-      if (req.isAuthenticated()) {
-        const userMetadata = await magic.users.getMetadataByIssuer(req.user.issuer);
-        const response = await getGigsToRate(userMetadata.email);
+      if (req.get('skillWalletID')) {
+        const response = await getGigsToRate(req.get('skillWalletID'));
         res.status(200).send(response);
       } else {
         return res.status(401).end({ message: 'Could not log user in.' });
@@ -317,6 +307,19 @@ export class GigsController {
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public validateGigHash = async (req: any, res: Response) => {
+    const isMock: boolean = req.query.isMock === 'true';
+    const returnTrue: boolean = req.query.returnTrue === 'true';
+    console.log('validating hash!');
+    console.log('the hash is valid');
+    if (isMock) {
+      res.status(200).send({ isValid: returnTrue });
+    } else {
+      const isValid = await validateHash(req.query.communityID, req.query.hash);
+      res.status(200).send({ isValid });
     }
   }
 }
