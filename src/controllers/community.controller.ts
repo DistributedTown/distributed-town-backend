@@ -58,7 +58,6 @@ export class CommunityController {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
-    return res.status(200).send({message: "test passed"});
   }
 }
 
