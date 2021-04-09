@@ -2,7 +2,7 @@ import { CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
-import { calculateInitialCreditsAmount } from './skills.service';
+import { calculateInitialCreditsAmount, getCreditsBySkill } from './skills.service';
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await CommunityRegistryContracts.getCommunities();
@@ -28,7 +28,7 @@ export async function join(communityAddress: string, userAddress: string, skills
     const displayName1 = skillNames.indexOf(skills.skills[0].name);
     const displayName2 = skillNames.indexOf(skills.skills[1].name);
     const displayName3 = skillNames.indexOf(skills.skills[2].name);
-    const calculateDitos = await calculateInitialCreditsAmount(skills.skills)
+    const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
     const joined = await CommunityRegistryContracts.joinNewMember(
         communityAddress,
         userAddress,

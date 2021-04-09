@@ -20,3 +20,14 @@ export interface Skill {
 export interface SkillSet {
     skills: Skill[];
 }
+
+
+export interface SkillOnChain {
+    displayStringId: string;
+    level: number;
+}
+export interface SkillSetOnChain {
+    skill1: SkillOnChain;
+    skill2: SkillOnChain;
+    skill3: SkillOnChain;
+}
