@@ -53,8 +53,32 @@ export class SkillWalletController {
    */
    public getCommunity = async (req: any, res: Response) => {
     try {
-      const skillWallet = await getCommunityDetails(req.query.address);
-      return res.status(200).send(skillWallet);
+      // const skillWallet = await getCommunityDetails(req.query.address);
+      return res.status(200).send({
+          "nickname": "migrenaa",
+          "imageUrl": "https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg",
+          "diToCredits": 2342, 
+          "currentCommunity": {
+            "name": "DiTo 23",
+            "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
+          },
+          "pastCommunities": [
+            {
+              "name": "DiTo 24",
+              "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
+            },
+            {
+              "name": "DiTo 25",
+              "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
+            }
+          ],
+          "skills": [ 
+            {
+              "name":"Tokenomics",
+              "value": 6
+            }
+          ]
+      });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
