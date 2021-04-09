@@ -11,10 +11,12 @@ import {
 import {
   GigsCollection,
   GeneralSkillsCollection,
+  AuthenticationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   gigSchema,
+  authenticationSchema
 } from './models'
 require('dotenv').config()
 
@@ -116,6 +118,14 @@ class ThreadDBInit {
       await client.getCollectionIndexes(this.ditoThreadID, GigsCollection);
     } catch (err) {
       await client.newCollection(this.ditoThreadID, { name: GigsCollection, schema: gigSchema });
+    }
+
+
+
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, AuthenticationCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: AuthenticationCollection, schema: authenticationSchema });
     }
   }
 

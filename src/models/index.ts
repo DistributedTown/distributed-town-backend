@@ -5,6 +5,7 @@ export * from "./gig";
 export * from "./validationResponseModel";
 export * from "./project";
 export * from './skillWallet';
+export * from './authentication';
 
 
 export const skillNames = [

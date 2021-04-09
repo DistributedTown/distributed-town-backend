@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import { getCommunityDetails, getSkillWallet } from '../services/skillWallet.service';
+import { getCommunityDetails, getSkillWallet, hasPendingAuth } from '../services/skillWallet.service';
 
 @injectable()
 export class SkillWalletController {
@@ -55,6 +55,16 @@ export class SkillWalletController {
     try {
       const skillWallet = await getCommunityDetails(req.query.address);
       return res.status(200).send(skillWallet);
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public hasPendingAuthentication = async(req: any, res: Response) => {
+    try {
+      const pendingAuth = await hasPendingAuth(req.query.address);
+      return res.status(200).send({ hasPendingAuth: pendingAuth });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
