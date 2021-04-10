@@ -2,6 +2,7 @@ import { calculateInitialCreditsAmount, LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunities, join } from "../services/community.service";
+import { Skill, skillNames } from "../models";
 
 
 @injectable()
@@ -63,7 +64,25 @@ export class CommunityController {
 
   public calculateCredits = async (req: any, res: any) => {
     try {
-      const credits = await calculateInitialCreditsAmount(req.body);
+      console.log(req.query.skill1ID);
+      console.log(skillNames[req.query.skill1ID]);
+      const skillModel: Skill[] = [
+        {
+          name: skillNames[req.query.skill1ID],
+          value: req.query.lvl1
+        },
+        {
+          name: skillNames[req.query.skill2ID],
+          value: req.query.lvl2
+
+        },
+        {
+          name: skillNames[req.query.skill3ID],
+          value: req.query.lvl3
+
+        },
+      ]
+      const credits = await calculateInitialCreditsAmount(skillModel);
       res.status(200).send({ credits });
     } catch (err) {
       this.loggerService.error(err);

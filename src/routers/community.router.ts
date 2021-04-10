@@ -15,7 +15,7 @@ export class CommunityRouter {
   private init(): void {
     this._router.get("/", this.communityController.get);
     this._router.post("/join", this.communityController.joinNewUser)
-    this._router.post("/calculateCredits", this.communityController.calculateCredits)
+    this._router.get("/calculateCredits", this.communityController.calculateCredits)
   }
 
   public get router(): Router {
