@@ -27,32 +27,8 @@ export class SkillWalletController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      // const skillWallet = await getSkillWallet(req.query.address);
-      return res.status(200).send({
-        "nickname": "migrenaa",
-        "imageUrl": "https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg",
-        "diToCredits": 2342, 
-        "currentCommunity": {
-          "name": "DiTo 23",
-          "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
-        },
-        "pastCommunities": [
-          {
-            "name": "DiTo 24",
-            "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
-          },
-          {
-            "name": "DiTo 25",
-            "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
-          }
-        ],
-        "skills": [ 
-          {
-            "name":"Tokenomics",
-            "value": 6
-          }
-        ]
-    });
+      const skillWallet = await getSkillWallet(req.query.address);
+      return res.status(200).send(skillWallet);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -75,7 +51,7 @@ export class SkillWalletController {
    *          500:
    *              description: Server error
    */
-   public getCommunity = async (req: any, res: Response) => {
+  public getCommunity = async (req: any, res: Response) => {
     try {
       const skillWallet = await getCommunityDetails(req.query.address);
       return res.status(200).send(skillWallet);
@@ -85,7 +61,7 @@ export class SkillWalletController {
     }
   }
 
-  public hasPendingAuthentication = async(req: any, res: Response) => {
+  public hasPendingAuthentication = async (req: any, res: Response) => {
     try {
       const pendingAuth = await hasPendingAuth(req.query.address);
       return res.status(200).send({ hasPendingAuth: pendingAuth });
@@ -111,18 +87,18 @@ export class SkillWalletController {
    *          500:
    *              description: Server error
    */
-  public registerSkillWallet = async (req: any, res: Response) => {
+  public activateSkillWallet = async (req: any, res: Response) => {
     try {
-      const isRegistered = SkillWalletContracts.isSkillWalletRegistered(req.body.tokenId);
-      if (isRegistered) {
-        return res.status(400).send({ message: "Skill wallet already registered" });
-      } else {
-        const success = await SkillWalletContracts.registerSkillWallet(req.body.tokenId);
-        if (success)
-          return res.status(200).send({ message: "Skill wallet registered successfully." });
-        else
-          return res.status(500).send({ message: "Something went wrong!" });
-      }
+      // const isRegistered = SkillWalletContracts.isActive(req.body.tokenId);
+      // if (isRegistered) {
+      //   return res.status(400).send({ message: "Skill Wallet already activated" });
+      // } else {
+      await SkillWalletContracts.activate(req.body.tokenId, req.body.hash);
+      // if (success)
+        return res.status(200).send({ message: "Skill Wallet activated successfully." });
+      // else
+      //   return res.status(500).send({ message: "Something went wrong!" });
+      // }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

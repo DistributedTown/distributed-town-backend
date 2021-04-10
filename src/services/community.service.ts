@@ -2,7 +2,9 @@ import { CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
-import { calculateInitialCreditsAmount, getCreditsBySkill } from './skills.service';
+import { getCreditsBySkill } from './skills.service';
+import threadDBClient from '../threaddb.config';
+import { AuthenticationCollection } from '../constants/constants';
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await CommunityRegistryContracts.getCommunities();
@@ -29,7 +31,7 @@ export async function join(communityAddress: string, userAddress: string, skills
     const displayName2 = skillNames.indexOf(skills.skills[1].name);
     const displayName3 = skillNames.indexOf(skills.skills[2].name);
     const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
-    const joined = await CommunityRegistryContracts.joinNewMember(
+    const success = await CommunityRegistryContracts.joinNewMember(
         communityAddress,
         userAddress,
         displayName1,
@@ -41,6 +43,12 @@ export async function join(communityAddress: string, userAddress: string, skills
         url,
         calculateDitos.toString()
     );
+
+    threadDBClient.insert(AuthenticationCollection, {
+        address: userAddress,
+        isAuthenticated: false
+    })
+
     return calculateDitos;
 }
 

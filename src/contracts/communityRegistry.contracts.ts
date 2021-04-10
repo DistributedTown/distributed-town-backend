@@ -89,16 +89,24 @@ export class CommunityRegistryContracts {
     displayStringId3: number,
     url: string,
     ditos: string
-  ) {
+  ): Promise<boolean> {
     const communityRegistryContractInst = communityRegistryContract();
-
+    // communityRegistryContractInst.on(
+    //   'MemberJoined',
+    //   (member, community, credits) => {
+    //     console.log('Community created!');
+    //     console.log(member);
+    //     console.log(community);
+    //     return true;
+    //   },
+    // );
     try {
       const tokens = ethers.utils.parseEther(ditos);
       let overrides = {
         // The maximum units of gas for the transaction to use
         gasLimit: 2300000,
-    };
-      let result = await communityRegistryContractInst.joinNewMember(
+      };
+      const createTx = await communityRegistryContractInst.joinNewMember(
         communityAddress,
         userAddress,
         displayStringId1,
@@ -112,8 +120,16 @@ export class CommunityRegistryContracts {
         overrides
       );
 
-      console.log(result);
-      return result;
+      const communityTransactionResult = await createTx.wait();
+      // const { events } = communityTransactionResult;
+      // const memberJoinedEvent = events.find(
+      //   e => e.event === 'MemberJoined',
+      // );
+
+      // if (!memberJoinedEvent) {
+      //   throw new Error('Something went wrong');
+      // }
+
     } catch (err) {
       console.log(err);
       return;

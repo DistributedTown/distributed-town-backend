@@ -12,8 +12,9 @@ export class SkillWalletRouter {
 
   private init(): void {
     this._router.get('/', this.skillWalletController.get);
-    this._router.get("/community", this.skillWalletController.getCommunity)
-    this._router.get("/hasPendingAuth", this.skillWalletController.hasPendingAuthentication)
+    this._router.get("/community", this.skillWalletController.getCommunity);
+    this._router.get("/hasPendingAuth", this.skillWalletController.hasPendingAuthentication);
+    this._router.post("/activate", this.skillWalletController.activateSkillWallet);
     
   }
 

@@ -15,7 +15,8 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         currentCommunity: {}
     } as SkillWallet;
 
-    const isActive = await SkillWalletContracts.isSkillWalletRegistered(userAddress);
+    const isActive = await SkillWalletContracts.isActive(userAddress);
+    console.log(isActive);
     const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
     if (isActive) {
         const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
@@ -62,7 +63,7 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
 }
 
 export const getCommunityDetails = async (userAddress: string): Promise<CommunityListView> => {
-    const isActive = await SkillWalletContracts.isSkillWalletRegistered(userAddress);
+    const isActive = await SkillWalletContracts.isActive(userAddress);
     const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
     if (isActive) {
         const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);

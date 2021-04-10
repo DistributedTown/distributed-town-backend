@@ -54,40 +54,41 @@ export class SkillWalletContracts {
     }
 
 
-    public static async isSkillWalletRegistered(tokenId: string): Promise<boolean> {
+    public static async isActive(tokenId: string): Promise<boolean> {
         try {
             const contract = skillWalletContract();
-            const isRegistered = await contract.isSkillWalletRegistered(tokenId);
+            const isRegistered = await contract.isSkillWalletActivated(tokenId);
             return isRegistered;
         } catch (err) {
             console.log(err);
         }
     }
 
-    public static async registerSkillWallet(tokenId: number): Promise<boolean> {
+    public static async activate(tokenId: number, hash: string): Promise<boolean> {
         const contractInst = skillWalletContract();
 
-        contractInst.on(
-            'Registered',
-            (tokenId) => {
-                console.log('SW registered!');
-                console.log(tokenId);
-                return true;
-            },
-        );
+        // contractInst.on(
+        //     'Registered',
+        //     (tokenId) => {
+        //         console.log('SW registered!');
+        //         console.log(tokenId);
+        //         return true;
+        //     },
+        // );
         try {
-            let createTx = await contractInst.registerSkillWallet(
-                tokenId
+            let createTx = await contractInst.activateSkillWallet(
+                tokenId,
+                hash
             );
 
             // Wait for transaction to finish
             const registerSkillWalletTransactionResult = await createTx.wait();
             const { events } = registerSkillWalletTransactionResult;
-            const registeredEvent = events.find(
-                e => e.event === 'Registered',
-            );
+            // const registeredEvent = events.find(
+            //     e => e.event === 'Registered',
+            // );
 
-            return registeredEvent;
+            // return registeredEvent;
         } catch (err) {
             console.log(err);
             return;
