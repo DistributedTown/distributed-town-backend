@@ -15,10 +15,10 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         currentCommunity: {}
     } as SkillWallet;
 
-    const isActive = await SkillWalletContracts.isActive(userAddress);
-    console.log(isActive);
+    // const isActive = await SkillWalletContracts.isActive(userAddress);
+    // console.log(isActive);
     const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
-    if (isActive) {
+    // if (isActive) {
         const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
 
         let rawdata = fs.readFileSync(jsonUri);
@@ -56,10 +56,21 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
                 name: skillNames[skills.skill3.displayStringId],
                 value: skills.skill3.level
             });
+
+        const query = new Where('address').eq(userAddress);
+        const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+        const lastAuth = userAuths[userAuths.length - 1]
+
+        if (!lastAuth.isAuthenticated) {
+            lastAuth.isAuthenticated = true;
+            await threadDBClient.save(AuthenticationCollection, [lastAuth]);
+        }
+
         return skillWallet;
-    } else {
-        return undefined;
-    }
+    // } else {
+    //     return undefined;
+    // }
+    return undefined;
 }
 
 export const getCommunityDetails = async (userAddress: string): Promise<CommunityListView> => {
@@ -70,16 +81,6 @@ export const getCommunityDetails = async (userAddress: string): Promise<Communit
 
         const members = await CommunityContracts.getMembersCount(currentCommunity);
         const name = await CommunityContracts.getName(currentCommunity);
-
-
-        const query = new Where('address').eq(userAddress);
-        const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-        const lastAuth = userAuths[userAuths.length - 1]
-
-        if (!lastAuth.isAuthenticated) {
-            lastAuth.isAuthenticated = true;
-            await threadDBClient.save(AuthenticationCollection, [lastAuth]);
-        }
 
         return {
             members,
