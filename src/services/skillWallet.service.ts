@@ -9,64 +9,73 @@ const fs = require('fs');
 
 export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> => {
 
-    const skillWallet: SkillWallet = {
-        pastCommunities: [],
-        skills: [],
-        currentCommunity: {}
-    } as SkillWallet;
+    const query = new Where('address').eq(userAddress);
+    const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    const lastAuth = userAuths[userAuths.length - 1]
 
-    // const isActive = await SkillWalletContracts.isActive(userAddress);
-    // console.log(isActive);
-    const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
-    // if (isActive) {
-        const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
+    if (!lastAuth.isAuthenticated) {
+        lastAuth.isAuthenticated = true;
+        await threadDBClient.save(AuthenticationCollection, [lastAuth]);
+    }
 
-        let rawdata = fs.readFileSync(jsonUri);
-        let jsonMetadata = JSON.parse(rawdata);
-        skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg';
-        skillWallet.nickname = jsonMetadata.nickname;
+    // const skillWallet: SkillWallet = {
+    //     pastCommunities: [],
+    //     skills: [],
+    //     currentCommunity: {}
+    // } as SkillWallet;
 
-        const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
-        console.log(oldCommunityAddresses)
-        oldCommunityAddresses.forEach(async address => {
-            const name = await CommunityContracts.getName(address);
-            skillWallet.pastCommunities.push({
-                name,
-                address
-            })
-        });
+    // // const isActive = await SkillWalletContracts.isActive(userAddress);
+    // // console.log(isActive);
+    // const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
+    // // if (isActive) {
+    //     const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
 
-        const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
+    //     let rawdata = fs.readFileSync(jsonUri);
+    //     let jsonMetadata = JSON.parse(rawdata);
+    //     skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg';
+    //     skillWallet.nickname = jsonMetadata.nickname;
 
-        skillWallet.currentCommunity.address = currentCommunity;
-        skillWallet.currentCommunity.name = await CommunityContracts.getName(currentCommunity);
-        skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
-        const skills = await SkillWalletContracts.getSkills(tokenId);
-        skillWallet.skills.push({
-            name: skillNames[skills.skill1.displayStringId],
-            value: skills.skill1.level
-        });
-        if (skills.skill2)
-            skillWallet.skills.push({
-                name: skillNames[skills.skill2.displayStringId],
-                value: skills.skill2.level
-            });
-        if (skills.skill3)
-            skillWallet.skills.push({
-                name: skillNames[skills.skill3.displayStringId],
-                value: skills.skill3.level
-            });
+    //     const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
+    //     console.log(oldCommunityAddresses)
+    //     oldCommunityAddresses.forEach(async address => {
+    //         const name = await CommunityContracts.getName(address);
+    //         skillWallet.pastCommunities.push({
+    //             name,
+    //             address
+    //         })
+    //     });
 
-        const query = new Where('address').eq(userAddress);
-        const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-        const lastAuth = userAuths[userAuths.length - 1]
+    //     const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
 
-        if (!lastAuth.isAuthenticated) {
-            lastAuth.isAuthenticated = true;
-            await threadDBClient.save(AuthenticationCollection, [lastAuth]);
-        }
+    //     skillWallet.currentCommunity.address = currentCommunity;
+    //     skillWallet.currentCommunity.name = await CommunityContracts.getName(currentCommunity);
+    //     skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
+    //     const skills = await SkillWalletContracts.getSkills(tokenId);
+    //     skillWallet.skills.push({
+    //         name: skillNames[skills.skill1.displayStringId],
+    //         value: skills.skill1.level
+    //     });
+    //     if (skills.skill2)
+    //         skillWallet.skills.push({
+    //             name: skillNames[skills.skill2.displayStringId],
+    //             value: skills.skill2.level
+    //         });
+    //     if (skills.skill3)
+    //         skillWallet.skills.push({
+    //             name: skillNames[skills.skill3.displayStringId],
+    //             value: skills.skill3.level
+    //         });
 
-        return skillWallet;
+    //     const query = new Where('address').eq(userAddress);
+    //     const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    //     const lastAuth = userAuths[userAuths.length - 1]
+
+    //     if (!lastAuth.isAuthenticated) {
+    //         lastAuth.isAuthenticated = true;
+    //         await threadDBClient.save(AuthenticationCollection, [lastAuth]);
+    //     }
+
+    //     return skillWallet;
     // } else {
     //     return undefined;
     // }
