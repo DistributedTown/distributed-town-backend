@@ -31,6 +31,19 @@ export async function join(communityAddress: string, userAddress: string, skills
     const displayName2 = skillNames.indexOf(skills.skills[1].name);
     const displayName3 = skillNames.indexOf(skills.skills[2].name);
     const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
+
+    console.log( 
+        communityAddress,
+        userAddress,
+        displayName1,
+        skills.skills[0].value,
+        displayName2,
+        skills.skills[1].value,
+        displayName3,
+        skills.skills[2].value,
+        url
+        );
+
     const success = await CommunityRegistryContracts.joinNewMember(
         communityAddress,
         userAddress,
@@ -40,8 +53,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         skills.skills[1].value,
         displayName3,
         skills.skills[2].value,
-        url,
-        calculateDitos.toString()
+        url
     );
 
     threadDBClient.insert(AuthenticationCollection, {

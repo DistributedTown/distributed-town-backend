@@ -12,8 +12,7 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
     const query = new Where('address').eq(userAddress);
     const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
     const lastAuth = userAuths[userAuths.length - 1]
-
-    if (!lastAuth.isAuthenticated) {
+    if (lastAuth && !lastAuth.isAuthenticated) {
         lastAuth.isAuthenticated = true;
         await threadDBClient.save(AuthenticationCollection, [lastAuth]);
     }

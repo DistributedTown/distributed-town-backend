@@ -416,34 +416,34 @@
           "type": "address"
         },
         {
-          "internalType": "uint64",
+          "internalType": "uint256",
           "name": "displayStringId1",
-          "type": "uint64"
+          "type": "uint256"
         },
         {
-          "internalType": "uint8",
+          "internalType": "uint256",
           "name": "level1",
-          "type": "uint8"
+          "type": "uint256"
         },
         {
-          "internalType": "uint64",
+          "internalType": "uint256",
           "name": "displayStringId2",
-          "type": "uint64"
+          "type": "uint256"
         },
         {
-          "internalType": "uint8",
+          "internalType": "uint256",
           "name": "level2",
-          "type": "uint8"
+          "type": "uint256"
         },
         {
-          "internalType": "uint64",
+          "internalType": "uint256",
           "name": "displayStringId3",
-          "type": "uint64"
+          "type": "uint256"
         },
         {
-          "internalType": "uint8",
+          "internalType": "uint256",
           "name": "level3",
-          "type": "uint8"
+          "type": "uint256"
         },
         {
           "internalType": "string",

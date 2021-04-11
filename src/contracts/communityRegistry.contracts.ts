@@ -87,8 +87,7 @@ export class CommunityRegistryContracts {
     displayStringId2: number,
     skillLevel3: number,
     displayStringId3: number,
-    url: string,
-    ditos: string
+    url: string
   ): Promise<boolean> {
     const communityRegistryContractInst = communityRegistryContract();
     // communityRegistryContractInst.on(
@@ -101,7 +100,6 @@ export class CommunityRegistryContracts {
     //   },
     // );
     try {
-      const tokens = ethers.utils.parseEther(ditos);
       let overrides = {
         // The maximum units of gas for the transaction to use
         gasLimit: 2300000,
@@ -116,7 +114,6 @@ export class CommunityRegistryContracts {
         displayStringId3,
         skillLevel3,
         url,
-        tokens,
         overrides
       );
 

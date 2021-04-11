@@ -12,12 +12,12 @@
         },
         {
           "internalType": "address",
-          "name": "_oracle",
+          "name": "_vrfCoordinator",
           "type": "address"
         },
         {
           "internalType": "bytes32",
-          "name": "_jobId",
+          "name": "_keyHash",
           "type": "bytes32"
         }
       ],
@@ -79,45 +79,6 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "id",
-          "type": "bytes32"
-        }
-      ],
-      "name": "ChainlinkCancelled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "id",
-          "type": "bytes32"
-        }
-      ],
-      "name": "ChainlinkFulfilled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "id",
-          "type": "bytes32"
-        }
-      ],
-      "name": "ChainlinkRequested",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
           "internalType": "address",
           "name": "previousOwner",
           "type": "address"
@@ -146,14 +107,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -163,14 +124,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -180,14 +141,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -262,14 +223,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -279,14 +240,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -296,14 +257,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -318,9 +279,9 @@
         },
         {
           "indexed": false,
-          "internalType": "string",
-          "name": "randomString",
-          "type": "string"
+          "internalType": "uint256",
+          "name": "randomNumber",
+          "type": "uint256"
         }
       ],
       "name": "SkillWalletCreated",
@@ -359,9 +320,9 @@
           "type": "uint256"
         },
         {
-          "internalType": "string",
-          "name": "randomString",
-          "type": "string"
+          "internalType": "uint256",
+          "name": "randomNumber",
+          "type": "uint256"
         }
       ],
       "name": "activateSkillWallet",
@@ -420,28 +381,7 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_requestId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_payment",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bytes4",
-          "name": "_callbackFunctionId",
-          "type": "bytes4"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_expiration",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [],
       "name": "cancelRequest",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -472,14 +412,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -489,14 +429,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -506,14 +446,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -532,24 +472,6 @@
         }
       ],
       "name": "create",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "_requestId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "_data",
-          "type": "bytes32"
-        }
-      ],
-      "name": "fulfill",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -593,19 +515,6 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "getChainlinkToken",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -632,12 +541,12 @@
           "type": "uint256"
         }
       ],
-      "name": "getRandomString",
+      "name": "getRandomNumber",
       "outputs": [
         {
-          "internalType": "string",
-          "name": "randomString",
-          "type": "string"
+          "internalType": "uint256",
+          "name": "randomNumber",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -658,14 +567,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -675,14 +584,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -692,14 +601,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -852,6 +761,24 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "randomness",
+          "type": "uint256"
+        }
+      ],
+      "name": "rawFulfillRandomness",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -1085,14 +1012,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -1102,14 +1029,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",
@@ -1119,14 +1046,14 @@
             {
               "components": [
                 {
-                  "internalType": "uint64",
+                  "internalType": "uint256",
                   "name": "displayStringId",
-                  "type": "uint64"
+                  "type": "uint256"
                 },
                 {
-                  "internalType": "uint8",
+                  "internalType": "uint256",
                   "name": "level",
-                  "type": "uint8"
+                  "type": "uint256"
                 }
               ],
               "internalType": "struct Types.Skill",

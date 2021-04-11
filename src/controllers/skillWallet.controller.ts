@@ -30,9 +30,9 @@ export class SkillWalletController {
       const skillWallet = await getSkillWallet(req.query.address);
       // return res.status(200).send(skillWallet);
       return res.status(200).send({
-        "nickname": "migrenaa",
+        "nickname": "jabyl",
         "imageUrl": "https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg",
-        "diToCredits": 2342,
+        "diToCredits": 2360,
         "currentCommunity": {
           "name": "DiTo 23",
           "address": "0xE5dFc64faD45122545B0A5B88726ff7858509600"
@@ -50,6 +50,14 @@ export class SkillWalletController {
         "skills": [
           {
             "name": "Tokenomics",
+            "value": 9
+          },
+          {
+            "name": "Network Design",
+            "value": 8
+          },
+          {
+            "name": "Game Theory  ",
             "value": 6
           }
         ]
