@@ -1,5 +1,4 @@
-import communityRegistry from './abis/CommunitiesRegistry.json';
-import membership from './abis/Membership.json';
+import distributedTown from './abis/DistributedTown.json';
 import community from './abis/Community.json';
 import skillWallet from './abis/SkillWallet.json';
 
@@ -10,11 +9,11 @@ require('dotenv').config()
 
 let jsonRpcProvider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.maticvigil.com");
 
-export const communityRegistryContract = () => {
+export const distributedTownContract = () => {
   try {
     let contract = new ethers.Contract(
       process.env.COMMUNITY_REGISTRY_ADDRESS,
-      communityRegistry.abi,
+      distributedTown.abi,
       signer,
     );
     return contract;
@@ -25,14 +24,14 @@ export const communityRegistryContract = () => {
 
 export const skillWalletContract = () => {
   try {
-      let contract = new ethers.Contract(
-          process.env.SKILL_WALLET_ADDRESS,
-          skillWallet.abi,
-          signer,
-      );
-      return contract;
+    let contract = new ethers.Contract(
+      process.env.SKILL_WALLET_ADDRESS,
+      skillWallet.abi,
+      signer,
+    );
+    return contract;
   } catch (err) {
-      console.log(err);
+    console.log(err);
   }
 }
 export const communityContract = (address) => {
@@ -61,17 +60,5 @@ export const gigsContract = () => {
   }
 };
 
-export const membershipContract = (address) => {
-  try {
-    let contract = new ethers.Contract(
-      address,
-      membership.abi,
-      signer,
-    );
-    return contract;
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 

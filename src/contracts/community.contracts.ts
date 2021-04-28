@@ -1,4 +1,4 @@
-import { communityRegistryContract } from "./index";
+import { distributedTownContract } from "./index";
 import { communityContract } from "./index";
 
 export class CommunityContracts {
@@ -74,4 +74,64 @@ export class CommunityContracts {
       console.log(err);
     }
   }
+
+  public static async getMetadataUri(
+    address: string
+  ) {
+    try {
+      const contract = communityContract(address);
+      const uri = await contract.metadataUri();
+      return uri;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  public static async joinNewMember(
+    communityAddress: string,
+    userAddress: string,
+    skillLevel1: number,
+    displayStringId1: number,
+    skillLevel2: number,
+    displayStringId2: number,
+    skillLevel3: number,
+    displayStringId3: number,
+    url: string,
+    credits: string
+  ): Promise<boolean> {
+    const communityContractInst = communityContract(communityAddress);
+
+    try {
+      let overrides = {
+        // The maximum units of gas for the transaction to use
+        gasLimit: 2300000,
+      };
+      const createTx = await communityContractInst.joinNewMember(
+        userAddress,
+        displayStringId1,
+        skillLevel1,
+        displayStringId2,
+        skillLevel2,
+        displayStringId3,
+        skillLevel3,
+        url,
+        credits,
+        overrides
+      );
+
+      const communityTransactionResult = await createTx.wait();
+      const { events } = communityTransactionResult;
+      const memberJoinedEvent = events.find(
+        e => e.event === 'MemberJoined',
+      );
+
+      if (!memberJoinedEvent) {
+        throw new Error('Something went wrong');
+      }
+
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  };
 }

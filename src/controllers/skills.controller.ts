@@ -2,7 +2,6 @@ import { findMainCat, getAllSkills, getByCategory, LoggerService } from "../serv
 import { Response } from "express";
 import { injectable } from "inversify";
 import { skillNames } from "../models";
-import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
 
 @injectable()
 export class SkillsController {

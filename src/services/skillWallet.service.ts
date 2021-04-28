@@ -1,10 +1,11 @@
 
-import { Authentication, CommunityListView, skillNames, SkillWallet } from '../models';
+import { Authentication, CommunityListView, skillNames, SkillWallet, SkillWalletLogin } from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { Where } from '@textile/hub';
 import threadDBClient from '../threaddb.config';
-import { AuthenticationCollection } from '../constants/constants';
+import { AuthenticationCollection, SkillWalletLoginCollection } from '../constants/constants';
+import { v4 as uuidv4 } from 'uuid';
 const fs = require('fs');
 
 export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> => {
@@ -112,4 +113,31 @@ export const hasPendingAuth = async (userAddress: string): Promise<boolean> => {
     else
         return !lastAuth.isAuthenticated;
 
+}
+
+export const getUniqueStringForLogin = async (): Promise<string> => {
+    const uniqueStr = `${uuidv4()}${uuidv4()}`;
+    await threadDBClient.insert(SkillWalletLoginCollection, { uniqueString: uniqueStr, isAuthenticated: false });
+    return uniqueStr;
+}
+
+export const verifyUniqueString = async (tokenId: number, uniqueString: string): Promise<boolean> => {
+    const query = new Where('uniqueString').eq(uniqueString);
+    const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
+    if(login && login.length == 1) {
+        login[0].isAuthenticated = true;
+        login[0].tokenId = tokenId;
+        await threadDBClient.save(SkillWalletLoginCollection, login);
+        return true;
+    } else 
+        return false;
+}
+
+export const getTokenIDAfterLogin = async (uniqueString: string): Promise<number> => {
+    const query = new Where('uniqueString').eq(uniqueString);
+    const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
+    if(login && login.length === 1 && login[0].isAuthenticated) {
+        return login[0].tokenId;
+    } else 
+        return -1;
 }
