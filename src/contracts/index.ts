@@ -1,6 +1,7 @@
 import distributedTown from './abis/DistributedTown.json';
 import community from './abis/Community.json';
 import skillWallet from './abis/SkillWallet.json';
+import project from './abis/Project.json';
 
 import { ethers, provider, signer } from '../tools/ethers';
 // import { Biconomy } from "@biconomy/mexa";
@@ -39,6 +40,20 @@ export const communityContract = (address) => {
     let contract = new ethers.Contract(
       address,
       community.abi,
+      signer,
+    );
+    return contract;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+export const projectsContract = () => {
+  try {
+    let contract = new ethers.Contract(
+      process.env.PROJECTS_ADDRESS,
+      project.abi,
       signer,
     );
     return contract;

@@ -6,6 +6,13 @@ export interface Project {
     owner: string;
 }
 
+export interface ProjectsViewModel {
+    title: string;
+    description: string;
+	skillsNeeded: string;
+	fundsNeeded: number;
+}
+
 export const projectSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#", 
