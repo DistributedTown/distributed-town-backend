@@ -98,7 +98,7 @@ export class CommunityContracts {
     displayStringId3: number,
     url: string,
     credits: string
-  ): Promise<boolean> {
+  ): Promise<number> {
     const communityContractInst = communityContract(communityAddress);
 
     try {
@@ -122,11 +122,13 @@ export class CommunityContracts {
       const communityTransactionResult = await createTx.wait();
       const { events } = communityTransactionResult;
       const memberJoinedEvent = events.find(
-        e => e.event === 'MemberJoined',
+        e => e.event === 'MemberAdded',
       );
 
       if (!memberJoinedEvent) {
         throw new Error('Something went wrong');
+      } else {
+        return memberJoinedEvent.args[1];
       }
 
     } catch (err) {

@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import { getCommunityDetails, getMessagesBySkillWalletID, getSkillWallet, getTokenIDAfterLogin, getUniqueStringForLogin, hasPendingAuth, verifyUniqueString } from '../services/skillWallet.service';
+import { getCommunityDetails, getMessagesBySkillWalletID, getSkillWallet, getTokenIDAfterLogin, getUniqueStringForLogin, hasPendingActivation, verifyUniqueString } from '../services/skillWallet.service';
 
 @injectable()
 export class SkillWalletController {
@@ -66,7 +66,7 @@ export class SkillWalletController {
 
   public hasPendingAuthentication = async (req: any, res: Response) => {
     try {
-      const pendingAuth = await hasPendingAuth(req.query.address);
+      const pendingAuth = await hasPendingActivation(req.query.address);
       return res.status(200).send({ hasPendingAuth: pendingAuth });
     } catch (err) {
       this.loggerService.error(err);
@@ -121,8 +121,9 @@ export class SkillWalletController {
 
   public getUniqueStringForLogin = async (req: any, res: Response) => {
     try {
-      const str = await getUniqueStringForLogin();
-      return res.status(200).send({ uniqueString: str });
+      const uniqueString = await getUniqueStringForLogin();
+      console.log(uniqueString);
+      res.status(200).send({ uniqueString });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -131,8 +132,12 @@ export class SkillWalletController {
 
   public login = async (req: any, res: Response) => {
     try {
-      const str = await verifyUniqueString(req.body.tokenId, req.body.uniqueString);
-      return res.status(200).send({ uniqueString: str });
+      const success = await verifyUniqueString(req.body.tokenId, req.body.uniqueString);
+      if (success)
+        res.status(200).send({ message: "Successful login." });
+      else
+        res.status(400).send({ message: "Invalid login." });
+
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -141,7 +146,7 @@ export class SkillWalletController {
 
   public getLogins = async (req: any, res: Response) => {
     try {
-      const tokenId = await getTokenIDAfterLogin(req.body.uniqueString);
+      const tokenId = await getTokenIDAfterLogin(req.query.uniqueString);
       if (tokenId === -1)
         return res.status(200).send({ message: "The QR code is not yet scanned." });
       else

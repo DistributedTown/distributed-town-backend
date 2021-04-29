@@ -1,12 +1,12 @@
 
-export interface Authentication {
+export interface SWActivation {
 	_id: string;
     address: string;
-    isAuthenticated: boolean;
+    isActivated: boolean;
 }
 
 
-export const authenticationSchema = {
+export const activationSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#", 
 	"$id": "https://example.com/object1612283285.json", 
@@ -14,8 +14,8 @@ export const authenticationSchema = {
 	"type": "object",
 	"required": [
 		"_id",
-		"address",
-		"isAuthenticated"
+		"tokenId",
+		"isActivated"
 	],
 	"properties": {
 		"_id": {
@@ -34,12 +34,12 @@ export const authenticationSchema = {
 			"type": "string",
 			"default": "",
 			"examples": [
-				"string"
+				"0x.."
 			],
 		},
-		"isAuthenticated": {
-			"$id": "#root/isAuthenticated", 
-			"title": "isAuthenticated", 
+		"isActivated": {
+			"$id": "#root/isActivated", 
+			"title": "isActivated", 
 			"type": "boolean",
 			"examples": [
 				false
@@ -50,7 +50,7 @@ export const authenticationSchema = {
 }
 
 
-export interface SkillWalletLogin {
+export interface Authentication {
 	_id: string;
 	uniqueString: string;
 	isAuthenticated: boolean;
@@ -58,7 +58,7 @@ export interface SkillWalletLogin {
 }
 
 
-export const skillWalletLoginSchema = {
+export const authenticationSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#", 
 	"$id": "https://example.com/object1612283285.json", 

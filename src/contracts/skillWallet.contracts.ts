@@ -64,6 +64,17 @@ export class SkillWalletContracts {
         }
     }
 
+
+    public static async ownerOf(tokenId: string): Promise<boolean> {
+        try {
+            const contract = skillWalletContract();
+            const owner = await contract.ownerOf(tokenId);
+            return owner;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     public static async activate(tokenId: number, hash: string): Promise<boolean> {
         const contractInst = skillWalletContract();
 
