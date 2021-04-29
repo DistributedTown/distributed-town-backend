@@ -12,16 +12,17 @@ import {
   GigsCollection,
   GeneralSkillsCollection,
   AuthenticationCollection,
-  SkillWalletLoginCollection,
   MessagesCollection,
+  ActivationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   gigSchema,
   authenticationSchema,
-  skillWalletLoginSchema,
   messagesSchema,
-  MessageType
+  MessageType,
+  activationSchema,
+  Authentication
 } from './models'
 require('dotenv').config()
 
@@ -125,8 +126,6 @@ class ThreadDBInit {
       await client.newCollection(this.ditoThreadID, { name: GigsCollection, schema: gigSchema });
     }
 
-
-
     try {
       await client.getCollectionIndexes(this.ditoThreadID, AuthenticationCollection);
     } catch (err) {
@@ -135,9 +134,9 @@ class ThreadDBInit {
 
 
     try {
-      await client.getCollectionIndexes(this.ditoThreadID, SkillWalletLoginCollection);
+      await client.getCollectionIndexes(this.ditoThreadID, ActivationCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: SkillWalletLoginCollection, schema: skillWalletLoginSchema });
+      await client.newCollection(this.ditoThreadID, { name: ActivationCollection, schema: activationSchema });
     }
 
 

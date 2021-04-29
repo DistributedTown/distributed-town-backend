@@ -4,7 +4,7 @@ import { DistributedTownContracts } from '../contracts/distributedTown.contracts
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { getCreditsBySkill } from './skills.service';
 import threadDBClient from '../threaddb.config';
-import { AuthenticationCollection } from '../constants/constants';
+import { ActivationCollection } from '../constants/constants';
 import { getJSONFromURI } from '../utils/helpers';
 
 export async function getCommunities(template: number): Promise<any> {
@@ -46,7 +46,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         url
         );
 
-    const success = await CommunityContracts.joinNewMember(
+    const skillWalletId = await CommunityContracts.joinNewMember(
         communityAddress,
         userAddress,
         displayName1,
@@ -56,12 +56,12 @@ export async function join(communityAddress: string, userAddress: string, skills
         displayName3,
         skills.skills[2].value,
         url,
-        "2006"
+        calculateDitos.toString()
     );
 
-    threadDBClient.insert(AuthenticationCollection, {
-        address: userAddress,
-        isAuthenticated: false
+    threadDBClient.insert(ActivationCollection, {
+        tokenId: skillWalletId,
+        isActivated: false
     })
 
     return calculateDitos;

@@ -1,10 +1,10 @@
 
-import { Authentication, CommunityListView, Message, SkillWallet, SkillWalletLogin } from '../models';
+import { Authentication, CommunityListView, Message, SkillWallet, SWActivation } from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { Where } from '@textile/hub';
 import threadDBClient from '../threaddb.config';
-import { AuthenticationCollection, MessagesCollection, SkillWalletLoginCollection } from '../constants/constants';
+import { ActivationCollection, MessagesCollection, AuthenticationCollection } from '../constants/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { getJSONFromURI } from '../utils/helpers';
 const fs = require('fs');
@@ -52,15 +52,7 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         skillWallet.diToCredits = 2060;
         // const skills = await SkillWalletContracts.getSkills(tokenId);
 
-        // TODO : activate skill wallet
-        // const query = new Where('address').eq(userAddress);
-        // const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-        // const lastAuth = userAuths[userAuths.length - 1]
 
-        // if (lastAuth && !lastAuth.isAuthenticated) {
-        //     lastAuth.isAuthenticated = true;
-        //     await threadDBClient.save(AuthenticationCollection, [lastAuth]);
-        // }
 
         return skillWallet;
     } else {
@@ -92,31 +84,33 @@ export const getCommunityDetails = async (userAddress: string): Promise<Communit
     }
 }
 
-export const hasPendingAuth = async (userAddress: string): Promise<boolean> => {
-
+export const hasPendingActivation = async (userAddress: string): Promise<boolean> => {
     const query = new Where('address').eq(userAddress);
-    const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-    const lastAuth = userAuths[userAuths.length - 1];
-    if (!lastAuth)
+    const activationAttempts = (await threadDBClient.filter(ActivationCollection, query)) as SWActivation[];
+    const lastAttempt = activationAttempts[activationAttempts.length - 1];
+    if (!lastAttempt)
         return false;
     else
-        return !lastAuth.isAuthenticated;
+        return !lastAttempt.isActivated;
 
 }
 
 export const getUniqueStringForLogin = async (): Promise<string> => {
     const uniqueStr = `${uuidv4()}${uuidv4()}`;
-    await threadDBClient.insert(SkillWalletLoginCollection, { uniqueString: uniqueStr, isAuthenticated: false });
+    await threadDBClient.insert(AuthenticationCollection, { uniqueString: uniqueStr, isAuthenticated: false });
     return uniqueStr;
 }
 
 export const verifyUniqueString = async (tokenId: number, uniqueString: string): Promise<boolean> => {
     const query = new Where('uniqueString').eq(uniqueString);
-    const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
+    const a = await threadDBClient.getAll(AuthenticationCollection);
+    console.log(a);
+    const login = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    console.log(login);
     if (login && login.length == 1) {
         login[0].isAuthenticated = true;
         login[0].tokenId = tokenId;
-        await threadDBClient.save(SkillWalletLoginCollection, login);
+        await threadDBClient.save(AuthenticationCollection, login);
         return true;
     } else
         return false;
@@ -124,8 +118,10 @@ export const verifyUniqueString = async (tokenId: number, uniqueString: string):
 
 export const getTokenIDAfterLogin = async (uniqueString: string): Promise<number> => {
     const query = new Where('uniqueString').eq(uniqueString);
-    const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
-    if (login && login.length === 1 && login[0].isAuthenticated) {
+    const login = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    if (login && login.length > 0 && login[0].isAuthenticated) {
+        const tokenId = login[0].tokenId;
+        await threadDBClient.delete(AuthenticationCollection, query);
         return login[0].tokenId;
     } else
         return -1;
@@ -137,4 +133,17 @@ export const getMessagesBySkillWalletID = async (skillWalletId: number): Promise
     // const messages = await threadDBClient.filter(MessagesCollection, query) as Message[];
     const messages = await threadDBClient.getAll(MessagesCollection) as Message[];
     return messages;
+}
+
+export const activateSkillWallet = async (tokenId: number, hash: string): Promise<void> => {
+    await SkillWalletContracts.activate(tokenId, hash);
+    const ownerAddr = await SkillWalletContracts.ownerOf(tokenId.toString());
+    const query = new Where('address').eq(ownerAddr);
+    const userActivations = (await threadDBClient.filter(ActivationCollection, query)) as SWActivation[];
+    const lastActivationAttempt = userActivations[userActivations.length - 1]
+
+    if (lastActivationAttempt && !lastActivationAttempt.isActivated) {
+        lastActivationAttempt.isActivated = true;
+        await threadDBClient.save(ActivationCollection, [lastActivationAttempt]);
+    }
 }
