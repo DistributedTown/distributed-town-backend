@@ -21,7 +21,8 @@ export async function getCommunities(template: number): Promise<any> {
             name: metadata.title,
             members,
             scarcityScore,
-            address: community
+            address: community,
+            description: metadata.description
         });
     }
     return result;

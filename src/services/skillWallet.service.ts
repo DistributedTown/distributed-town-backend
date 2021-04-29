@@ -38,13 +38,16 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         });
 
         const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
+        const members = await CommunityContracts.getMembersCount(currentCommunity);
 
         skillWallet.currentCommunity.address = currentCommunity;
-
+        skillWallet.currentCommunity.members = members;
         const communityMetadata = await CommunityContracts.getMetadataUri(currentCommunity);
         let jsonCommunityMetadata = await getJSONFromURI(communityMetadata)
 
         skillWallet.currentCommunity.name = jsonCommunityMetadata.name ?? 'DiTo #1';
+        skillWallet.currentCommunity.description = jsonCommunityMetadata.description ?? 'description description description';
+        skillWallet.currentCommunity.scarcityScore = 0;
         // skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
         skillWallet.diToCredits = 2060;
         // const skills = await SkillWalletContracts.getSkills(tokenId);
@@ -72,12 +75,15 @@ export const getCommunityDetails = async (userAddress: string): Promise<Communit
         const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
 
         const members = await CommunityContracts.getMembersCount(currentCommunity);
-        const name = await CommunityContracts.getName(currentCommunity);
-
+        const communityMetadataUrl = await CommunityContracts.getMetadataUri(currentCommunity);
+        let communityMetadata = await getJSONFromURI(communityMetadataUrl)
+        const name = communityMetadata.name ?? 'DiTo #1';
+        const description = communityMetadata.description ?? 'description description description';
         return {
             members,
             name,
             scarcityScore: 0,
+            description,
             address: currentCommunity
         };
 
