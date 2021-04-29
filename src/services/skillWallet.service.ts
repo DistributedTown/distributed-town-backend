@@ -6,80 +6,63 @@ import { Where } from '@textile/hub';
 import threadDBClient from '../threaddb.config';
 import { AuthenticationCollection, SkillWalletLoginCollection } from '../constants/constants';
 import { v4 as uuidv4 } from 'uuid';
+import { getJSONFromURI } from '../utils/helpers';
 const fs = require('fs');
 
 export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> => {
 
-    const query = new Where('address').eq(userAddress);
-    const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-    const lastAuth = userAuths[userAuths.length - 1]
-    if (lastAuth && !lastAuth.isAuthenticated) {
-        lastAuth.isAuthenticated = true;
-        await threadDBClient.save(AuthenticationCollection, [lastAuth]);
+    const skillWallet: SkillWallet = {
+        pastCommunities: [],
+        skills: [],
+        currentCommunity: {}
+    } as SkillWallet;
+    const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
+    const isActive = await SkillWalletContracts.isActive(tokenId);
+    console.log(isActive);
+    if (isActive) {
+        const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
+        let jsonMetadata = await getJSONFromURI(jsonUri)
+        skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg';
+        skillWallet.nickname = jsonMetadata.properties.username;
+        skillWallet.skills = jsonMetadata.properties.skills;
+
+        const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
+        oldCommunityAddresses.forEach(async address => {
+            const communityMetadata = await CommunityContracts.getMetadataUri(address);
+            let jsonOldCommunityMetadata = await getJSONFromURI(communityMetadata)
+            console.log(communityMetadata);
+            skillWallet.pastCommunities.push({
+                name: jsonOldCommunityMetadata.name ?? 'DiTo #1',
+                address
+            })
+        });
+
+        const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
+
+        skillWallet.currentCommunity.address = currentCommunity;
+
+        const communityMetadata = await CommunityContracts.getMetadataUri(currentCommunity);
+        let jsonCommunityMetadata = await getJSONFromURI(communityMetadata)
+
+        skillWallet.currentCommunity.name = jsonCommunityMetadata.name ?? 'DiTo #1';
+        // skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
+        skillWallet.diToCredits = 2060;
+        // const skills = await SkillWalletContracts.getSkills(tokenId);
+
+        // TODO : activate skill wallet
+        // const query = new Where('address').eq(userAddress);
+        // const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+        // const lastAuth = userAuths[userAuths.length - 1]
+
+        // if (lastAuth && !lastAuth.isAuthenticated) {
+        //     lastAuth.isAuthenticated = true;
+        //     await threadDBClient.save(AuthenticationCollection, [lastAuth]);
+        // }
+
+        return skillWallet;
+    } else {
+        return undefined;
     }
-
-    // const skillWallet: SkillWallet = {
-    //     pastCommunities: [],
-    //     skills: [],
-    //     currentCommunity: {}
-    // } as SkillWallet;
-
-    // // const isActive = await SkillWalletContracts.isActive(userAddress);
-    // // console.log(isActive);
-    // const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
-    // // if (isActive) {
-    //     const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
-
-    //     let rawdata = fs.readFileSync(jsonUri);
-    //     let jsonMetadata = JSON.parse(rawdata);
-    //     skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-png-image_4017288.jpg';
-    //     skillWallet.nickname = jsonMetadata.nickname;
-
-    //     const oldCommunityAddresses: string[] = await SkillWalletContracts.getCommunityHistory(tokenId);
-    //     console.log(oldCommunityAddresses)
-    //     oldCommunityAddresses.forEach(async address => {
-    //         const name = await CommunityContracts.getName(address);
-    //         skillWallet.pastCommunities.push({
-    //             name,
-    //             address
-    //         })
-    //     });
-
-    //     const currentCommunity = await SkillWalletContracts.getCurrentCommunity(tokenId);
-
-    //     skillWallet.currentCommunity.address = currentCommunity;
-    //     skillWallet.currentCommunity.name = await CommunityContracts.getName(currentCommunity);
-    //     skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
-    //     const skills = await SkillWalletContracts.getSkills(tokenId);
-    //     skillWallet.skills.push({
-    //         name: skillNames[skills.skill1.displayStringId],
-    //         value: skills.skill1.level
-    //     });
-    //     if (skills.skill2)
-    //         skillWallet.skills.push({
-    //             name: skillNames[skills.skill2.displayStringId],
-    //             value: skills.skill2.level
-    //         });
-    //     if (skills.skill3)
-    //         skillWallet.skills.push({
-    //             name: skillNames[skills.skill3.displayStringId],
-    //             value: skills.skill3.level
-    //         });
-
-    //     const query = new Where('address').eq(userAddress);
-    //     const userAuths = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
-    //     const lastAuth = userAuths[userAuths.length - 1]
-
-    //     if (!lastAuth.isAuthenticated) {
-    //         lastAuth.isAuthenticated = true;
-    //         await threadDBClient.save(AuthenticationCollection, [lastAuth]);
-    //     }
-
-    //     return skillWallet;
-    // } else {
-    //     return undefined;
-    // }
-    return undefined;
 }
 
 export const getCommunityDetails = async (userAddress: string): Promise<CommunityListView> => {
@@ -124,20 +107,20 @@ export const getUniqueStringForLogin = async (): Promise<string> => {
 export const verifyUniqueString = async (tokenId: number, uniqueString: string): Promise<boolean> => {
     const query = new Where('uniqueString').eq(uniqueString);
     const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
-    if(login && login.length == 1) {
+    if (login && login.length == 1) {
         login[0].isAuthenticated = true;
         login[0].tokenId = tokenId;
         await threadDBClient.save(SkillWalletLoginCollection, login);
         return true;
-    } else 
+    } else
         return false;
 }
 
 export const getTokenIDAfterLogin = async (uniqueString: string): Promise<number> => {
     const query = new Where('uniqueString').eq(uniqueString);
     const login = (await threadDBClient.filter(SkillWalletLoginCollection, query)) as SkillWalletLogin[];
-    if(login && login.length === 1 && login[0].isAuthenticated) {
+    if (login && login.length === 1 && login[0].isAuthenticated) {
         return login[0].tokenId;
-    } else 
+    } else
         return -1;
 }
