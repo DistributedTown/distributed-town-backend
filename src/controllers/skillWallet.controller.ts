@@ -2,7 +2,7 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import { getCommunityDetails, getSkillWallet, getTokenIDAfterLogin, getUniqueStringForLogin, hasPendingAuth, verifyUniqueString } from '../services/skillWallet.service';
+import { getCommunityDetails, getMessagesBySkillWalletID, getSkillWallet, getTokenIDAfterLogin, getUniqueStringForLogin, hasPendingAuth, verifyUniqueString } from '../services/skillWallet.service';
 
 @injectable()
 export class SkillWalletController {
@@ -102,6 +102,16 @@ export class SkillWalletController {
       // else
       //   return res.status(500).send({ message: "Something went wrong!" });
       // }
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public getMessages = async (req: any, res: Response) => {
+    try {
+      const messages = await getMessagesBySkillWalletID(req.params.skillWalletId);
+      return res.status(200).send({ messages });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

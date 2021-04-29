@@ -2,14 +2,16 @@ export enum MessageType {
     GigCreated,
     GigTaken,
     GigAccepted,
-    GigCompleted
+    GigCompleted,
+	Reminder
 }
-export interface Messages {
+export interface Message {
 	_id: string;
     type: MessageType;
     title: string;
     message: string;
-    skillWalletId?: number;
+    skillWalletId: number;
+	contactSkillWalletId?: number;
 }
 
 
@@ -23,7 +25,8 @@ export const messagesSchema = {
 		"_id",
 		"type",
         "title",
-        "message"
+        "message",
+        "skillWalletId"
 	],
 	"properties": {
 		"_id": {
@@ -66,6 +69,14 @@ export const messagesSchema = {
         "skillWalletId": {
 			"$id": "#root/skillWalletId", 
 			"title": "skillWalletId", 
+			"type": "integer",
+			"examples": [
+				1
+			],
+		},
+		"contactSkillWalletId": {
+			"$id": "#root/contactSkillWalletId", 
+			"title": "contactSkillWalletId", 
 			"type": "integer",
 			"examples": [
 				1

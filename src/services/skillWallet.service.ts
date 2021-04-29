@@ -1,10 +1,10 @@
 
-import { Authentication, CommunityListView, skillNames, SkillWallet, SkillWalletLogin } from '../models';
+import { Authentication, CommunityListView, Message, SkillWallet, SkillWalletLogin } from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { Where } from '@textile/hub';
 import threadDBClient from '../threaddb.config';
-import { AuthenticationCollection, SkillWalletLoginCollection } from '../constants/constants';
+import { AuthenticationCollection, MessagesCollection, SkillWalletLoginCollection } from '../constants/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { getJSONFromURI } from '../utils/helpers';
 const fs = require('fs');
@@ -129,4 +129,12 @@ export const getTokenIDAfterLogin = async (uniqueString: string): Promise<number
         return login[0].tokenId;
     } else
         return -1;
+}
+
+export const getMessagesBySkillWalletID = async (skillWalletId: number): Promise<Message[]> => {
+    // console.log(skillWalletId);
+    // const query = new Where('skillWalletId').eq(skillWalletId);
+    // const messages = await threadDBClient.filter(MessagesCollection, query) as Message[];
+    const messages = await threadDBClient.getAll(MessagesCollection) as Message[];
+    return messages;
 }

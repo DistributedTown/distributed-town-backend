@@ -6,6 +6,7 @@ export * from "./validationResponseModel";
 export * from "./project";
 export * from './skillWallet';
 export * from './authentication';
+export * from './messages';
 
 
 export const skillNames = [
