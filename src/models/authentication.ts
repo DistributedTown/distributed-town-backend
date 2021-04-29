@@ -66,7 +66,7 @@ export const skillWalletLoginSchema = {
 	"type": "object",
 	"required": [
 		"_id",
-		"address",
+		"uniqueString",
 		"isAuthenticated"
 	],
 	"properties": {
