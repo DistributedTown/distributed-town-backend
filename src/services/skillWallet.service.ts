@@ -53,7 +53,6 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         // const skills = await SkillWalletContracts.getSkills(tokenId);
 
 
-
         return skillWallet;
     } else {
         return undefined;
