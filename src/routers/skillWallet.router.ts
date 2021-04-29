@@ -15,6 +15,7 @@ export class SkillWalletRouter {
     this._router.get("/community", this.skillWalletController.getCommunity);
     this._router.get("/hasPendingAuth", this.skillWalletController.hasPendingAuthentication);
     this._router.post("/activate", this.skillWalletController.activateSkillWallet);
+    this._router.get("/:skillWalletId/messages", this.skillWalletController.getMessages);
     
   }
 

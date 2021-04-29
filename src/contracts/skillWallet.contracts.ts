@@ -1,5 +1,5 @@
 import { ethers, provider, signer } from '../tools/ethers';
-import { skillWalletContract} from './index';
+import { skillWalletContract } from './index';
 
 export class SkillWalletContracts {
 
@@ -67,28 +67,22 @@ export class SkillWalletContracts {
     public static async activate(tokenId: number, hash: string): Promise<boolean> {
         const contractInst = skillWalletContract();
 
-        // contractInst.on(
-        //     'Registered',
-        //     (tokenId) => {
-        //         console.log('SW registered!');
-        //         console.log(tokenId);
-        //         return true;
-        //     },
-        // );
         try {
             let createTx = await contractInst.activateSkillWallet(
-                tokenId,
-                hash
+                tokenId
+                // hash
             );
 
             // Wait for transaction to finish
             const registerSkillWalletTransactionResult = await createTx.wait();
             const { events } = registerSkillWalletTransactionResult;
-            // const registeredEvent = events.find(
-            //     e => e.event === 'Registered',
-            // );
-
-            // return registeredEvent;
+            const registeredEvent = events.find(
+                e => e.event === 'SkillWalletActivated',
+            );
+            if (!registeredEvent)
+                throw Error('Something went wrong!');
+            else 
+                console.log('Skill wallet activated')
         } catch (err) {
             console.log(err);
             return;

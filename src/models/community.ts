@@ -6,4 +6,5 @@ export interface CommunityListView {
 	members: number;
 	scarcityScore: number;
 	address: string;
+	description: string;
 }

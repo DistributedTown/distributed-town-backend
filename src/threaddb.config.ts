@@ -12,11 +12,16 @@ import {
   GigsCollection,
   GeneralSkillsCollection,
   AuthenticationCollection,
+  SkillWalletLoginCollection,
+  MessagesCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   gigSchema,
-  authenticationSchema
+  authenticationSchema,
+  skillWalletLoginSchema,
+  messagesSchema,
+  MessageType
 } from './models'
 require('dotenv').config()
 
@@ -127,6 +132,35 @@ class ThreadDBInit {
     } catch (err) {
       await client.newCollection(this.ditoThreadID, { name: AuthenticationCollection, schema: authenticationSchema });
     }
+
+
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, SkillWalletLoginCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: SkillWalletLoginCollection, schema: skillWalletLoginSchema });
+    }
+
+
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, MessagesCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: MessagesCollection, schema: messagesSchema });
+      await client.create(this.ditoThreadID, MessagesCollection, [{
+        type: MessageType.GigCreated,
+        title: 'Your Gig has started!',
+        message: 'Start working on your Gig - and earn DITO Credits!',
+        skillWalletId: 1,
+        contactSkillWalletId: 2
+      },
+      {
+        type: MessageType.GigCreated,
+        title: 'Your Gig has started!',
+        message: 'Start working on your Gig - and earn DITO Credits!',
+        skillWalletId: 1,
+        contactSkillWalletId: 2
+      }])
+    }
+
   }
 
 

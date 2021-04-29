@@ -1,25 +1,28 @@
 import { CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
-import { CommunityRegistryContracts } from '../contracts/communityRegistry.contracts';
+import { DistributedTownContracts } from '../contracts/distributedTown.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { getCreditsBySkill } from './skills.service';
 import threadDBClient from '../threaddb.config';
 import { AuthenticationCollection } from '../constants/constants';
+import { getJSONFromURI } from '../utils/helpers';
 
 export async function getCommunities(template: number): Promise<any> {
-    const allCommunities = await CommunityRegistryContracts.getCommunities();
+    const allCommunities = await DistributedTownContracts.getCommunities();
 
     const result: CommunityListView[] = [];
     for (let community of allCommunities) {
-        const name = await CommunityContracts.getName(community);
+        const metadataUri = await CommunityContracts.getMetadataUri(community);
+        const metadata = await getJSONFromURI(metadataUri);
         const members = await CommunityContracts.getMembersCount(community);
-        const scarcityScore = await calculateScarcityStore(community);
+        const scarcityScore = 0;
 
         result.push({
-            name,
+            name: metadata.title,
             members,
             scarcityScore,
-            address: community
+            address: community,
+            description: metadata.description
         });
     }
     return result;
@@ -33,7 +36,6 @@ export async function join(communityAddress: string, userAddress: string, skills
     const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
 
     console.log( 
-        communityAddress,
         userAddress,
         displayName1,
         skills.skills[0].value,
@@ -44,7 +46,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         url
         );
 
-    const success = await CommunityRegistryContracts.joinNewMember(
+    const success = await CommunityContracts.joinNewMember(
         communityAddress,
         userAddress,
         displayName1,
@@ -53,7 +55,8 @@ export async function join(communityAddress: string, userAddress: string, skills
         skills.skills[1].value,
         displayName3,
         skills.skills[2].value,
-        url
+        url,
+        "2006"
     );
 
     threadDBClient.insert(AuthenticationCollection, {

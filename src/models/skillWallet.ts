@@ -10,6 +10,9 @@ export interface SkillWallet {
 export interface CommunityList {
     name: string;
     address: string;
+    members?: number;
+    description?: string;
+    scarcityScore?: number;
 }
 
 export interface Skill {

@@ -21,6 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "@textile/hub": "1.2.0",
+    "axios": "0.21.1",
     "ethers": "^5.0.24",
     "body-parser": "^1.19.0",
     "cookie-parser": "1.4.5",
