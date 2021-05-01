@@ -100,7 +100,6 @@ export class CommunityContracts {
     credits: string
   ): Promise<number> {
     const communityContractInst = communityContract(communityAddress);
-
     try {
       let overrides = {
         // The maximum units of gas for the transaction to use
@@ -128,6 +127,7 @@ export class CommunityContracts {
       if (!memberJoinedEvent) {
         throw new Error('Something went wrong');
       } else {
+        console.log('MemberAdded');
         return memberJoinedEvent.args[1];
       }
 

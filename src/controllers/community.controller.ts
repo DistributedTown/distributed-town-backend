@@ -1,8 +1,9 @@
-import { calculateInitialCreditsAmount, LoggerService } from "../services";
+import { calculateInitialCreditsAmount, getProjectsPerCommunity, LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunities, join } from "../services/community.service";
 import { Skill, skillNames } from "../models";
+import { ProjectsContracts } from "../contracts/projects.contract";
 
 
 @injectable()
@@ -61,6 +62,25 @@ export class CommunityController {
     }
   }
 
+  public getProjects = async (req: any, res: Response) => {
+    try {
+      const projects = await getProjectsPerCommunity(req.params.communityAddress);
+      res.status(200).send(projects);
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public createProject = async (req: any, res: Response) => {
+    try {
+      const projectId = await ProjectsContracts.createProject(req.body.url, req.body.template, req.body.communityAddress);
+      res.status(201).send({ projectId });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
 
   public calculateCredits = async (req: any, res: any) => {
     try {
