@@ -8,7 +8,7 @@ export async function getProjectsPerCommunity(communityAddress: string): Promise
         const projectMetadataUri = await ProjectsContracts.getTokenURI(projectId);
         let jsonMetadata = await getJSONFromURI(projectMetadataUri)
         console.log(jsonMetadata);
-        return jsonMetadata.properties;
+        return { ...jsonMetadata.properties, projectId: projectId.toString() };
     }));
     return projects as ProjectsViewModel[];
 }

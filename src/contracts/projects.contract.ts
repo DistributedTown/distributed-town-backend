@@ -2,14 +2,14 @@ import { projectsContract } from './index';
 
 export class ProjectsContracts {
 
-    public static async createProject(props: string, template: number, communityAddress: string): Promise<boolean> {
+    public static async createProject(props: string, communityAddress: string, creator: string): Promise<boolean> {
         const contractInst = projectsContract();
 
         try {
             let createTx = await contractInst.createProject(
                 props,
-                template,
-                communityAddress
+                communityAddress,
+                creator
             );
 
             // Wait for transaction to finish

@@ -54,8 +54,8 @@ export class CommunityController {
   public joinNewUser = async (req: any, res: any) => {
     try {
       console.log(req.body);
-      const credits = await join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
-      res.status(200).send({ credits });
+      const result = await join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
+      res.status(200).send(result);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -74,7 +74,7 @@ export class CommunityController {
 
   public createProject = async (req: any, res: Response) => {
     try {
-      const projectId = await ProjectsContracts.createProject(req.body.url, req.body.template, req.body.communityAddress);
+      const projectId = await ProjectsContracts.createProject(req.body.url, req.body.communityAddress, req.body.creator);
       res.status(201).send({ projectId });
     } catch (err) {
       this.loggerService.error(err);

@@ -98,7 +98,7 @@ export class CommunityContracts {
     displayStringId3: number,
     url: string,
     credits: string
-  ): Promise<number> {
+  ): Promise<string> {
     const communityContractInst = communityContract(communityAddress);
     try {
       let overrides = {
@@ -128,7 +128,7 @@ export class CommunityContracts {
         throw new Error('Something went wrong');
       } else {
         console.log('MemberAdded');
-        return memberJoinedEvent.args[1];
+        return memberJoinedEvent.args[1].toString();
       }
 
     } catch (err) {
