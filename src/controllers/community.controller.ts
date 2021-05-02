@@ -1,4 +1,4 @@
-import { calculateInitialCreditsAmount, getProjectsPerCommunity, LoggerService } from "../services";
+import { calculateInitialCreditsAmount, createMilestone, getProjectsPerCommunity, LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunities, join } from "../services/community.service";
@@ -76,6 +76,16 @@ export class CommunityController {
     try {
       const projectId = await ProjectsContracts.createProject(req.body.url, req.body.communityAddress, req.body.creator);
       res.status(201).send({ projectId });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public createProjectMilestone =  async (req: any, res: Response) => {
+    try {
+      const milestoneId = await createMilestone(req.body.skillWalletId, req.params.projectId, req.body.url, req.body.ditoCredits);
+      res.status(201).send({ milestoneId });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

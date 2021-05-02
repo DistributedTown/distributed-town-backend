@@ -12,10 +12,10 @@ async function pushImages() {
     })
     const { root, threadID } = await buckets.getOrCreate('QuadraticTreasury')
     if (!root) throw new Error('bucket not created')
-    // let file = fs.readFileSync('./art.png');
-    // let path = `art.png`
-    // let links = await buckets.pushPath(root.key, path, file, { root })
-    // console.log('art', `https://hub.textile.io${links.path.path}`);
+    let path = `profilePic.png`
+    let links = await buckets.pushPath(root.key, path, file, { root })
+    console.log('art', `https://hub.textile.io${links.path.path}`);
+}
 
     // let file = fs.readFileSync('./blockchain.png');
     // let path = `blockchain.png`

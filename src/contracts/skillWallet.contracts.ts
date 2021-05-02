@@ -65,7 +65,7 @@ export class SkillWalletContracts {
     }
 
 
-    public static async ownerOf(tokenId: string): Promise<boolean> {
+    public static async ownerOf(tokenId: string): Promise<string> {
         try {
             const contract = skillWalletContract();
             const owner = await contract.ownerOf(tokenId);

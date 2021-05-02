@@ -2,6 +2,7 @@ import distributedTown from './abis/DistributedTown.json';
 import community from './abis/Community.json';
 import skillWallet from './abis/SkillWallet.json';
 import project from './abis/Project.json';
+import milestones from './abis/Milestones.json';
 
 import { ethers, provider, signer } from '../tools/ethers';
 // import { Biconomy } from "@biconomy/mexa";
@@ -62,11 +63,11 @@ export const projectsContract = () => {
   }
 };
 
-export const gigsContract = () => {
+export const milestonesContract = (milestonesAddress: string) => {
   try {
     let contract = new ethers.Contract(
-      process.env.GIGS_ADDRESS,
-      community.abi, // TODO - change
+      milestonesAddress,
+      milestones.abi,
       signer,
     );
     return contract;
