@@ -6,6 +6,7 @@ import { getCreditsBySkill } from './skills.service';
 import threadDBClient from '../threaddb.config';
 import { ActivationCollection } from '../constants/constants';
 import { getJSONFromURI } from '../utils/helpers';
+import { ethers } from 'ethers';
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await DistributedTownContracts.getCommunities();
@@ -56,7 +57,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         displayName3,
         skills.skills[2].value,
         url,
-        calculateDitos.toString()
+        ethers.utils.parseEther(calculateDitos.toString()).toString()
     );
 
     threadDBClient.insert(ActivationCollection, {
@@ -64,7 +65,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         isActivated: false
     })
 
-    return calculateDitos;
+    return { tokenId: skillWalletId, credits: calculateDitos };
 }
 
 async function calculateScarcityStore(address: string): Promise<number> {

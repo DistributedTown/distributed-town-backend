@@ -27,7 +27,9 @@ export class SkillWalletController {
    */
   public get = async (req: any, res: Response) => {
     try {
-      const skillWallet = await getSkillWallet(req.query.address);
+      console.log(req.query.tokenId);
+      const skillWallet = await getSkillWallet(req.query.tokenId);
+      console.log(skillWallet);
       if (skillWallet)
         return res.status(200).send(skillWallet);
       else

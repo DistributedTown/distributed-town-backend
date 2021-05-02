@@ -7,16 +7,14 @@ import threadDBClient from '../threaddb.config';
 import { ActivationCollection, MessagesCollection, AuthenticationCollection } from '../constants/constants';
 import { v4 as uuidv4 } from 'uuid';
 import { getJSONFromURI } from '../utils/helpers';
-const fs = require('fs');
 
-export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> => {
+export const getSkillWallet = async (tokenId: string): Promise<SkillWallet> => {
 
     const skillWallet: SkillWallet = {
         pastCommunities: [],
         skills: [],
         currentCommunity: {}
     } as SkillWallet;
-    const tokenId = await SkillWalletContracts.getSkillWalletIdByOwner(userAddress);
     const isActive = await SkillWalletContracts.isActive(tokenId);
     console.log(isActive);
     if (isActive) {
@@ -50,7 +48,6 @@ export const getSkillWallet = async (userAddress: string): Promise<SkillWallet> 
         skillWallet.currentCommunity.scarcityScore = 0;
         // skillWallet.diToCredits = await CommunityContracts.getDiToBalance(currentCommunity, userAddress)
         skillWallet.diToCredits = 2060;
-        // const skills = await SkillWalletContracts.getSkills(tokenId);
 
 
         return skillWallet;
