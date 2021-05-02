@@ -7,6 +7,7 @@ export * from "./project";
 export * from './skillWallet';
 export * from './authentication';
 export * from './messages';
+export * from './milestone';
 
 
 export const skillNames = [

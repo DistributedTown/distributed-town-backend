@@ -98,6 +98,7 @@ export class SkillWalletController {
       // if (isRegistered) {
       //   return res.status(400).send({ message: "Skill Wallet already activated" });
       // } else {
+        console.log(req.body);
       await SkillWalletContracts.activate(req.body.tokenId, req.body.hash);
       // if (success)
       return res.status(200).send({ message: "Skill Wallet activated successfully." });

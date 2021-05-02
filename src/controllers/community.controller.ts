@@ -1,4 +1,4 @@
-import { calculateInitialCreditsAmount, createMilestone, getProjectsPerCommunity, LoggerService } from "../services";
+import { calculateInitialCreditsAmount, createMilestone, getMilestones, getProjectsPerCommunity, LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { getCommunities, join } from "../services/community.service";
@@ -92,6 +92,15 @@ export class CommunityController {
     }
   }
 
+  public getProjectMilestones =  async (req: any, res: Response) => {
+    try {
+      const milestones = await getMilestones(req.params.projectId);
+      res.status(201).send({ milestones });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
   public calculateCredits = async (req: any, res: any) => {
     try {
       console.log(req.query.skill1ID);

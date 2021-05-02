@@ -19,6 +19,7 @@ export class CommunityRouter {
     this._router.get("/:communityAddress/project", this.communityController.getProjects)
     this._router.post("/:communityAddress/project", this.communityController.createProject)
     this._router.post("/projects/:projectId/milestone", this.communityController.createProjectMilestone)
+    this._router.get("/projects/:projectId/milestone", this.communityController.getProjectMilestones)
   }
 
   public get router(): Router {

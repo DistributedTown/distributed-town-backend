@@ -36,4 +36,25 @@ export class MilestonesContracts {
             return;
         }
     }
+
+    public static async getProjectMilestones(milestonesAddress: string, projectId: string) {
+        try {
+            const contract = milestonesContract(milestonesAddress);
+            const milestones = await contract.projectMilestones(projectId);
+            return milestones;
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+    public static async getTokenURI(milestonesAddress: string, tokenId: string): Promise<string> {
+        try {
+            const contract = milestonesContract(milestonesAddress);
+            const uri = await contract.tokenURI(tokenId);
+            return uri;
+        } catch (err) {
+            console.log(err);
+        }
+    }
 }
