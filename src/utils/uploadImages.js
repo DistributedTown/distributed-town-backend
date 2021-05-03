@@ -1,9 +1,7 @@
 
 const hub = require('@textile/hub');
 const fs = require('fs');
-require('dotenv').config()
-
-
+require('dotenv').config();
 
 async function pushImages() {
     const buckets = await hub.Buckets.withKeyInfo({
@@ -12,18 +10,9 @@ async function pushImages() {
     })
     const { root, threadID } = await buckets.getOrCreate('QuadraticTreasury')
     if (!root) throw new Error('bucket not created')
-    let path = `profilePic.png`
-    let links = await buckets.pushPath(root.key, path, file, { root })
-    console.log('art', `https://hub.textile.io${links.path.path}`);
-}
 
-    // let file = fs.readFileSync('./blockchain.png');
-    // let path = `blockchain.png`
-    // let links = await buckets.pushPath(root.key, path, file, { root })
-    // console.log('blockchain', `https://hub.textile.io${links.path.path}`);
-
-    let file = fs.readFileSync('./local.png');
-    let path = `local.png`
+    let file = fs.readFileSync('./jabyl.jpg');
+    let path = `jabyl.jpg`
     let links = await buckets.pushPath(root.key, path, file, { root })
     console.log('local', `https://hub.textile.io${links.path.path}`);
 }

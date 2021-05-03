@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { milestonesContract } from './index';
 
 export class MilestonesContracts {
@@ -12,15 +13,19 @@ export class MilestonesContracts {
         const contractInst = milestonesContract(milestonesAddress);
 
         try {
+
             let createTx = await contractInst.createMilestone(
                 creator,
+                // ethers.utils.parseEther(ditoCredits.toString()).toString(),
                 ditoCredits,
                 metadataUrl,
                 projectId
             );
 
+            console.log(createTx);
             // Wait for transaction to finish
             const createMilestoneResult = await createTx.wait();
+            console.log(createMilestoneResult);
             const { events } = createMilestoneResult;
             const registeredEvent = events.find(
                 e => e.event === 'MilestoneCreated',

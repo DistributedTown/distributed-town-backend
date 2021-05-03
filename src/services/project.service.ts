@@ -23,7 +23,7 @@ export async function createMilestone(skillWalletId: string, projectId: number, 
 }
 
 export async function getMilestones(projectId: string) : Promise<Milestone[]>{
-    const milestoneIds = ['0'];
+    const milestoneIds = ['0', '1', '2'];
     const milestones = await Promise.all(milestoneIds.map(async milestoneId => {
         const milestonesMetadata = await MilestonesContracts.getTokenURI(milestonesAddress, milestoneId);
         let jsonMetadata = await getJSONFromURI(milestonesMetadata)
