@@ -4,7 +4,7 @@ import { DistributedTownContracts } from '../contracts/distributedTown.contracts
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { getCreditsBySkill } from './skills.service';
 import threadDBClient from '../threaddb.config';
-import { ActivationCollection } from '../constants/constants';
+import { PendingSWActivationCollection } from '../constants/constants';
 import { getJSONFromURI } from '../utils/helpers';
 import { ethers } from 'ethers';
 
@@ -60,7 +60,7 @@ export async function join(communityAddress: string, userAddress: string, skills
         ethers.utils.parseEther(calculateDitos.toString()).toString()
     );
 
-    threadDBClient.insert(ActivationCollection, {
+    threadDBClient.insert(PendingSWActivationCollection, {
         tokenId: skillWalletId,
         isActivated: false
     })

@@ -1,12 +1,11 @@
 
-export interface SWActivation {
+export interface PendingActivation {
 	_id: string;
 	address: string;
-	isActivated: boolean;
 }
 
 
-export const activationSchema = {
+export const pendingActivationSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://example.com/object1612283285.json",
@@ -36,15 +35,6 @@ export const activationSchema = {
 			"examples": [
 				"0x.."
 			],
-		},
-		"isActivated": {
-			"$id": "#root/isActivated",
-			"title": "isActivated",
-			"type": "boolean",
-			"examples": [
-				false
-			],
-			"default": false
 		}
 	}
 }
@@ -61,7 +51,7 @@ export interface Authentication {
 	_id: string;
 	nonce: number;
 	action: Actions,
-	isAuthenticated: boolean;
+	isValidated: boolean;
 	tokenId?: number;
 }
 
@@ -74,8 +64,9 @@ export const authenticationSchema = {
 	"type": "object",
 	"required": [
 		"_id",
-		"uniqueString",
-		"isAuthenticated"
+		"nonce",
+		"action",
+		"isValidated"
 	],
 	"properties": {
 		"_id": {
@@ -106,9 +97,9 @@ export const authenticationSchema = {
 				1
 			],
 		},
-		"isAuthenticated": {
-			"$id": "#root/isAuthenticated",
-			"title": "isAuthenticated",
+		"isValidated": {
+			"$id": "#root/isValidated",
+			"title": "isValidated",
 			"type": "boolean",
 			"examples": [
 				false
@@ -125,4 +116,11 @@ export const authenticationSchema = {
 			"default": -1
 		},
 	}
+}
+
+
+
+export interface QRCodeObject {
+    nonce: number;
+    action: Actions
 }

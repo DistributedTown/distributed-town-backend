@@ -12,14 +12,14 @@ import {
   GeneralSkillsCollection,
   AuthenticationCollection,
   MessagesCollection,
-  ActivationCollection,
+  PendingSWActivationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   authenticationSchema,
   messagesSchema,
   MessageType,
-  activationSchema,
+  pendingActivationSchema,
 } from './models'
 require('dotenv').config()
 
@@ -125,9 +125,9 @@ class ThreadDBInit {
 
 
     try {
-      await client.getCollectionIndexes(this.ditoThreadID, ActivationCollection);
+      await client.getCollectionIndexes(this.ditoThreadID, PendingSWActivationCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: ActivationCollection, schema: activationSchema });
+      await client.newCollection(this.ditoThreadID, { name: PendingSWActivationCollection, schema: pendingActivationSchema });
     }
 
 

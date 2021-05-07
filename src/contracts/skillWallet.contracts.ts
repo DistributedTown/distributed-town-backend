@@ -75,13 +75,13 @@ export class SkillWalletContracts {
         }
     }
 
-    public static async activate(tokenId: number, hash: string): Promise<boolean> {
+    public static async activate(tokenId: number, pubKey: string): Promise<boolean> {
         const contractInst = skillWalletContract();
 
         try {
             let createTx = await contractInst.activateSkillWallet(
-                tokenId
-                // hash
+                tokenId,
+                pubKey
             );
 
             // Wait for transaction to finish

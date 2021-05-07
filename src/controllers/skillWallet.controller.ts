@@ -2,7 +2,16 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import { getCommunityDetails, getMessagesBySkillWalletID, getSkillWallet, getTokenIDAfterLogin, getUniqueStringForLogin, hasPendingActivation, verifyUniqueString } from '../services/skillWallet.service';
+import {
+  getCommunityDetails,
+  getMessagesBySkillWalletID,
+  getSkillWallet,
+  getTokenIDAfterLogin,
+  hasPendingActivation,
+  loginValidation,
+  findNonceForAction,
+  createNonceForLogin
+} from '../services/skillWallet.service';
 
 @injectable()
 export class SkillWalletController {
@@ -98,8 +107,8 @@ export class SkillWalletController {
       // if (isRegistered) {
       //   return res.status(400).send({ message: "Skill Wallet already activated" });
       // } else {
-        console.log(req.body);
-      await SkillWalletContracts.activate(req.body.tokenId, req.body.hash);
+      console.log(req.body);
+      await SkillWalletContracts.activate(req.body.tokenId, req.body.pubKey);
       // if (success)
       return res.status(200).send({ message: "Skill Wallet activated successfully." });
       // else
@@ -121,12 +130,11 @@ export class SkillWalletController {
     }
   }
 
-
-  public getUniqueStringForLogin = async (req: any, res: Response) => {
+  public getLoginNonce = async (req: any, res: Response) => {
     try {
-      const uniqueString = await getUniqueStringForLogin();
-      console.log(uniqueString);
-      res.status(200).send({ uniqueString });
+      const loginObj = await createNonceForLogin();
+      console.log(loginObj);
+      res.status(200).send(loginObj);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -135,7 +143,7 @@ export class SkillWalletController {
 
   public login = async (req: any, res: Response) => {
     try {
-      const success = await verifyUniqueString(req.body.tokenId, req.body.uniqueString);
+      const success = await loginValidation(req.body.nonce, req.body.tokenId);
       if (success)
         res.status(200).send({ message: "Successful login." });
       else
