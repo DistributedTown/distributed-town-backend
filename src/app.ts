@@ -6,7 +6,6 @@ import {
   SkillWalletRouter,
   SkillsRouter,
   CommunityRouter,
-  GigRouter,
   SwaggerRouter,
 } from "./routers";
 const session = require("express-session");
@@ -21,8 +20,7 @@ export class App {
   constructor(
     private skillWalletRouter: SkillWalletRouter,
     private skillsRouter: SkillsRouter,
-    private communityRouter: CommunityRouter,
-    private gigRouter: GigRouter,
+    private communityRouter: CommunityRouter
   ) {
     this._app = express();
     this.config();
@@ -70,6 +68,5 @@ export class App {
     this._app.use("/api/skillWallet", this.skillWalletRouter.router);
     this._app.use("/api/skill", this.skillsRouter.router);
     this._app.use("/api/community", this.communityRouter.router);
-    this._app.use("/api/gig", this.gigRouter.router);
   }
 }
