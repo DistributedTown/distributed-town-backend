@@ -1,10 +1,18 @@
 
-import { Actions, Authentication, CommunityListView, Message, SkillWallet, PendingActivation, QRCodeObject } from '../models';
+import {
+    Actions,
+    QRCodeAuth,
+    CommunityListView,
+    Message,
+    SkillWallet,
+    PendingActivation,
+    QRCodeObject
+} from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
-import { Action, Where } from '@textile/hub';
+import { Where } from '@textile/hub';
 import threadDBClient from '../threaddb.config';
-import { PendingSWActivationCollection, MessagesCollection, AuthenticationCollection } from '../constants/constants';
+import { PendingSWActivationCollection, MessagesCollection, QRCodeAuthCollection } from '../constants/constants';
 import { getJSONFromURI, getNonce } from '../utils/helpers';
 
 export const getSkillWallet = async (tokenId: string): Promise<SkillWallet> => {
@@ -90,49 +98,49 @@ export const authenticateAction = async (action: Actions, tokenId?: number): Pro
     const nonce = getNonce();
     if (action !== Actions.LOGIN && (tokenId === undefined || tokenId === -1))
         return;
-    const authModel: Authentication = {
+    const authModel: QRCodeAuth = {
         _id: undefined,
         nonce,
         action,
         isValidated: false,
     }
-    await threadDBClient.insert(AuthenticationCollection, authModel);
+    await threadDBClient.insert(QRCodeAuthCollection, authModel);
     return { nonce, action };
 }
 export const createNonceForLogin = async (): Promise<QRCodeObject> => {
     const nonce = getNonce();
-    
-    const authModel: Authentication = {
+
+    const authModel: QRCodeAuth = {
         _id: undefined,
         nonce,
         action: Actions.LOGIN,
         isValidated: false,
     }
-    await threadDBClient.insert(AuthenticationCollection, authModel);
+    await threadDBClient.insert(QRCodeAuthCollection, authModel);
     return { nonce, action: Actions.LOGIN };
 }
 
 export const loginValidation = async (nonce: number, tokenId: number): Promise<boolean> => {
     const query = new Where('nonce').eq(nonce).and('action').eq(Actions.LOGIN).and('isValidated').eq(false);
-    const login = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
     if (login && login.length > 0) {
         login[login.length - 1].isValidated = true;
         login[login.length - 1].tokenId = tokenId;
-        await threadDBClient.save(AuthenticationCollection, login);
+        await threadDBClient.save(QRCodeAuthCollection, login);
         return true;
     }
     return false;
 }
 
 export const findNonceForAction = async (nonce: number, action: Actions, tokenId: number): Promise<boolean> => {
-    if (action === Actions.LOGIN) 
+    if (action === Actions.LOGIN)
         return false;
 
     const query = new Where('nonce').eq(nonce).and('action').eq(action).and('isValidated').eq(false).and('tokenId').eq(tokenId);
-    const login = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
     if (login && login.length > 0) {
         login[login.length - 1].isValidated = true;
-        await threadDBClient.save(AuthenticationCollection, login);
+        await threadDBClient.save(QRCodeAuthCollection, login);
         return true;
     } else
         return false;
@@ -140,9 +148,9 @@ export const findNonceForAction = async (nonce: number, action: Actions, tokenId
 
 export const getTokenIDAfterLogin = async (nonce: number): Promise<number> => {
     const query = new Where('nonce').eq(nonce).and('action').eq(Actions.LOGIN).and('isValidated').eq(true);
-    const login = (await threadDBClient.filter(AuthenticationCollection, query)) as Authentication[];
+    const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
     if (login && login.length > 0) {
-        await threadDBClient.delete(AuthenticationCollection, query);
+        await threadDBClient.delete(QRCodeAuthCollection, query);
         return login[login.length - 1].tokenId;
     } else
         return -1;

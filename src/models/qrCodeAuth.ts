@@ -1,44 +1,3 @@
-
-export interface PendingActivation {
-	_id: string;
-	address: string;
-}
-
-
-export const pendingActivationSchema = {
-	"definitions": {},
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"$id": "https://example.com/object1612283285.json",
-	"title": "Root",
-	"type": "object",
-	"required": [
-		"_id",
-		"tokenId",
-		"isActivated"
-	],
-	"properties": {
-		"_id": {
-			"$id": "#root/_id",
-			"title": "_id",
-			"type": "string",
-			"default": "",
-			"examples": [
-				"asd"
-			],
-			"pattern": "^.*$"
-		},
-		"address": {
-			"$id": "#root/address",
-			"title": "address",
-			"type": "string",
-			"default": "",
-			"examples": [
-				"0x.."
-			],
-		}
-	}
-}
-
 export enum Actions {
 	ACTIVATE_SW,
 	LOGIN,
@@ -47,7 +6,7 @@ export enum Actions {
 	ACCEPT_GIG
 };
 
-export interface Authentication {
+export interface QRCodeAuth {
 	_id: string;
 	nonce: number;
 	action: Actions,
@@ -56,7 +15,7 @@ export interface Authentication {
 }
 
 
-export const authenticationSchema = {
+export const qrCodeAuthSchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"$id": "https://example.com/object1612283285.json",
@@ -117,8 +76,6 @@ export const authenticationSchema = {
 		},
 	}
 }
-
-
 
 export interface QRCodeObject {
     nonce: number;

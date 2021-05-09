@@ -10,13 +10,13 @@ import {
 
 import {
   GeneralSkillsCollection,
-  AuthenticationCollection,
+  QRCodeAuthCollection,
   MessagesCollection,
   PendingSWActivationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  authenticationSchema,
+  qrCodeAuthSchema,
   messagesSchema,
   MessageType,
   pendingActivationSchema,
@@ -118,9 +118,9 @@ class ThreadDBInit {
     }
 
     try {
-      await client.getCollectionIndexes(this.ditoThreadID, AuthenticationCollection);
+      await client.getCollectionIndexes(this.ditoThreadID, QRCodeAuthCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: AuthenticationCollection, schema: authenticationSchema });
+      await client.newCollection(this.ditoThreadID, { name: QRCodeAuthCollection, schema: qrCodeAuthSchema });
     }
 
 
