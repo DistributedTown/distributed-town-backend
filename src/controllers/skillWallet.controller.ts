@@ -94,17 +94,17 @@ export class SkillWalletController {
    */
   public activateSkillWallet = async (req: any, res: Response) => {
     try {
-      // const isRegistered = SkillWalletContracts.isActive(req.body.tokenId);
-      // if (isRegistered) {
-      //   return res.status(400).send({ message: "Skill Wallet already activated" });
-      // } else {
+      const isRegistered = SkillWalletContracts.isActive(req.body.tokenId);
+      if (isRegistered) {
+        return res.status(400).send({ message: "Skill Wallet already activated" });
+      } else {
         console.log(req.body);
-      await SkillWalletContracts.activate(req.body.tokenId, req.body.hash);
-      // if (success)
-      return res.status(200).send({ message: "Skill Wallet activated successfully." });
-      // else
-      //   return res.status(500).send({ message: "Something went wrong!" });
-      // }
+        const success = await SkillWalletContracts.activate(req.body.tokenId, req.body.hash);
+        if (success)
+          return res.status(200).send({ message: "Skill Wallet activated successfully." });
+        else
+          return res.status(500).send({ message: "Something went wrong!" });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
