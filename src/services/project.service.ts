@@ -22,16 +22,13 @@ export async function createMilestone(skillWalletId: string, projectId: number, 
     return milestoneId;
 }
 
-export async function getMilestones(projectId: string): Promise<Milestone[]> {
-    const milestoneIds = ['0', '1', '2', '3', '4'];
+export async function getMilestones(projectId: string) : Promise<Milestone[]>{
+    const milestoneIds = ['0'];
     const milestones = await Promise.all(milestoneIds.map(async milestoneId => {
-        let milestonesMetadata = ''
-        try {
-            milestonesMetadata = await MilestonesContracts.getTokenURI(milestonesAddress, milestoneId);
-        } catch (err) { return; }
+        const milestonesMetadata = await MilestonesContracts.getTokenURI(milestonesAddress, milestoneId);
         let jsonMetadata = await getJSONFromURI(milestonesMetadata)
         console.log(jsonMetadata);
         return { ...jsonMetadata, milestoneId: milestoneId.toString() };
     }));
     return milestones as Milestone[];
-}
+}  

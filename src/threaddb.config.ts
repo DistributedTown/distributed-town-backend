@@ -9,7 +9,6 @@ import {
 } from '@textile/hub'
 
 import {
-  GigsCollection,
   GeneralSkillsCollection,
   AuthenticationCollection,
   MessagesCollection,
@@ -17,12 +16,10 @@ import {
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  gigSchema,
   authenticationSchema,
   messagesSchema,
   MessageType,
   activationSchema,
-  Authentication
 } from './models'
 require('dotenv').config()
 
@@ -118,12 +115,6 @@ class ThreadDBInit {
           ]
         }
       ])
-    }
-
-    try {
-      await client.getCollectionIndexes(this.ditoThreadID, GigsCollection);
-    } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: GigsCollection, schema: gigSchema });
     }
 
     try {
