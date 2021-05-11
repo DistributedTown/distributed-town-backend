@@ -23,11 +23,10 @@ export const getSkillWallet = async (tokenId: string): Promise<SkillWallet> => {
         currentCommunity: {}
     } as SkillWallet;
     const isActive = await SkillWalletContracts.isActive(tokenId);
-    console.log(isActive);
     if (isActive) {
         const jsonUri = await SkillWalletContracts.getTokenURI(tokenId);
         let jsonMetadata = await getJSONFromURI(jsonUri)
-        skillWallet.imageUrl = 'https://png.pngtree.com/png-clipart/20190619/original/pngtree-vector-avatar-icon-p  ng-image_4017288.jpg';
+        skillWallet.imageUrl = jsonMetadata.image;
         skillWallet.nickname = jsonMetadata.properties.username;
         skillWallet.skills = jsonMetadata.properties.skills;
 
@@ -146,6 +145,20 @@ export const findNonceForAction = async (nonce: number, action: Actions, tokenId
         return false;
 }
 
+export const findNonce = async (action: Actions, tokenId: number): Promise<number[]> => {
+    if (action === Actions.LOGIN)
+        return;
+
+    const query = new Where('action').eq(action).and('isValidated').eq(false).and('tokenId').eq(tokenId);
+    const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
+    if (login && login.length > 0) {
+        login[login.length - 1].isValidated = true;
+        await threadDBClient.save(QRCodeAuthCollection, login);
+        return login.map(l => l.nonce);
+    } else
+        return [];
+}
+
 export const getTokenIDAfterLogin = async (nonce: number): Promise<number> => {
     const query = new Where('nonce').eq(nonce).and('action').eq(Actions.LOGIN).and('isValidated').eq(true);
     const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
@@ -173,4 +186,10 @@ export const activateSkillWallet = async (tokenId: number, pubKey: string): Prom
     if (userActivations && userActivations.length > 0) {
         await threadDBClient.delete(PendingSWActivationCollection, query);
     }
+}
+
+export const invalidateNonce = async(nonce: number, tokenId: number): Promise<void> => {
+    const query = new Where('nonce').eq(nonce).and('isValidated').eq(true).and('tokenId').eq(tokenId);
+    await threadDBClient.delete(QRCodeAuthCollection, query);
+    return;
 }

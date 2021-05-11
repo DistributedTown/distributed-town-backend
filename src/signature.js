@@ -27,20 +27,31 @@ var nonce = '123123'
 const bufferNonce = Buffer.from(nonce);
 var signature = privKey.sign(bufferNonce);
 var derSign = signature.toDER();
+console.log(derSign);
 var sigAsString = Buffer.from(derSign).toString('hex');
 console.log('signature', sigAsString);
 
 // ---------- Chainlink External Adapter --------------
 // parameter sent - signature + nonce (fetched from the Backend) + hashedPubKey
 
-
 // Import public key
 var pubKey = ec.keyFromPublic(publicKey, 'hex');
 
 // Verify signature
 console.log(pubKey.verify(bufferNonce, sigAsString));
+
+function hexToBytes(hex) {
+    for (var bytes = [], c = 0; c < hex.length; c += 2)
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+    return bytes;
+}
+
+
+const bytes = hexToBytes(sigAsString);
+console.log('stringToHex', bytes);
 var recid = ec.getKeyRecoveryParam(bufferNonce, signature, pubKey);
-const recoveredObj = ec.recoverPubKey(bufferNonce, signature, recid, 'string');
+console.log(recid);
+const recoveredObj = ec.recoverPubKey(bufferNonce, bytes, recid);
 
 const recoveredKey = ec.keyFromPublic(recoveredObj, 'hex');
 const hexRecoveredKey = recoveredKey.getPublic('hex');
@@ -48,3 +59,4 @@ console.log('hexRecoveredKey', hexRecoveredKey);
 const hashedRecoveredPubKey = keccak256(hexRecoveredKey).toString('hex');
 
 console.log(hashedRecoveredPubKey === hashedPubKey);
+

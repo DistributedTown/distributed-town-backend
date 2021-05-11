@@ -19,6 +19,8 @@ export class SkillWalletRouter {
     this._router.get("/authNonce", this.skillWalletController.getLoginNonce);
     this._router.post("/login", this.skillWalletController.login);
     this._router.get("/login", this.skillWalletController.getLogins);
+    this._router.get("/:skillWalletId/nonces", this.skillWalletController.getNonceForValidation);
+    this._router.delete("/:skillWalletId/nonces", this.skillWalletController.deleteNonce);
 
     
   }

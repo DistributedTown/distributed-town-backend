@@ -9,8 +9,9 @@ import {
   getTokenIDAfterLogin,
   hasPendingActivation,
   loginValidation,
-  findNonceForAction,
-  createNonceForLogin
+  findNonce,
+  createNonceForLogin,
+  invalidateNonce
 } from '../services/skillWallet.service';
 
 @injectable()
@@ -162,6 +163,27 @@ export class SkillWalletController {
         return res.status(200).send({ message: "The QR code is not yet scanned." });
       else
         return res.status(200).send({ tokenId });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public getNonceForValidation = async (req: any, res: Response) => {
+    try {
+      // const nonces = await findNonce(req.query.action, req.params.skillWalletId);
+      const nonces = ['123123', '0'];
+      return res.status(200).send({ nonces });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public deleteNonce = async (req: any, res: Response) => {
+    try {
+      // const nonces = await invalidateNonce(req.query.nonce, req.params.skillWalletId);
+      return res.status(200).send();
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
