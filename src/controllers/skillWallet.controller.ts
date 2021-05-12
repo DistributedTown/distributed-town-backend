@@ -13,6 +13,7 @@ import {
   createNonceForLogin,
   invalidateNonce
 } from '../services/skillWallet.service';
+import * as eccryptoJS from 'eccrypto-js';
 
 @injectable()
 export class SkillWalletController {
@@ -172,7 +173,7 @@ export class SkillWalletController {
   public getNonceForValidation = async (req: any, res: Response) => {
     try {
       // const nonces = await findNonce(req.query.action, req.params.skillWalletId);
-      const nonces = ['123123', '0'];
+      const nonces = [1, 123, 0];
       return res.status(200).send({ nonces });
     } catch (err) {
       this.loggerService.error(err);
@@ -188,5 +189,43 @@ export class SkillWalletController {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
+  }
+
+  public getKeys = async (req: any, res: Response) => {
+    // mobile App
+    const key = eccryptoJS.generateKeyPair();
+    const hex = key.publicKey.toString('hex');
+    console.log("PUBLIC KEY HEX", hex);
+
+    const hashed = eccryptoJS.keccak256(Buffer.from(hex));
+    console.log("PUBLIC KEY HASHED", eccryptoJS.bufferToHex(hashed));
+
+    const str = '123';
+    const msg = eccryptoJS.utf8ToBuffer(str);
+    const hash = await eccryptoJS.sha256(msg);
+    const signed = eccryptoJS.sign(key.privateKey, hash, true);
+
+    const signedStr = eccryptoJS.bufferToHex(signed);
+    console.log(signedStr, "SIGNED STRING");
+
+    // Adapter
+
+
+    function hexToBytes(hex) {
+      for (var bytes = [], c = 0; c < hex.length; c += 2)
+        bytes.push(parseInt(hex.substr(c, 2), 16));
+      return bytes;
+    }
+
+    const sigBytes = hexToBytes(signedStr);
+    const buf = Buffer.from(sigBytes);
+
+    const pub = eccryptoJS.recover(hash, buf);
+    const recoveredHexPub = pub.toString('hex');
+    console.log("RECOVEDER PUBLIC KEY HEX", recoveredHexPub);
+
+    const hashedRecoveredPub = eccryptoJS.keccak256(Buffer.from(recoveredHexPub));
+    console.log("RECOVEDER PUBLIC KEY HASHED", eccryptoJS.bufferToHex(hashedRecoveredPub));
+    res.status(200).send({ isValid: eccryptoJS.bufferToHex(hashed) === eccryptoJS.bufferToHex(hashedRecoveredPub) });
   }
 }
