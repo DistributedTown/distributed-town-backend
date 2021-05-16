@@ -119,6 +119,7 @@ export class CommunityContracts {
       );
 
       const communityTransactionResult = await createTx.wait();
+      console.log(communityTransactionResult);
       const { events } = communityTransactionResult;
       const memberJoinedEvent = events.find(
         e => e.event === 'MemberAdded',

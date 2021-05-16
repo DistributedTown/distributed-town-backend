@@ -1,7 +1,7 @@
 
 export interface PendingActivation {
 	_id: string;
-	address: string;
+	tokenId: string;
 }
 
 
@@ -13,7 +13,7 @@ export const pendingActivationSchema = {
 	"type": "object",
 	"required": [
 		"_id",
-		"address"
+		"tokenId"
 	],
 	"properties": {
 		"_id": {
@@ -26,9 +26,9 @@ export const pendingActivationSchema = {
 			],
 			"pattern": "^.*$"
 		},
-		"address": {
+		"tokenId": {
 			"$id": "#root/address",
-			"title": "address",
+			"title": "tokenId",
 			"type": "string",
 			"default": "",
 			"examples": [

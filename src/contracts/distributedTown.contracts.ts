@@ -12,7 +12,7 @@ export class DistributedTownContracts {
     }
   }
 
-  public static async getMetadata(tokenID: number) {
+  public static async getMetadata(tokenID: string) {
     try {
       const contract = distributedTownContract();
       const url = await contract.uri(tokenID);

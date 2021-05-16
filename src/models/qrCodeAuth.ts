@@ -11,7 +11,7 @@ export interface QRCodeAuth {
 	nonce: number;
 	action: Actions,
 	isValidated: boolean;
-	tokenId?: number;
+	tokenId?: string;
 }
 
 
@@ -68,11 +68,10 @@ export const qrCodeAuthSchema = {
 		"tokenId": {
 			"$id": "#root/tokenId",
 			"title": "TokenId",
-			"type": "integer",
+			"type": "string",
 			"examples": [
-				1
+				"1"
 			],
-			"default": -1
 		},
 	}
 }

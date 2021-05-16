@@ -1,4 +1,4 @@
-import { findMainCat, getAllSkills, getByCategory, LoggerService } from "../services";
+import * as services from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { skillNames } from "../models";
@@ -7,7 +7,7 @@ import { skillNames } from "../models";
 export class SkillsController {
 
   constructor(
-    private loggerService: LoggerService,
+    private loggerService: services.LoggerService,
   ) {
   }
 
@@ -41,12 +41,12 @@ export class SkillsController {
       const category = req.query.category;
       let skills = undefined;
       if (skillName) {
-        skills = await findMainCat(skillName);
+        skills = await services.findMainCat(skillName);
       } else if (category) {
-        skills = await getByCategory(category);
+        skills = await services.getByCategory(category);
       }
       else {
-        skills = await getAllSkills();
+        skills = await services.getAllSkills();
       }
       res.status(200).send(skills);
     } catch (err) {

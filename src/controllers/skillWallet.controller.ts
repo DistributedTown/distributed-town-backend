@@ -2,17 +2,7 @@ import { LoggerService } from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { SkillWalletContracts } from "../contracts/skillWallet.contracts";
-import {
-  getCommunityDetails,
-  getMessagesBySkillWalletID,
-  getSkillWallet,
-  getTokenIDAfterLogin,
-  hasPendingActivation,
-  loginValidation,
-  findNonce,
-  createNonceForLogin,
-  invalidateNonce
-} from '../services/skillWallet.service';
+import * as skillWalletService from '../services/skillWallet.service';
 import * as eccryptoJS from 'eccrypto-js';
 
 @injectable()
@@ -39,7 +29,7 @@ export class SkillWalletController {
   public get = async (req: any, res: Response) => {
     try {
       console.log(req.query.tokenId);
-      const skillWallet = await getSkillWallet(req.query.tokenId);
+      const skillWallet = await skillWalletService.getSkillWallet(req.query.tokenId);
       console.log(skillWallet);
       if (skillWallet)
         return res.status(200).send(skillWallet);
@@ -69,7 +59,7 @@ export class SkillWalletController {
    */
   public getCommunity = async (req: any, res: Response) => {
     try {
-      const skillWallet = await getCommunityDetails(req.query.address);
+      const skillWallet = await skillWalletService.getCommunityDetails(req.query.address);
       return res.status(200).send(skillWallet);
     } catch (err) {
       this.loggerService.error(err);
@@ -79,7 +69,7 @@ export class SkillWalletController {
 
   public hasPendingAuthentication = async (req: any, res: Response) => {
     try {
-      const pendingAuth = await hasPendingActivation(req.query.address);
+      const pendingAuth = await skillWalletService.hasPendingActivation(req.query.address);
       return res.status(200).send({ hasPendingAuth: pendingAuth });
     } catch (err) {
       this.loggerService.error(err);
@@ -105,17 +95,16 @@ export class SkillWalletController {
    */
   public activateSkillWallet = async (req: any, res: Response) => {
     try {
-      // const isRegistered = SkillWalletContracts.isActive(req.body.tokenId);
-      // if (isRegistered) {
-      //   return res.status(400).send({ message: "Skill Wallet already activated" });
-      // } else {
-      console.log(req.body);
-      await SkillWalletContracts.activate(req.body.tokenId, req.body.pubKey);
-      // if (success)
-      return res.status(200).send({ message: "Skill Wallet activated successfully." });
-      // else
-      //   return res.status(500).send({ message: "Something went wrong!" });
-      // }
+
+      const isActive = await SkillWalletContracts.isActive(req.params.skillWalletId);
+      if (isActive) {
+        console.log('skill wallet active');
+        return res.status(400).send({ message: "Skill Wallet already activated" });
+      } else {
+        console.log('activating SW');
+        await SkillWalletContracts.activate(req.params.skillWalletId, req.body.pubKey);
+        return res.status(200).send({ message: "Skill Wallet activated successfully." });
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -124,7 +113,7 @@ export class SkillWalletController {
 
   public getMessages = async (req: any, res: Response) => {
     try {
-      const messages = await getMessagesBySkillWalletID(req.params.skillWalletId);
+      const messages = await skillWalletService.getMessagesBySkillWalletID(req.params.skillWalletId);
       return res.status(200).send({ messages });
     } catch (err) {
       this.loggerService.error(err);
@@ -132,11 +121,10 @@ export class SkillWalletController {
     }
   }
 
-  public getLoginNonce = async (req: any, res: Response) => {
+  public generateNonce = async (req: any, res: Response) => {
     try {
-      const loginObj = await createNonceForLogin();
-      console.log(loginObj);
-      res.status(200).send(loginObj);
+      const nonce = await skillWalletService.getNonceForQR(req.query.action, req.params.tokenId);
+      res.status(200).send(nonce);
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -145,7 +133,7 @@ export class SkillWalletController {
 
   public login = async (req: any, res: Response) => {
     try {
-      const success = await loginValidation(req.body.nonce, req.body.tokenId);
+      const success = await skillWalletService.loginValidation(req.body.nonce, req.body.tokenId);
       if (success)
         res.status(200).send({ message: "Successful login." });
       else
@@ -159,8 +147,8 @@ export class SkillWalletController {
 
   public getLogins = async (req: any, res: Response) => {
     try {
-      const tokenId = await getTokenIDAfterLogin(req.query.uniqueString);
-      if (tokenId === -1)
+      const tokenId = await skillWalletService.getTokenIDAfterLogin(req.query.nonce);
+      if (tokenId === "-1")
         return res.status(200).send({ message: "The QR code is not yet scanned." });
       else
         return res.status(200).send({ tokenId });
@@ -172,8 +160,7 @@ export class SkillWalletController {
 
   public getNonceForValidation = async (req: any, res: Response) => {
     try {
-      // const nonces = await findNonce(req.query.action, req.params.skillWalletId);
-      const nonces = [1, 123, 0];
+      const nonces = await skillWalletService.findNonce(req.query.action, req.params.skillWalletId);
       return res.status(200).send({ nonces });
     } catch (err) {
       this.loggerService.error(err);
@@ -183,7 +170,17 @@ export class SkillWalletController {
 
   public deleteNonce = async (req: any, res: Response) => {
     try {
-      // const nonces = await invalidateNonce(req.query.nonce, req.params.skillWalletId);
+      const nonces = await skillWalletService.invalidateNonce(req.query.nonce, req.params.skillWalletId, req.query.action);
+      return res.status(200).send();
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+  public validateSW = async (req: any, res: Response) => {
+    try {
+      await SkillWalletContracts.validate(req.body.signature, req.body.tokenId, req.body.action);
       return res.status(200).send();
     } catch (err) {
       this.loggerService.error(err);
