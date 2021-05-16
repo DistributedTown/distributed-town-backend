@@ -6,5 +6,5 @@ export async function getJSONFromURI(uri: string) {
 }
 
 export function getNonce(): number {
-    return Math.floor(Math.random() * 10^8);
+    return Math.floor(Math.random() * 1000000000);
 }

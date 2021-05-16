@@ -6,7 +6,6 @@ import {
     Message,
     SkillWallet,
     PendingActivation,
-    QRCodeObject
 } from '../models';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { CommunityContracts } from '../contracts/community.contracts';
@@ -93,10 +92,11 @@ export const hasPendingActivation = async (userAddress: string): Promise<boolean
     return lastAttempt !== undefined;
 }
 
-export const getNonceForQR = async (action: Actions, tokenId?: string): Promise<any> => {
+export const getNonceForQR = async (action: number, tokenId?: string): Promise<any> => {
     const nonce = getNonce();
     if ((!tokenId || tokenId === '-1') && action !== Actions.LOGIN)
-        return { message: 'TokenId is required' };
+        return { message: 'skillWalletId is required' };
+        console.log(action);
     const authModel: QRCodeAuth = {
         _id: undefined,
         nonce,
@@ -120,21 +120,18 @@ export const loginValidation = async (nonce: number, tokenId: string): Promise<b
     return false;
 }
 
-export const findNonce = async (nonce: number, action: Actions): Promise<boolean> => {
+export const findNonce = async (action: Actions, tokenId: string): Promise<number[]> => {
     let query = undefined;
+    const actionNumber = +action;
+    console.log(actionNumber);
+    console.log(typeof(actionNumber));
     if (action === Actions.LOGIN)
         // TODO: add tokenId
-        query = new Where('nonce').eq(nonce).and('action').eq(action).and('isValidated').eq(false);
+        query = new Where('action').eq(actionNumber).and('isValidated').eq(false);
     else
-        query = new Where('nonce').eq(nonce).and('action').eq(action).and('isValidated').eq(false);
-
-    const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
-    if (login && login.length > 0) {
-        login[login.length - 1].isValidated = true;
-        await threadDBClient.save(QRCodeAuthCollection, login);
-        return true;
-    } else
-        return false;
+        query = new Where('tokenId').eq(tokenId).and('action').eq(actionNumber).and('isValidated').eq(false);
+    const auths = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
+    return auths.map(l => l.nonce);
 }
 
 export const getTokenIDAfterLogin = async (nonce: number): Promise<string> => {

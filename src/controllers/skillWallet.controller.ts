@@ -111,6 +111,34 @@ export class SkillWalletController {
     }
   }
 
+
+
+  /**
+   * @swagger
+   * /skillWallet/register:
+   *  post:
+   *      description: Validates the skill wallet by scanning the QR code 
+   *      tags:
+   *          - SkillWallet
+   *      produces:
+   *          - application/json
+   *      responses:
+   *          200:
+   *              description: OK
+   *          500:
+   *              description: Server error
+   */
+  public isActive = async (req: any, res: Response) => {
+    try {
+
+      const isActive = await SkillWalletContracts.isActive(req.params.skillWalletId);
+      return res.status(200).send({ isActive });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
   public getMessages = async (req: any, res: Response) => {
     try {
       const messages = await skillWalletService.getMessagesBySkillWalletID(req.params.skillWalletId);
@@ -123,7 +151,7 @@ export class SkillWalletController {
 
   public generateNonce = async (req: any, res: Response) => {
     try {
-      const nonce = await skillWalletService.getNonceForQR(req.query.action, req.params.tokenId);
+      const nonce = await skillWalletService.getNonceForQR(+req.query.action, req.params.skillWalletId);
       res.status(200).send(nonce);
     } catch (err) {
       this.loggerService.error(err);
