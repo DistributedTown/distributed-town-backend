@@ -4,7 +4,8 @@ export * from "./skillCategory";
 export * from "./validationResponseModel";
 export * from "./project";
 export * from './skillWallet';
-export * from './authentication';
+export * from './qrCodeAuth';
+export * from './swActivation';
 export * from './messages';
 export * from './milestone';
 

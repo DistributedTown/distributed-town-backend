@@ -1,3 +1,4 @@
+import { Actions } from '../models';
 import { ethers, provider, signer } from '../tools/ethers';
 import { skillWalletContract } from './index';
 
@@ -75,28 +76,37 @@ export class SkillWalletContracts {
         }
     }
 
-    public static async activate(tokenId: number, hash: string): Promise<boolean> {
+    public static async activate(tokenId: string, pubKey: string): Promise<void> {
         const contractInst = skillWalletContract();
 
-        try {
-            let createTx = await contractInst.activateSkillWallet(
-                tokenId
-                // hash
-            );
+        let createTx = await contractInst.activateSkillWallet(
+            tokenId,
+            pubKey
+        );
 
-            // Wait for transaction to finish
-            const registerSkillWalletTransactionResult = await createTx.wait();
-            const { events } = registerSkillWalletTransactionResult;
-            const registeredEvent = events.find(
-                e => e.event === 'SkillWalletActivated',
-            );
-            if (!registeredEvent)
-                throw Error('Something went wrong!');
-            else 
-                console.log('Skill wallet activated')
-        } catch (err) {
-            console.log(err);
-            return;
-        }
+        // Wait for transaction to finish
+        const registerSkillWalletTransactionResult = await createTx.wait();
+        const { events } = registerSkillWalletTransactionResult;
+        const registeredEvent = events.find(
+            e => e.event === 'SkillWalletActivated',
+        );
+        if (!registeredEvent)
+            throw Error('Something went wrong!');
+        else
+            console.log('Skill wallet Activated');
+    }
+
+
+    public static async validate(signature: string, tokenId: string, action: Actions): Promise<void> {
+        const contractInst = skillWalletContract();
+
+        let createTx = await contractInst.validate(
+            signature,
+            tokenId,
+            action
+        );
+
+        // Wait for transaction to finish
+        const validateSkillWalletTransactionResult = await createTx.wait();
     }
 }

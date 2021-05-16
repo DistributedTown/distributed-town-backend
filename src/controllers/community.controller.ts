@@ -1,7 +1,6 @@
-import { calculateInitialCreditsAmount, createMilestone, getMilestones, getProjectsPerCommunity, LoggerService } from "../services";
+import * as services from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { getCommunities, join } from "../services/community.service";
 import { Skill, skillNames } from "../models";
 import { ProjectsContracts } from "../contracts/projects.contract";
 
@@ -9,7 +8,7 @@ import { ProjectsContracts } from "../contracts/projects.contract";
 @injectable()
 export class CommunityController {
   constructor(
-    private loggerService: LoggerService,
+    private loggerService: services.LoggerService,
   ) { }
 
   /**
@@ -43,7 +42,7 @@ export class CommunityController {
       if (!blockchain) {
         blockchain = 'MATIC';
       }
-      const com = await getCommunities(template);
+      const com = await services.getCommunities(template);
       res.status(200).send(com);
     } catch (err) {
       this.loggerService.error(err);
@@ -54,7 +53,7 @@ export class CommunityController {
   public joinNewUser = async (req: any, res: any) => {
     try {
       console.log(req.body);
-      const result = await join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
+      const result = await services.join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
       res.status(200).send(result);
     } catch (err) {
       this.loggerService.error(err);
@@ -64,7 +63,7 @@ export class CommunityController {
 
   public getProjects = async (req: any, res: Response) => {
     try {
-      const projects = await getProjectsPerCommunity(req.params.communityAddress);
+      const projects = await services.getProjectsPerCommunity(req.params.communityAddress);
       res.status(200).send(projects);
     } catch (err) {
       this.loggerService.error(err);
@@ -84,7 +83,7 @@ export class CommunityController {
 
   public createProjectMilestone =  async (req: any, res: Response) => {
     try {
-      const milestoneId = await createMilestone(req.body.skillWalletId, req.params.projectId, req.body.url, req.body.ditoCredits);
+      const milestoneId = await services.createMilestone(req.body.skillWalletId, req.params.projectId, req.body.url, req.body.ditoCredits);
       res.status(201).send({ milestoneId });
     } catch (err) {
       this.loggerService.error(err);
@@ -94,7 +93,7 @@ export class CommunityController {
 
   public getProjectMilestones =  async (req: any, res: Response) => {
     try {
-      const milestones = await getMilestones(req.params.projectId);
+      const milestones = await services.getMilestones(req.params.projectId);
       res.status(201).send({ milestones });
     } catch (err) {
       this.loggerService.error(err);
@@ -121,7 +120,7 @@ export class CommunityController {
 
         },
       ]
-      const credits = await calculateInitialCreditsAmount(skillModel);
+      const credits = await services.calculateInitialCreditsAmount(skillModel);
       res.status(200).send({ credits });
     } catch (err) {
       this.loggerService.error(err);

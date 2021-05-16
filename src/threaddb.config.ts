@@ -10,16 +10,16 @@ import {
 
 import {
   GeneralSkillsCollection,
-  AuthenticationCollection,
+  QRCodeAuthCollection,
   MessagesCollection,
-  ActivationCollection,
+  PendingSWActivationCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
-  authenticationSchema,
+  qrCodeAuthSchema,
   messagesSchema,
   MessageType,
-  activationSchema,
+  pendingActivationSchema,
 } from './models'
 require('dotenv').config()
 
@@ -118,16 +118,16 @@ class ThreadDBInit {
     }
 
     try {
-      await client.getCollectionIndexes(this.ditoThreadID, AuthenticationCollection);
+      await client.getCollectionIndexes(this.ditoThreadID, QRCodeAuthCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: AuthenticationCollection, schema: authenticationSchema });
+      await client.newCollection(this.ditoThreadID, { name: QRCodeAuthCollection, schema: qrCodeAuthSchema });
     }
 
 
     try {
-      await client.getCollectionIndexes(this.ditoThreadID, ActivationCollection);
+      await client.getCollectionIndexes(this.ditoThreadID, PendingSWActivationCollection);
     } catch (err) {
-      await client.newCollection(this.ditoThreadID, { name: ActivationCollection, schema: activationSchema });
+      await client.newCollection(this.ditoThreadID, { name: PendingSWActivationCollection, schema: pendingActivationSchema });
     }
 
 

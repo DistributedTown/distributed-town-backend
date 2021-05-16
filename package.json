@@ -7,6 +7,7 @@
     "build": "tsc --resolveJsonModule",
     "dev": "npm install && nodemon",
     "start": "npm run build && node ./dist/server.js",
+    "testFlow": "npm run build && node ./dist/testFlow.js",
     "test": "mocha -r ts-node/register --timeout 40000 test/*.spec.ts"
   },
   "repository": {
@@ -42,7 +43,9 @@
     "swagger-ui-express": "^3.0.10",
     "unique-string": "^1.0.0",
     "uuid": "8.3.1",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "keccak256": "1.0.2",
+    "eccrypto-js": "^5.4.0"
   },
   "devDependencies": {
     "@types/big.js": "4.0.5",
