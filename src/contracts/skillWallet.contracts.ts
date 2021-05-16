@@ -58,8 +58,8 @@ export class SkillWalletContracts {
     public static async isActive(tokenId: string): Promise<boolean> {
         try {
             const contract = skillWalletContract();
-            const isRegistered = await contract.isSkillWalletActivated(tokenId);
-            return isRegistered;
+            const isActivated = await contract.isSkillWalletActivated(tokenId);
+            return isActivated;
         } catch (err) {
             console.log(err);
         }
