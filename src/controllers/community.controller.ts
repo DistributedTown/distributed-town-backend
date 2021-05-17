@@ -50,17 +50,6 @@ export class CommunityController {
     }
   }
 
-  public joinNewUser = async (req: any, res: any) => {
-    try {
-      console.log(req.body);
-      const result = await services.join(req.body.communityAddress, req.body.userAddress, req.body.skills, req.body.url);
-      res.status(200).send(result);
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
   public getProjects = async (req: any, res: Response) => {
     try {
       const projects = await services.getProjectsPerCommunity(req.params.communityAddress);

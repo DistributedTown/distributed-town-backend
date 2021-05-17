@@ -29,45 +29,6 @@ export async function getCommunities(template: number): Promise<any> {
     return result;
 }
 
-export async function join(communityAddress: string, userAddress: string, skills: SkillSet, url: string) {
-    console.log(skills);
-    const displayName1 = skillNames.indexOf(skills.skills[0].name);
-    const displayName2 = skillNames.indexOf(skills.skills[1].name);
-    const displayName3 = skillNames.indexOf(skills.skills[2].name);
-    const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
-
-    console.log( 
-        userAddress,
-        displayName1,
-        skills.skills[0].value,
-        displayName2,
-        skills.skills[1].value,
-        displayName3,
-        skills.skills[2].value,
-        url
-        );
-
-    const skillWalletId = await CommunityContracts.joinNewMember(
-        communityAddress,
-        userAddress,
-        displayName1,
-        skills.skills[0].value,
-        displayName2,
-        skills.skills[1].value,
-        displayName3,
-        skills.skills[2].value,
-        url,
-        ethers.utils.parseEther(calculateDitos.toString()).toString()
-    );
-
-    threadDBClient.insert(PendingSWActivationCollection, {
-        tokenId: skillWalletId,
-        isActivated: false
-    })
-
-    return { tokenId: skillWalletId, credits: calculateDitos };
-}
-
 async function calculateScarcityStore(address: string): Promise<number> {
     const members = await CommunityContracts.getMembersCount(address);
     const skillWalletIds = await CommunityContracts.getMembersSkillWalletIds(address);
