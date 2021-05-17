@@ -20,6 +20,7 @@ export class SkillWalletRouter {
     this._router.delete("/:skillWalletId/nonces", this.skillWalletController.deleteNonce);
     this._router.post('/:skillWalletId/nonces', this.skillWalletController.generateNonce);
     this._router.post("/:skillWalletId/activate", this.skillWalletController.activateSkillWallet);
+    this._router.get("/:skillWalletId/isActive", this.skillWalletController.isActive);
     this._router.get("/:skillWalletId/messages", this.skillWalletController.getMessages);
     this._router.post("/:skillWalletId/validate", this.skillWalletController.validateSW);
     this._router.get("/keys", this.skillWalletController.getKeys);

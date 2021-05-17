@@ -10,7 +10,7 @@ const joinCommunity = async (): Promise<string> => {
     const joinResp = await axios.post(`${process.env.DEV_API_URL}/community/join`,
         {
             "communityAddress": communityAddress,
-            "userAddress": "0x6Ed1B4Eb7055B836D571a76f6BbdB9695eFA8f87",
+            "userAddress": "0x3BCA13D24FFB8286d48ac0847D89b9DC638e3dEa",
             "url": "https://hub.textile.io/ipfs/bafkreicucfykyhkhkp2p64fesnjnjbdguzh5q5t6n3r6bfa5g5gbvzysvq",
             "skills": {
                 "skills": [
@@ -62,6 +62,13 @@ const activateSW = async (tokenId: string) => {
     console.log('res', activateRes.data);
 }
 
+
+const isActive = async (tokenId: string) => {
+    console.log('activate skill wallet');
+    const isActive = await axios.get(`${process.env.DEV_API_URL}/skillWallet/${tokenId}/isActive`);
+    console.log('res', isActive);
+}
+
 const login = async (tokenId: string) => {
     const action = Actions.LOGIN;
     const signature = '9266a4aa1fe3bae8eaec10aab954ba560efdd976ca850b01e956b586121dbfbf275f2bde2071071fa08ed4d7b10626510300f1dc752c4924e85743a463b900761b';
@@ -92,14 +99,20 @@ const login = async (tokenId: string) => {
     console.log(sw.data);
 }
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 const test = async () => {
-    console.log('join started');
-    const tokenId = await joinCommunity();
-    // const tokenId = '3';
-    console.log('join ended');
-    console.log('activate started');
-    await activateSW(tokenId);
-    console.log('activate ended');
+    // console.log('join started');
+    // const tokenId = await joinCommunity();
+    // // const tokenId = '3';
+    // console.log('join ended');
+    // console.log('activate started');
+    // await activateSW(tokenId);
+    // console.log('activate ended');
+    const tokenId = '5';
+    await isActive(tokenId);
+
     console.log('login started');
     await login(tokenId);
     console.log('login ended');
