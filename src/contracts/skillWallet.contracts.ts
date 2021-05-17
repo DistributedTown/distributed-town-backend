@@ -103,10 +103,11 @@ export class SkillWalletContracts {
         let createTx = await contractInst.validate(
             signature,
             tokenId,
-            action
+            +action
         );
 
         // Wait for transaction to finish
         const validateSkillWalletTransactionResult = await createTx.wait();
+        console.log(validateSkillWalletTransactionResult);
     }
 }

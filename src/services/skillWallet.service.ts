@@ -135,7 +135,7 @@ export const findNonce = async (action: Actions, tokenId: string): Promise<numbe
 }
 
 export const getTokenIDAfterLogin = async (nonce: number): Promise<string> => {
-    const query = new Where('nonce').eq(nonce).and('action').eq(Actions.LOGIN).and('isValidated').eq(true);
+    const query = new Where('nonce').eq(nonce).and('action').eq(+Actions.LOGIN).and('isValidated').eq(true);
     const login = (await threadDBClient.filter(QRCodeAuthCollection, query)) as QRCodeAuth[];
     if (login && login.length > 0) {
         await threadDBClient.delete(QRCodeAuthCollection, query);

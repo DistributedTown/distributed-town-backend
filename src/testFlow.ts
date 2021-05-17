@@ -10,7 +10,7 @@ const joinCommunity = async (): Promise<string> => {
     const joinResp = await axios.post(`${process.env.DEV_API_URL}/community/join`,
         {
             "communityAddress": communityAddress,
-            "userAddress": "0x3BCA13D24FFB8286d48ac0847D89b9DC638e3dEa",
+            "userAddress": "0x093ECac1110EF08976A0A1F24393c3e48936489D",
             "url": "https://hub.textile.io/ipfs/bafkreicucfykyhkhkp2p64fesnjnjbdguzh5q5t6n3r6bfa5g5gbvzysvq",
             "skills": {
                 "skills": [
@@ -73,27 +73,27 @@ const login = async (tokenId: string) => {
     const action = Actions.LOGIN;
     const signature = '9266a4aa1fe3bae8eaec10aab954ba560efdd976ca850b01e956b586121dbfbf275f2bde2071071fa08ed4d7b10626510300f1dc752c4924e85743a463b900761b';
     const nonce = await generateNonce(action, tokenId);
-    console.log(nonce);
-    await axios.post(`${process.env.DEV_API_URL}/skillWallet/${tokenId}/validate`,
+    console.log('nonce', nonce);
+    const res = await axios.post(`${process.env.DEV_API_URL}/skillWallet/${tokenId}/validate`,
         {
             signature,
             tokenId,
-            action
+            action: +action
         },
         {
             headers: {
                 'Content-Type': 'application/json',
             }
         });
-
-    while(true) {
-        const logins = await axios.get(`${process.env.DEV_API_URL}/skillWallet/logins`);
-        if(logins.tokenId !== '-1'){
-            console.log('validation passed');
-            console.log(logins.tokenId);
-            break;
-        }
-    }
+    console.log(res);
+    // while(true) {
+    //     const logins = await axios.get(`${process.env.DEV_API_URL}/skillWallet/login`);
+    //     if(logins.tokenId !== '-1'){
+    //         console.log('validation passed');
+    //         console.log(logins.tokenId);
+    //         break;
+    //     }
+    // }
 
     const sw = await axios.get(`${process.env.DEV_API_URL}/skillWallet/${tokenId}`);
     console.log(sw.data);
@@ -103,14 +103,16 @@ function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
 const test = async () => {
-    // console.log('join started');
-    // const tokenId = await joinCommunity();
-    // // const tokenId = '3';
-    // console.log('join ended');
-    // console.log('activate started');
-    // await activateSW(tokenId);
-    // console.log('activate ended');
-    const tokenId = '5';
+    console.log('join started');
+    const tokenId = await joinCommunity();
+    console.log('tokenId', tokenId)
+    // const tokenId = '3';
+    console.log('join ended');
+    console.log('activate started');
+
+    await activateSW(tokenId);
+    console.log('activate ended');
+    // const tokenId = '6';
     await isActive(tokenId);
 
     console.log('login started');
