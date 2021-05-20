@@ -36,16 +36,6 @@ export async function join(communityAddress: string, userAddress: string, skills
     const displayName3 = skillNames.indexOf(skills.skills[2].name);
     const calculateDitos = (await getCreditsBySkill(skills.skills)) + 2000;
 
-    console.log( 
-        userAddress,
-        displayName1,
-        skills.skills[0].value,
-        displayName2,
-        skills.skills[1].value,
-        displayName3,
-        skills.skills[2].value,
-        url
-        );
 
     const skillWalletId = await CommunityContracts.joinNewMember(
         communityAddress,
