@@ -14,7 +14,7 @@ let jsonRpcProvider = new ethers.providers.JsonRpcProvider("https://rpc-mumbai.m
 export const distributedTownContract = () => {
   try {
     let contract = new ethers.Contract(
-      process.env.COMMUNITY_REGISTRY_ADDRESS,
+      process.env.DISTRIBUTED_TOWN_ADDRESS,
       distributedTown.abi,
       signer,
     );
