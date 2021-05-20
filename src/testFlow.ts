@@ -77,7 +77,6 @@ const login = async (tokenId: string) => {
     await axios.post(`${process.env.DEV_API_URL}/skillWallet/${tokenId}/validate`,
         {
             signature,
-            tokenId,
             action
         },
         {
@@ -103,14 +102,15 @@ function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
 const test = async () => {
-    // console.log('join started');
-    // const tokenId = await joinCommunity();
-    // // const tokenId = '3';
-    // console.log('join ended');
-    // console.log('activate started');
-    // await activateSW(tokenId);
-    // console.log('activate ended');
-    const tokenId = '5';
+    console.log('join started');
+    const tokenId = await joinCommunity();
+    // const tokenId = '3';
+    console.log('join ended');
+    // const tokenId = '4';
+
+    console.log('activate started');
+    await activateSW(tokenId);
+    console.log('activate ended');
     await isActive(tokenId);
 
     console.log('login started');
