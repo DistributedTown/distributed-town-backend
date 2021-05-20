@@ -108,5 +108,6 @@ export class SkillWalletContracts {
 
         // Wait for transaction to finish
         const validateSkillWalletTransactionResult = await createTx.wait();
+        console.log(validateSkillWalletTransactionResult);
     }
 }

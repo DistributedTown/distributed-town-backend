@@ -208,7 +208,7 @@ export class SkillWalletController {
 
   public validateSW = async (req: any, res: Response) => {
     try {
-      await SkillWalletContracts.validate(req.body.signature, req.body.tokenId, req.body.action);
+      await SkillWalletContracts.validate(req.body.signature, req.params.skillWalletId, req.body.action);
       return res.status(200).send();
     } catch (err) {
       this.loggerService.error(err);
