@@ -2,6 +2,7 @@ import { Actions } from "./models";
 
 require('dotenv').config()
 const axios = require('axios').default;
+
 const joinCommunity = async (): Promise<string> => {
     console.log('joining community');
 
@@ -46,7 +47,6 @@ const generateNonce = async (action: number, tokenId: string) => {
     return nonce.data;
 }
 
-
 const activateSW = async (tokenId: string) => {
     console.log('activate skill wallet');
     const pubKey = '7e61b836b79ed463994e6a9c6e9a92bdc4418ddfde88c9ec8adca3ea8d23ec4a';
@@ -61,7 +61,6 @@ const activateSW = async (tokenId: string) => {
         });
     console.log('res', activateRes.data);
 }
-
 
 const isActive = async (tokenId: string) => {
     console.log('activate skill wallet');
@@ -101,6 +100,7 @@ const login = async (tokenId: string) => {
 function delay(ms: number) {
     return new Promise( resolve => setTimeout(resolve, ms) );
 }
+
 const test = async () => {
     console.log('join started');
     const tokenId = await joinCommunity();

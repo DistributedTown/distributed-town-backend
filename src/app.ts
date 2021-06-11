@@ -3,7 +3,6 @@ var bodyParser = require('body-parser')
 import helmet from "helmet";
 import { injectable } from "inversify";
 import {
-  SkillWalletRouter,
   SkillsRouter,
   CommunityRouter,
   SwaggerRouter,
@@ -18,7 +17,6 @@ export class App {
   private _app: express.Application;
 
   constructor(
-    private skillWalletRouter: SkillWalletRouter,
     private skillsRouter: SkillsRouter,
     private communityRouter: CommunityRouter
   ) {
@@ -65,7 +63,6 @@ export class App {
 
   private _initRoutes() {
     // this._app.use("/api/docs", this.swaggerRouter.router);
-    this._app.use("/api/skillWallet", this.skillWalletRouter.router);
     this._app.use("/api/skill", this.skillsRouter.router);
     this._app.use("/api/community", this.communityRouter.router);
   }
