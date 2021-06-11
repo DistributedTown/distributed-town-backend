@@ -1,11 +1,9 @@
-export * from "./user"
 export * from "./community"
 export * from "./skillCategory";
 export * from "./validationResponseModel";
 export * from "./project";
 export * from './skillWallet';
 export * from './qrCodeAuth';
-export * from './swActivation';
 export * from './messages';
 export * from './milestone';
 

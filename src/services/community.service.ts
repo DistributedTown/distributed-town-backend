@@ -2,11 +2,7 @@ import { CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { DistributedTownContracts } from '../contracts/distributedTown.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
-import { getCreditsBySkill } from './skills.service';
-import threadDBClient from '../threaddb.config';
-import { PendingSWActivationCollection } from '../constants/constants';
 import { getJSONFromURI } from '../utils/helpers';
-import { ethers } from 'ethers';
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await DistributedTownContracts.getCommunities();
