@@ -14,5 +14,6 @@ export interface CommunityDetailsView {
 	address: string;
 	description: string;
 	roles?: [string];
-	metadata: string;
+	template: string;
+	image: string;
 }

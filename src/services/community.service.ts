@@ -30,12 +30,13 @@ export async function   getCommunity(address: string): Promise<CommunityDetailsV
     const metadataUri = await CommunityContracts.getMetadataUri(address);
     const metadata = await getJSONFromURI(metadataUri);
 
-    console.log(metadata);
     return {
         name: metadata.title,
         address: address,
         description: metadata.description,
-        metadata: metadataUri
+        roles: metadata.properties.roles,
+        template: metadata.properties.template,
+        image: metadata.image
     };
 }
 
