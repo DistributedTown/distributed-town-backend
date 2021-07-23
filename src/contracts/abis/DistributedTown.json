@@ -14,6 +14,11 @@
           "internalType": "address",
           "name": "_skillWalletAddress",
           "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_addrProvider",
+          "type": "address"
         }
       ],
       "stateMutability": "nonpayable",
@@ -73,6 +78,25 @@
         }
       ],
       "name": "CommunityCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
       "type": "event"
     },
     {
@@ -172,12 +196,12 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "account",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "_id",
+          "name": "id",
           "type": "uint256"
         }
       ],
@@ -196,12 +220,12 @@
       "inputs": [
         {
           "internalType": "address[]",
-          "name": "_owners",
+          "name": "accounts",
           "type": "address[]"
         },
         {
           "internalType": "uint256[]",
-          "name": "_ids",
+          "name": "ids",
           "type": "uint256[]"
         }
       ],
@@ -255,6 +279,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "communityFactoryAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -284,6 +321,16 @@
           "internalType": "uint256",
           "name": "template",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalMembersAllowed",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
         }
       ],
       "name": "createCommunity",
@@ -292,7 +339,13 @@
       "type": "function"
     },
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "template",
+          "type": "uint256"
+        }
+      ],
       "name": "deployGenesisCommunities",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -315,12 +368,31 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_owner",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getCommunityByOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_operator",
+          "name": "operator",
           "type": "address"
         }
       ],
@@ -415,7 +487,7 @@
     },
     {
       "inputs": [],
-      "name": "projectsAddress",
+      "name": "owner",
       "outputs": [
         {
           "internalType": "address",
@@ -430,27 +502,66 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_from",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "ownerToCommunity",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "projectsAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_to",
+          "name": "to",
           "type": "address"
         },
         {
           "internalType": "uint256[]",
-          "name": "_ids",
+          "name": "ids",
           "type": "uint256[]"
         },
         {
           "internalType": "uint256[]",
-          "name": "_values",
+          "name": "amounts",
           "type": "uint256[]"
         },
         {
           "internalType": "bytes",
-          "name": "_data",
+          "name": "data",
           "type": "bytes"
         }
       ],
@@ -463,27 +574,27 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_from",
+          "name": "from",
           "type": "address"
         },
         {
           "internalType": "address",
-          "name": "_to",
+          "name": "to",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "_id",
+          "name": "id",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "_value",
+          "name": "amount",
           "type": "uint256"
         },
         {
           "internalType": "bytes",
-          "name": "_data",
+          "name": "data",
           "type": "bytes"
         }
       ],
@@ -496,16 +607,29 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_operator",
+          "name": "operator",
           "type": "address"
         },
         {
           "internalType": "bool",
-          "name": "_approved",
+          "name": "approved",
           "type": "bool"
         }
       ],
       "name": "setApprovalForAll",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_partnersRegistryAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setPartnersRegistryAddress",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -546,34 +670,11 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_from",
+          "name": "newOwner",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_value",
-          "type": "uint256"
         }
       ],
-      "name": "transferToCommunity",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_value",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferToMember",
+      "name": "transferOwnership",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

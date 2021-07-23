@@ -9,7 +9,7 @@ require('dotenv').config()
 
 
 const provider = new ethers.providers.JsonRpcProvider(
-  process.env.MUMBAI_RPC_PROVIDER
+  process.env.KOVAN_RPC_PROVIDER
 );
 
 // Wallet connected to a provider

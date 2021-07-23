@@ -1,4 +1,4 @@
-import { CommunityListView, skillNames, SkillSet } from '../models';
+import { CommunityDetailsView, CommunityListView, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { DistributedTownContracts } from '../contracts/distributedTown.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
@@ -23,6 +23,20 @@ export async function getCommunities(template: number): Promise<any> {
         });
     }
     return result;
+}
+
+
+export async function   getCommunity(address: string): Promise<CommunityDetailsView> {
+    const metadataUri = await CommunityContracts.getMetadataUri(address);
+    const metadata = await getJSONFromURI(metadataUri);
+
+    console.log(metadata);
+    return {
+        name: metadata.title,
+        address: address,
+        description: metadata.description,
+        metadata: metadataUri
+    };
 }
 
 async function calculateScarcityStore(address: string): Promise<number> {

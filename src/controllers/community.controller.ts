@@ -11,39 +11,28 @@ export class CommunityController {
     private loggerService: services.LoggerService,
   ) { }
 
-  /**
-   * @swagger
-   * /community:
-   *  get:
-   *      description: Gets all communities from the database with blockchain addresses. Blockchain value defaults to ETH. Possible values ETH/RSK
-   *      parameters:
-   *          - in: query
-   *            name: blockchain
-   *            type: string
-   *            required: false
-   *          - in: query
-   *            name: category
-   *            type: string
-   *            required: false
-   *      tags:
-   *          - Community
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          200:
-   *              description: OK
-   *          500:
-   *              description: Server error
-   */
   public get = async (req: any, res: Response) => {
     try {
-      let blockchain = req.query.blockchain;
       let template = req.query.template;
-      if (!blockchain) {
-        blockchain = 'MATIC';
-      }
       const com = await services.getCommunities(template);
       res.status(200).send(com);
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
+
+  public getByAddress = async (req: any, res: Response) => {
+    try {
+      let address = req.params.address;
+      console.log(address);
+      if (address) {
+        const com = await services.getCommunity(address);
+        res.status(200).send(com);
+      } else {
+        res.status(400).send({ error: "Pass community address." })
+      }
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });
@@ -70,7 +59,7 @@ export class CommunityController {
     }
   }
 
-  public createProjectMilestone =  async (req: any, res: Response) => {
+  public createProjectMilestone = async (req: any, res: Response) => {
     try {
       const milestoneId = await services.createMilestone(req.body.skillWalletId, req.params.projectId, req.body.url, req.body.ditoCredits);
       res.status(201).send({ milestoneId });
@@ -80,7 +69,7 @@ export class CommunityController {
     }
   }
 
-  public getProjectMilestones =  async (req: any, res: Response) => {
+  public getProjectMilestones = async (req: any, res: Response) => {
     try {
       const milestones = await services.getMilestones(req.params.projectId);
       res.status(201).send({ milestones });

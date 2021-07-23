@@ -8,3 +8,11 @@ export interface CommunityListView {
 	address: string;
 	description: string;
 }
+
+export interface CommunityDetailsView {
+	name: string;
+	address: string;
+	description: string;
+	roles?: [string];
+	metadata: string;
+}

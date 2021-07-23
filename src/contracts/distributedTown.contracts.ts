@@ -63,4 +63,23 @@ export class DistributedTownContracts {
       return;
     }
   };
+
+
+  public static async setPartnersRegistry(
+    address: string
+  ) {
+    const distributedTownContractInst = distributedTownContract();
+
+    try {
+      let result = await distributedTownContractInst.setPartnersRegistryAddress(
+        address
+      );
+
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  };
 }
