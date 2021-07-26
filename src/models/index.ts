@@ -6,7 +6,7 @@ export * from './skillWallet';
 export * from './qrCodeAuth';
 export * from './messages';
 export * from './milestone';
-
+export * from './key';
 
 export const skillNames = [
     //Local
