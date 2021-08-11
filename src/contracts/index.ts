@@ -9,7 +9,7 @@ import { ethers, provider, signer } from '../tools/ethers';
 
 require('dotenv').config()
 
-let jsonRpcProvider = new ethers.providers.JsonRpcProvider(process.env.KOVAN_RPC_PROVIDER);
+let jsonRpcProvider = new ethers.providers.JsonRpcProvider(process.env.MUMBAI_RPC_PROVIDER);
 
 export const distributedTownContract = () => {
   try {
