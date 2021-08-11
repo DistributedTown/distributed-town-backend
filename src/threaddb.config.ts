@@ -11,11 +11,13 @@ import {
 import {
   GeneralSkillsCollection,
   MessagesCollection,
+  PartnerKeysCollection,
 } from './constants/constants';
 import { injectable } from 'inversify';
 import {
   messagesSchema,
   MessageType,
+  partnersKeySchema,
 } from './models'
 require('dotenv').config()
 
@@ -131,6 +133,14 @@ class ThreadDBInit {
         skillWalletId: 1,
         contactSkillWalletId: 2
       }])
+    }
+
+
+
+    try {
+      await client.getCollectionIndexes(this.ditoThreadID, PartnerKeysCollection);
+    } catch (err) {
+      await client.newCollection(this.ditoThreadID, { name: PartnerKeysCollection, schema: partnersKeySchema });
     }
   }
 

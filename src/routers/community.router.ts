@@ -15,11 +15,14 @@ export class CommunityRouter {
   private init(): void {
     this._router.get("/", this.communityController.get)
     this._router.get("/:address", this.communityController.getByAddress)
+    this._router.get("/key/:key", this.communityController.getCommunityByPartnerAgreementKey);
     this._router.get("/calculateCredits", this.communityController.calculateCredits)
     this._router.get("/:communityAddress/project", this.communityController.getProjects)
     this._router.post("/:communityAddress/project", this.communityController.createProject)
     this._router.post("/projects/:projectId/milestone", this.communityController.createProjectMilestone)
     this._router.get("/projects/:projectId/milestone", this.communityController.getProjectMilestones)
+    this._router.post("/key", this.communityController.postPartnerAgreement)
+
   }
 
   public get router(): Router {
