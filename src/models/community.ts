@@ -1,3 +1,4 @@
+import { SkillsCategory } from "./skillCategory";
 
 
 
@@ -16,4 +17,5 @@ export interface CommunityDetailsView {
 	roles?: [string];
 	template: string;
 	image: string;
+	skills: SkillsCategory;
 }
