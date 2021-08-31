@@ -7,6 +7,7 @@ import threadDBClient from '../threaddb.config';
 import { PartnerKeysCollection } from '../constants/constants';
 import { Where } from '@textile/hub';
 var crypto = require("crypto");
+import * as skillsService from "../services/skills.service";
 
 export async function getCommunities(template: number): Promise<any> {
     const allCommunities = await DistributedTownContracts.getCommunities();
@@ -33,14 +34,21 @@ export async function getCommunities(template: number): Promise<any> {
 export async function getCommunity(address: string): Promise<CommunityDetailsView> {
     const metadataUri = await CommunityContracts.getMetadataUri(address);
     const metadata = await getJSONFromURI(metadataUri);
-
+    let catName = '';
+    switch(metadata.properties.template) {
+        case 'Open-Source & DeFi' : catName = 'DLT & Blockchain'; break;
+        case 'Art & NFTs' : catName = 'Art & Lifestyle'; break;
+        case 'Local & DAOs': catName = 'Local Community'; break;
+    }
+    const skills = await skillsService.getByCategory(catName);
     return {
         name: metadata.title,
         address: address,
         description: metadata.description,
         roles: metadata.properties.roles,
         template: metadata.properties.template,
-        image: metadata.image
+        image: metadata.image,
+        skills: skills
     };
 }
 
