@@ -23,6 +23,15 @@ export class DistributedTownContracts {
     }
   }
 
+  public static async isDiToNativeCommunity(address: string) {
+    try {
+      const contract = distributedTownContract();
+      const isDiToNative = await contract.isDiToNativeCommunity(address);
+      return isDiToNative;
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   // TODO: update
   public static async createCommunity(

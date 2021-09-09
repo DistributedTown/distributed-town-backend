@@ -18,4 +18,5 @@ export interface CommunityDetailsView {
 	template: string;
 	image: string;
 	skills: SkillsCategory;
+	isDiToNativeCommunity: boolean;
 }
