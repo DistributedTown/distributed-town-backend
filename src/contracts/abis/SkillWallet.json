@@ -4,7 +4,18 @@
   "sourceName": "contracts/SkillWallet.sol",
   "abi": [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_linkToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_oracle",
+          "type": "address"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -124,68 +135,9 @@
           "internalType": "uint256",
           "name": "skillWalletId",
           "type": "uint256"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill2",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill3",
-              "type": "tuple"
-            }
-          ],
-          "indexed": false,
-          "internalType": "struct Types.SkillSet",
-          "name": "newSkillSet",
-          "type": "tuple"
         }
       ],
-      "name": "SkillSetUpdated",
+      "name": "PubKeyAddedToSkillWallet",
       "type": "event"
     },
     {
@@ -199,6 +151,25 @@
         }
       ],
       "name": "SkillWalletActivated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "SkillWalletClaimed",
       "type": "event"
     },
     {
@@ -240,65 +211,6 @@
           "internalType": "uint256",
           "name": "skillWalletId",
           "type": "uint256"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill2",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill3",
-              "type": "tuple"
-            }
-          ],
-          "indexed": false,
-          "internalType": "struct Types.SkillSet",
-          "name": "skillSet",
-          "type": "tuple"
         }
       ],
       "name": "SkillWalletCreated",
@@ -380,6 +292,44 @@
       "type": "event"
     },
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "ValidationRequestIdSent",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "skillWalletId",
+          "type": "uint256"
+        }
+      ],
+      "name": "activateSkillWallet",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",
@@ -392,7 +342,7 @@
           "type": "string"
         }
       ],
-      "name": "activateSkillWallet",
+      "name": "addPubKeyToSkillWallet",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -448,14 +398,8 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "skillWalletId",
-          "type": "uint256"
-        }
-      ],
-      "name": "changeCommunity",
+      "inputs": [],
+      "name": "claim",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -468,67 +412,14 @@
           "type": "address"
         },
         {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill2",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill3",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct Types.SkillSet",
-          "name": "skillSet",
-          "type": "tuple"
-        },
-        {
           "internalType": "string",
           "name": "url",
           "type": "string"
+        },
+        {
+          "internalType": "bool",
+          "name": "isClaimable",
+          "type": "bool"
         }
       ],
       "name": "create",
@@ -577,17 +468,17 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "skillWalletId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "skillWalletOwner",
+          "type": "address"
         }
       ],
-      "name": "getCommunityHistory",
+      "name": "getClaimableSkillWalletId",
       "outputs": [
         {
-          "internalType": "address[]",
-          "name": "communities",
-          "type": "address[]"
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -601,65 +492,12 @@
           "type": "uint256"
         }
       ],
-      "name": "getSkillSet",
+      "name": "getCommunityHistory",
       "outputs": [
         {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill2",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill3",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct Types.SkillSet",
-          "name": "skillSet",
-          "type": "tuple"
+          "internalType": "address[]",
+          "name": "communities",
+          "type": "address[]"
         }
       ],
       "stateMutability": "view",
@@ -724,12 +562,50 @@
     {
       "inputs": [
         {
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isRequestIdValid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "uint256",
           "name": "skillWalletId",
           "type": "uint256"
         }
       ],
       "name": "isSkillWalletActivated",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "skillWalletOwner",
+          "type": "address"
+        }
+      ],
+      "name": "isSkillWalletClaimable",
       "outputs": [
         {
           "internalType": "bool",
@@ -770,6 +646,40 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "onERC721Received",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -878,6 +788,25 @@
       "name": "setApprovalForAll",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "skillWalletClaimers",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1045,77 +974,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "skillWalletId",
-          "type": "uint256"
-        },
-        {
-          "components": [
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill1",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill2",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint64",
-                  "name": "displayStringId",
-                  "type": "uint64"
-                },
-                {
-                  "internalType": "uint8",
-                  "name": "level",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct Types.Skill",
-              "name": "skill3",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct Types.SkillSet",
-          "name": "newSkillSet",
-          "type": "tuple"
-        }
-      ],
-      "name": "updateSkillSet",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "string",
           "name": "signature",
           "type": "string"
@@ -1129,6 +987,21 @@
           "internalType": "uint256",
           "name": "action",
           "type": "uint256"
+        },
+        {
+          "internalType": "string[]",
+          "name": "stringParams",
+          "type": "string[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "intParams",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "address[]",
+          "name": "addressParams",
+          "type": "address[]"
         }
       ],
       "name": "validate",
