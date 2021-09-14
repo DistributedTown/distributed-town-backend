@@ -86,4 +86,17 @@ export class CommunityContracts {
       console.log(err);
     }
   }
+
+  
+  public static async getGigsConntractAddress(
+    address: string
+  ) {
+    try {
+      const contract = communityContract(address);
+      const gigsAddr = await contract.gigsAddr();
+      return gigsAddr;
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }

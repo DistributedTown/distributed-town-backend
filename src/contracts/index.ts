@@ -2,10 +2,10 @@ import distributedTown from './abis/DistributedTown.json';
 import community from './abis/Community.json';
 import skillWallet from './abis/SkillWallet.json';
 import project from './abis/Project.json';
+import gigs from './abis/Gigs.json';
 import milestones from './abis/Milestones.json';
-
-import { ethers, provider, signer } from '../tools/ethers';
-// import { Biconomy } from "@biconomy/mexa";
+import { CommunityContracts } from './community.contracts';
+import { ethers, signer } from '../tools/ethers';
 
 require('dotenv').config()
 
@@ -55,6 +55,21 @@ export const projectsContract = () => {
     let contract = new ethers.Contract(
       process.env.PROJECTS_ADDRESS,
       project.abi,
+      signer,
+    );
+    return contract;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+export const gigsContract = async (communityAddress) => {
+  try {
+    const gigsAddr = await CommunityContracts.getGigsConntractAddress(communityAddress)
+    let contract = new ethers.Contract(
+      gigsAddr,
+      gigs.abi,
       signer,
     );
     return contract;

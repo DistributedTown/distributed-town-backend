@@ -7,6 +7,7 @@ export * from './qrCodeAuth';
 export * from './messages';
 export * from './milestone';
 export * from './key';
+export * from './gig';
 
 export const skillNames = [
     //Local
