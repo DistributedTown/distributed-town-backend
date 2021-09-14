@@ -130,5 +130,17 @@ export class CommunityController {
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
   }
+
+
+  public getGigs = async (req: any, res: Response) => {
+    try {
+      const gigs = await services.getGigs(req.params.communityAddress);
+      res.status(201).send({ gigs });
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
 }
 

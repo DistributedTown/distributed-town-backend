@@ -36,7 +36,6 @@
     "helmet": "^3.20.0",
     "inversify": "^5.0.1",
     "passport": "0.4.1",
-    "passport-web3": "0.1.7",
     "prom-client": "^11.1.2",
     "reflect-metadata": "^0.1.13",
     "swagger-jsdoc": "1.9.6",
