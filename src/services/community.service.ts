@@ -9,7 +9,7 @@ import { Where } from '@textile/hub';
 var crypto = require("crypto");
 import * as skillsService from "../services/skills.service";
 
-export async function getCommunities(template: number): Promise<any> {
+export async function getCommunities(template: number): Promise<CommunityListView[]> {
     const allCommunities = await DistributedTownContracts.getCommunities();
 
     const result: CommunityListView[] = [];
@@ -23,13 +23,16 @@ export async function getCommunities(template: number): Promise<any> {
         const metadata = await getJSONFromURI(metadataUri);
         const members = await CommunityContracts.getMembersCount(community);
         const scarcityScore = 0;
+        // const totalMembersAllowed = await CommunityContracts.totalMembersAllowed(community);
 
         result.push({
             name: metadata.title,
             members,
             scarcityScore,
             address: community,
-            description: metadata.description
+            description: metadata.description,
+            image: metadata.image,
+            totalMembersAllowed: 24
         });
     }
     return result;

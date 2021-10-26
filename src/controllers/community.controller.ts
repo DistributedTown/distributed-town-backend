@@ -4,7 +4,6 @@ import { injectable } from "inversify";
 import { Skill, skillNames } from "../models";
 import { ProjectsContracts } from "../contracts/projects.contract";
 
-
 @injectable()
 export class CommunityController {
   constructor(
