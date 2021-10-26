@@ -8,6 +8,8 @@ export interface CommunityListView {
 	scarcityScore: number;
 	address: string;
 	description: string;
+	image: string;
+	totalMembersAllowed: number;
 }
 
 export interface CommunityDetailsView {
