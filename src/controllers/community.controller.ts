@@ -93,6 +93,7 @@ export class CommunityController {
       const key = await services.getKey(req.params.key);
       if(key){
         const com = await services.getCommunity(key.communityAddress);
+        com.partnersAgreementAddress = key.partnersAgreementAddress;
         res.status(200).send(com);
       } else 
         res.status(400).send({ error: 'Invalid key!'});

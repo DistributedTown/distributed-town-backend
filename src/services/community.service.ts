@@ -58,7 +58,8 @@ export async function getCommunity(address: string): Promise<CommunityDetailsVie
         template: metadata.properties.template,
         image: metadata.image,
         skills: skills,
-        isDiToNativeCommunity: isDiToNative
+        isDiToNativeCommunity: isDiToNative,
+        partnersAgreementAddress: undefined
     };
 }
 

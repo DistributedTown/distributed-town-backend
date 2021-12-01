@@ -21,4 +21,5 @@ export interface CommunityDetailsView {
 	image: string;
 	skills: SkillsCategory;
 	isDiToNativeCommunity: boolean;
+	partnersAgreementAddress: string;
 }
