@@ -16,6 +16,7 @@ export class CommunityRouter {
     this._router.get("/", this.communityController.get)
     this._router.get("/:address", this.communityController.getByAddress)
     this._router.get("/key/:key", this.communityController.getCommunityByPartnerAgreementKey);
+    this._router.get("/:communityAddress/key", this.communityController.getPAByCommunity);
     this._router.get("/calculateCredits", this.communityController.calculateCredits)
     this._router.get("/:communityAddress/project", this.communityController.getProjects)
     this._router.post("/:communityAddress/project", this.communityController.createProject)

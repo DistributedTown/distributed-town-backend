@@ -94,6 +94,18 @@ export async function getKey(key: string): Promise<PartnerKey> {
         return undefined;
 }
 
+
+
+export async function getPAByCommunity(communityAddress: string): Promise<PartnerKey> {
+    const query = new Where('communityAddress').eq(communityAddress);
+
+    const partnerKey = await threadDBClient.filter(PartnerKeysCollection, query) as PartnerKey[];
+    if (partnerKey && partnerKey.length > 0)
+        return partnerKey[0];
+    else
+        return undefined;
+}
+
 async function calculateScarcityStore(address: string): Promise<number> {
     const members = await CommunityContracts.getMembersCount(address);
     const skillWalletIds = await CommunityContracts.getMembersSkillWalletIds(address);

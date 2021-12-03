@@ -103,6 +103,19 @@ export class CommunityController {
     }
   }
 
+  public getPAByCommunity = async  (req: any, res: Response) => {
+    try {
+      const key = await services.getPAByCommunity(req.params.communityAddress);
+      if(key){
+        res.status(200).send(key);
+      } else 
+        res.status(400).send({ error: 'Invalid key!'});
+    } catch (err) {
+      this.loggerService.error(err);
+      res.status(500).send({ error: "Something went wrong, please try again later." });
+    }
+  }
+
   public calculateCredits = async (req: any, res: any) => {
     try {
       console.log(req.query.skill1ID);
