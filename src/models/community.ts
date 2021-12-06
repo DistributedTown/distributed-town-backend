@@ -16,7 +16,7 @@ export interface CommunityDetailsView {
 	name: string;
 	address: string;
 	description: string;
-	roles?: [string];
+	roles?: [any];
 	template: string;
 	image: string;
 	skills: SkillsCategory;

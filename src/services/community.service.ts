@@ -54,7 +54,7 @@ export async function getCommunity(address: string): Promise<CommunityDetailsVie
         name: metadata.title,
         address: address,
         description: metadata.description,
-        roles: metadata.properties.roles,
+        roles: metadata.skills,
         template: metadata.properties.template,
         image: metadata.image,
         skills: skills,
