@@ -5,9 +5,7 @@ import { injectable } from "inversify";
 import {
   SkillsRouter,
   CommunityRouter,
-  SwaggerRouter,
 } from "./routers";
-const session = require("express-session");
 const cookieParser = require("cookie-parser");
 var cors = require('cors');
 require('dotenv').config()
@@ -42,18 +40,6 @@ export class App {
 
     this._app.use(cookieParser());
 
-    this._app.use(
-      session({
-        secret: "not my cat's name",
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-          maxAge: 60 * 60 * 1000, // 1 hour
-          // secure: true, // Uncomment this line to enforce HTTPS protocol.
-          sameSite: true
-        }
-      })
-    );
 
     this._app.use(cors());
     //Initialize app routes
@@ -62,7 +48,6 @@ export class App {
   }
 
   private _initRoutes() {
-    // this._app.use("/api/docs", this.swaggerRouter.router);
     this._app.use("/api/skill", this.skillsRouter.router);
     this._app.use("/api/community", this.communityRouter.router);
   }

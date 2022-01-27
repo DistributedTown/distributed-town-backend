@@ -11,30 +11,6 @@ export class SkillsController {
   ) {
   }
 
-  /**
-   * @swagger
-   * /skill:
-   *  get:
-   *      description: Gets all predefined skills from the database
-   *      tags:
-   *          - Skills
-   *      parameters:
-   *          - in: query
-   *            name: skill
-   *            type: string
-   *            required: false
-   *          - in: query
-   *            name: category
-   *            type: string
-   *            required: false
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          200:
-   *              description: OK
-   *          500:
-   *              description: Server error
-   */
   public get = async (req: any, res: Response) => {
     try {
       const skillName = req.query.skill;
@@ -57,30 +33,6 @@ export class SkillsController {
 
 
 
-  /**
-   * @swagger
-   * /skill:
-   *  get:
-   *      description: Gets all predefined skills from the database
-   *      tags:
-   *          - Skills
-   *      parameters:
-   *          - in: query
-   *            name: skill
-   *            type: string
-   *            required: false
-   *          - in: query
-   *            name: category
-   *            type: string
-   *            required: false
-   *      produces:
-   *          - application/json
-   *      responses:
-   *          200:
-   *              description: OK
-   *          500:
-   *              description: Server error
-   */
   public getNames = async (req: any, res: Response) => {
     try {
       res.status(200).send(skillNames);
