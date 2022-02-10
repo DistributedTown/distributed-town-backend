@@ -1,9 +1,7 @@
 import distributedTown from './abis/DistributedTown.json';
 import community from './abis/Community.json';
 import skillWallet from './abis/SkillWallet.json';
-import project from './abis/Project.json';
 import gigs from './abis/Gigs.json';
-import milestones from './abis/Milestones.json';
 import { CommunityContracts } from './community.contracts';
 import { ethers, signer } from '../tools/ethers';
 
@@ -49,21 +47,6 @@ export const communityContract = (address) => {
   }
 };
 
-
-export const projectsContract = () => {
-  try {
-    let contract = new ethers.Contract(
-      process.env.PROJECTS_ADDRESS,
-      project.abi,
-      signer,
-    );
-    return contract;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-
 export const gigsContract = async (communityAddress) => {
   try {
     const gigsAddr = await CommunityContracts.getGigsConntractAddress(communityAddress)
@@ -78,18 +61,6 @@ export const gigsContract = async (communityAddress) => {
   }
 };
 
-export const milestonesContract = (milestonesAddress: string) => {
-  try {
-    let contract = new ethers.Contract(
-      milestonesAddress,
-      milestones.abi,
-      signer,
-    );
-    return contract;
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 
 

@@ -2,7 +2,6 @@ import * as services from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
 import { Skill, skillNames } from "../models";
-import { ProjectsContracts } from "../contracts/projects.contract";
 
 @injectable()
 export class CommunityController {
@@ -32,46 +31,6 @@ export class CommunityController {
       } else {
         res.status(400).send({ error: "Pass community address." })
       }
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public getProjects = async (req: any, res: Response) => {
-    try {
-      const projects = await services.getProjectsPerCommunity(req.params.communityAddress);
-      res.status(200).send(projects);
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public createProject = async (req: any, res: Response) => {
-    try {
-      const projectId = await ProjectsContracts.createProject(req.body.url, req.body.communityAddress, req.body.creator);
-      res.status(201).send({ projectId });
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public createProjectMilestone = async (req: any, res: Response) => {
-    try {
-      const milestoneId = await services.createMilestone(req.body.skillWalletId, req.params.projectId, req.body.url, req.body.ditoCredits);
-      res.status(201).send({ milestoneId });
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public getProjectMilestones = async (req: any, res: Response) => {
-    try {
-      const milestones = await services.getMilestones(req.params.projectId);
-      res.status(201).send({ milestones });
     } catch (err) {
       this.loggerService.error(err);
       res.status(500).send({ error: "Something went wrong, please try again later." });

@@ -2,7 +2,7 @@ import { CommunityDetailsView, CommunityListView, PartnerKey, partnersKeySchema,
 import { CommunityContracts } from '../contracts/community.contracts';
 import { DistributedTownContracts } from '../contracts/distributedTown.contracts';
 import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
-import { getJSONFromURI } from '../utils/helpers';
+import { getJSONFromURI, ipfsCIDToHttpUrl } from '../utils/helpers';
 import threadDBClient from '../threaddb.config';
 import { PartnerKeysCollection } from '../constants/constants';
 import { Where } from '@textile/hub';
@@ -15,11 +15,12 @@ export async function getCommunities(template: number): Promise<CommunityListVie
     const result: CommunityListView[] = [];
     for (let community of allCommunities) {
         const isDiToNative = await DistributedTownContracts.isDiToNativeCommunity(community);
-        
-        if(!isDiToNative)
+
+        if (!isDiToNative)
             continue;
 
-        const metadataUri = await CommunityContracts.getMetadataUri(community);
+        const metadataUriCID = await CommunityContracts.getMetadataUri(community);
+        const metadataUri = ipfsCIDToHttpUrl(metadataUriCID, true);
         const metadata = await getJSONFromURI(metadataUri);
         const members = await CommunityContracts.getMembersCount(community);
         const scarcityScore = 0;
@@ -31,7 +32,7 @@ export async function getCommunities(template: number): Promise<CommunityListVie
             scarcityScore,
             address: community,
             description: metadata.description,
-            image: metadata.image,
+            image: ipfsCIDToHttpUrl(metadata.image, false),
             totalMembersAllowed: 24
         });
     }
@@ -39,14 +40,15 @@ export async function getCommunities(template: number): Promise<CommunityListVie
 }
 
 export async function getCommunity(address: string): Promise<CommunityDetailsView> {
-    const metadataUri = await CommunityContracts.getMetadataUri(address);
+    const metadataUriCID = await CommunityContracts.getMetadataUri(address);
+    const metadataUri = ipfsCIDToHttpUrl(metadataUriCID, true);
     const metadata = await getJSONFromURI(metadataUri);
     const isDiToNative = await DistributedTownContracts.isDiToNativeCommunity(address);
 
     let catName = '';
-    switch(metadata.properties.template) {
-        case 'Open-Source & DeFi' : catName = 'DLT & Blockchain'; break;
-        case 'Art & NFTs' : catName = 'Art & Lifestyle'; break;
+    switch (metadata.properties.template) {
+        case 'Open-Source & DeFi': catName = 'DLT & Blockchain'; break;
+        case 'Art & NFTs': catName = 'Art & Lifestyle'; break;
         case 'Local & DAOs': catName = 'Local Community'; break;
     }
     const skills = await skillsService.getByCategory(catName);
@@ -56,7 +58,7 @@ export async function getCommunity(address: string): Promise<CommunityDetailsVie
         description: metadata.description,
         roles: metadata.skills,
         template: metadata.properties.template,
-        image: metadata.image,
+        image: ipfsCIDToHttpUrl(metadata.image, false),
         skills: skills,
         isDiToNativeCommunity: isDiToNative,
         partnersAgreementAddress: undefined
@@ -104,31 +106,4 @@ export async function getPAByCommunity(communityAddress: string): Promise<Partne
         return partnerKey[0];
     else
         return undefined;
-}
-
-async function calculateScarcityStore(address: string): Promise<number> {
-    const members = await CommunityContracts.getMembersCount(address);
-    const skillWalletIds = await CommunityContracts.getMembersSkillWalletIds(address);
-    const uniqueSkills = [];
-    let totalSkills: number = 0;
-
-    skillWalletIds.forEach(async tokenId => {
-        const skills = await SkillWalletContracts.getSkills(tokenId);
-        if (!uniqueSkills.includes(skills.skill1.displayStringId))
-            uniqueSkills.push(skills.skill1.displayStringId);
-        totalSkills++;
-        if (skills.skill2) {
-            if (!uniqueSkills.includes(skills.skill2.displayStringId))
-                uniqueSkills.push(skills.skill2.displayStringId);
-            totalSkills++;
-        }
-        if (skills.skill3) {
-            if (!uniqueSkills.includes(skills.skill3.displayStringId))
-                uniqueSkills.push(skills.skill3.displayStringId);
-            totalSkills++;
-        }
-    });
-    const uniqueSkillsCount = uniqueSkills.length;
-    const vc = (uniqueSkillsCount / totalSkills) * (members / 2);
-    return vc * 100;
 }
