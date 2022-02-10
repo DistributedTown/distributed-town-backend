@@ -1,5 +1,5 @@
 import { Gig } from '../models';
-import { getJSONFromURI } from '../utils/helpers';
+import { getJSONFromURI, ipfsCIDToHttpUrl } from '../utils/helpers';
 import { GigsContracts } from '../contracts/gigs.contract';
 import  {ethers } from 'ethers';
 export async function getGigs(communityAddress: string): Promise<Gig[]> {
@@ -7,10 +7,11 @@ export async function getGigs(communityAddress: string): Promise<Gig[]> {
     let getNextGig = true;
     const gigs = [];
     while (getNextGig) {
-        const tokenUri = await GigsContracts.getTokenURI(communityAddress, gigID.toString());
-        if (!tokenUri) {
+        const tokenCID = await GigsContracts.getTokenURI(communityAddress, gigID.toString());
+        if (!tokenCID) {
             getNextGig = false;
         } else {
+            const tokenUri = ipfsCIDToHttpUrl(tokenCID, false);
             const jsonMetadata = await getJSONFromURI(tokenUri)
             const gigDetails = await GigsContracts.getGig(communityAddress, gigID.toString());
 
