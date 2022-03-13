@@ -23,7 +23,7 @@ require('dotenv').config()
 
 
 const ditoThreadID = process.env.DITO_THREADID;
-const ditoPrivKey = process.env.DITO_PRIVATE_KEY;
+
 const keyInfo = {
   key: process.env.TEXTILE_KEY,
   secret: process.env.TEXTILE_SECRET
@@ -43,9 +43,7 @@ class ThreadDBInit {
   async initialize() {
 
     const auth = await this.auth(keyInfo);
-    const client = Client.withUserAuth(auth);
-    const identity = await PrivateKey.fromString(ditoPrivKey);
-    await client.getToken(identity)
+    const client = await Client.withKeyInfo(auth)
     this.ditoThreadID = ThreadID.fromString(ditoThreadID);
 
     try {
@@ -153,86 +151,61 @@ class ThreadDBInit {
     return userAuth
   }
 
-  public async getAll(collectionName: string, privKey?: string, threadID?: string) {
+  public async getAll(collectionName: string, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
 
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
 
-    const identity = await PrivateKey.fromString(privKey)
-    await client.getToken(identity)
     return await client.find(thread, collectionName, {});
   }
 
-  public async getByID(collectionName: string, id: string, privKey?: string, threadID?: string) {
+  public async getByID(collectionName: string, id: string, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
-
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
-
-    const identity = await PrivateKey.fromString(privKey)
-    await client.getToken(identity)
     return await client.findByID(thread, collectionName, id);
   }
 
-  public async filter(collectionName: string, filter: QueryJSON, privKey?: string, threadID?: string) {
+  public async filter(collectionName: string, filter: QueryJSON, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
-    const identity = await PrivateKey.fromString(privKey);
-    await client.getToken(identity)
     const toReturn = await client.find(thread, collectionName, filter);
     return toReturn;
   }
 
-  public async delete(collectionName: string, filter: QueryJSON, privKey?: string, threadID?: string) {
+  public async delete(collectionName: string, filter: QueryJSON, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
-    const identity = await PrivateKey.fromString(privKey);
-    await client.getToken(identity)
     const toDelete = (await client.find(thread, collectionName, {})).map(item => (item as any)._id);
     await client.delete(thread, collectionName, toDelete);
     return toDelete;
   }
 
-  public async insert(collectionName: string, model: any, privKey?: string, threadID?: string) {
+  public async insert(collectionName: string, model: any, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
 
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
 
-    const identity = await PrivateKey.fromString(privKey)
-    await client.getToken(identity)
     return await client.create(thread, collectionName, [model]);
   }
 
-  public async save(collectionName: string, values: any[], privKey?: string, threadID?: string) {
+  public async save(collectionName: string, values: any[], threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
 
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
-
-    const identity = await PrivateKey.fromString(privKey)
-    await client.getToken(identity)
     return await client.save(thread, collectionName, values);
   }
 
-  public async update(collectionName: string, id: string, model: any, privKey?: string, threadID?: string) {
+  public async update(collectionName: string, id: string, model: any, threadID?: string) {
     const auth = await this.auth(keyInfo);
     const client = Client.withUserAuth(auth);
 
-    privKey = privKey ? privKey : ditoPrivKey;
     const thread = threadID ? ThreadID.fromString(threadID) : this.ditoThreadID;
-
-    const identity = await PrivateKey.fromString(privKey)
-    await client.getToken(identity)
     let toUpdate = await client.findByID(thread, collectionName, id);
     toUpdate = model;
     client.save(thread, collectionName, [toUpdate]);
