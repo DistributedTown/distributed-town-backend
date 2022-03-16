@@ -1,10 +1,3 @@
-export interface PartnerKey { 
-    key: string; 
-    communityAddress: string;
-    partnersAgreementAddress: string;
-}
-
-
 export const partnersKeySchema = {
 	"definitions": {},
 	"$schema": "http://json-schema.org/draft-07/schema#", 
