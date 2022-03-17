@@ -1,7 +1,6 @@
 import * as services from "../services";
 import { Response } from "express";
 import { injectable } from "inversify";
-import { Skill, skillNames } from "../models";
 
 @injectable()
 export class CommunityController {
@@ -36,73 +35,6 @@ export class CommunityController {
       res.status(500).send({ error: "Something went wrong, please try again later." });
     }
   }
-
-  public postPartnerAgreement = async  (req: any, res: Response) => {
-    try {
-      const key = await services.createPartnerAgreementKey(req.body.partnersAgreementAddress, req.body.communityAddress);
-      res.status(201).send({ key });
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public getCommunityByPartnerAgreementKey = async  (req: any, res: Response) => {
-    try {
-      const key = await services.getKey(req.params.key);
-      if(key){
-        const com = await services.getCommunity(key.communityAddress);
-        com.partnersAgreementAddress = key.partnersAgreementAddress;
-        res.status(200).send(com);
-      } else 
-        res.status(400).send({ error: 'Invalid key!'});
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public getPAByCommunity = async  (req: any, res: Response) => {
-    try {
-      const key = await services.getPAByCommunity(req.params.communityAddress);
-      if(key){
-        res.status(200).send(key);
-      } else 
-        res.status(400).send({ error: 'Invalid key!'});
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
-  public calculateCredits = async (req: any, res: any) => {
-    try {
-      console.log(req.query.skill1ID);
-      console.log(skillNames[req.query.skill1ID]);
-      const skillModel: Skill[] = [
-        {
-          name: skillNames[req.query.skill1ID],
-          value: req.query.lvl1
-        },
-        {
-          name: skillNames[req.query.skill2ID],
-          value: req.query.lvl2
-
-        },
-        {
-          name: skillNames[req.query.skill3ID],
-          value: req.query.lvl3
-
-        },
-      ]
-      const credits = await services.calculateInitialCreditsAmount(skillModel);
-      res.status(200).send({ credits });
-    } catch (err) {
-      this.loggerService.error(err);
-      res.status(500).send({ error: "Something went wrong, please try again later." });
-    }
-  }
-
 
   public getGigs = async (req: any, res: Response) => {
     try {
