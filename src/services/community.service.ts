@@ -1,7 +1,12 @@
-import { CommunityDetailsView, CommunityListView } from '../models';
+import { CommunityDetailsView, CommunityListView, PartnerKey, partnersKeySchema, skillNames, SkillSet } from '../models';
 import { CommunityContracts } from '../contracts/community.contracts';
 import { DistributedTownContracts } from '../contracts/distributedTown.contracts';
+import { SkillWalletContracts } from '../contracts/skillWallet.contracts';
 import { getJSONFromURI, ipfsCIDToHttpUrl } from '../utils/helpers';
+import threadDBClient from '../threaddb.config';
+import { PartnerKeysCollection } from '../constants/constants';
+import { Where } from '@textile/hub';
+var crypto = require("crypto");
 import * as skillsService from "../services/skills.service";
 
 export async function getCommunities(template: number): Promise<CommunityListView[]> {
@@ -69,4 +74,36 @@ function generateKey() {
             charactersLength));
     }
     return result;
+}
+
+export async function createPartnerAgreementKey(partnersAgreementAddress: string, communityAddress: string): Promise<string> {
+    const key: PartnerKey = {
+        key: crypto.randomBytes(20).toString('hex'),
+        partnersAgreementAddress,
+        communityAddress
+    }
+    await threadDBClient.insert(PartnerKeysCollection, key);
+    return key.key;
+}
+
+export async function getKey(key: string): Promise<PartnerKey> {
+    const query = new Where('key').eq(key);
+
+    const partnerKey = await threadDBClient.filter(PartnerKeysCollection, query) as PartnerKey[];
+    if (partnerKey && partnerKey.length > 0)
+        return partnerKey[0];
+    else
+        return undefined;
+}
+
+
+
+export async function getPAByCommunity(communityAddress: string): Promise<PartnerKey> {
+    const query = new Where('communityAddress').eq(communityAddress);
+
+    const partnerKey = await threadDBClient.filter(PartnerKeysCollection, query) as PartnerKey[];
+    if (partnerKey && partnerKey.length > 0)
+        return partnerKey[0];
+    else
+        return undefined;
 }
