@@ -6,7 +6,7 @@ export async function getJSONFromURI(uri: string) {
 }
 
 export function ipfsCIDToHttpUrl(url: string, isJson: boolean) {
-    if (!url.includes('textile'))
-      return isJson ? `https://ipfs.io/ipfs/${url.replace('ipfs://', '')}/metadata.json` : `https://ipfs.io/ipfs/${url.replace('ipfs://', '')}`;
+    if (!url.includes('https://'))
+      return isJson ? `https://hub.textile.io/${url.replace('ipfs://', '')}/metadata.json` : `https://hub.textile.io/${url.replace('ipfs://', '')}`;
     else return url;
   }
