@@ -47,6 +47,7 @@ export async function getCommunity(address: string): Promise<CommunityDetailsVie
         case 'Local & DAOs': catName = 'Local Community'; break;
     }
     const skills = await skillsService.getByCategory(catName);
+    console.log(metadata.image);
     return {
         name: metadata.title,
         address: address,
